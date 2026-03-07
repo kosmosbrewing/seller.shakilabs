@@ -258,6 +258,39 @@
     @apply inline-flex items-center text-caption font-medium text-muted-foreground;
   }
 
+  .compare-cell {
+    @apply rounded-lg px-1 py-0.5;
+  }
+
+  .compare-cell-highlight {
+    @apply bg-emerald-50/70 dark:bg-emerald-950/15;
+  }
+
+  .compare-cell-caution {
+    @apply bg-orange-50/70 dark:bg-orange-950/15;
+  }
+
+  .compare-cell-value {
+    @apply text-[12px] font-semibold leading-[1.5] text-foreground;
+    word-break: keep-all;
+  }
+
+  .compare-tooltip-trigger {
+    @apply inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary focus-visible:text-primary;
+  }
+
+  .compare-tooltip-panel {
+    @apply pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-lg border border-border/70 bg-popover px-3 py-2 text-[11px] leading-4 text-popover-foreground opacity-0 shadow-lg transition-all duration-150 group-hover:translate-y-1 group-hover:opacity-100 group-focus-within:translate-y-1 group-focus-within:opacity-100;
+  }
+
+  .compare-tooltip-title {
+    @apply text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground;
+  }
+
+  .compare-tooltip-condition {
+    @apply mt-2 border-t border-border/60 pt-2 text-[10px] font-medium leading-4 text-amber-800 dark:text-amber-200;
+  }
+
   .retro-stat-grid {
     @apply grid grid-cols-2 gap-2 sm:grid-cols-4;
   }

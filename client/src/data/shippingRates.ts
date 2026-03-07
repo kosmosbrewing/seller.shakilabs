@@ -63,16 +63,11 @@ export interface ShippingEstimateResult {
   unavailableReason?: string;
 }
 
-export interface RemoteAreaPostalCodeReferenceEntry {
-  area: string;
-  postalRange: string;
-  note?: string;
-}
-
 export interface RemoteAreaPostalCodeSummaryCluster {
   zone: string;
   areas: string;
   postalRanges: string[];
+  variant?: "main" | "exception" | "conflict";
   note?: string;
 }
 
@@ -106,65 +101,154 @@ export const REMOTE_AREA_POSTAL_CODE_SUMMARY: RemoteAreaPostalCodeSummaryGroup[]
     group: "제주",
     clusters: [
       {
-        zone: "제주도 전역",
+        zone: "제주 본섬",
         areas: "제주시·서귀포시",
-        postalRanges: ["63000-63644"],
+        postalRanges: ["63002-63644"],
+        variant: "main",
+      },
+      {
+        zone: "추자면 예외",
+        areas: "제주 섬지역",
+        postalRanges: ["63000-63001"],
+        variant: "exception",
+        note: "여수시 공개 목록은 제주 섬지역으로 별도 분리",
+      },
+      {
+        zone: "우도 예외",
+        areas: "우도면",
+        postalRanges: ["63365"],
+        variant: "exception",
+        note: "일부 상업몰 공지에서만 별도 표기",
+      },
+    ],
+  },
+  {
+    group: "경기",
+    clusters: [
+      {
+        zone: "풍도 예외",
+        areas: "안산시 단원구 풍도동",
+        postalRanges: ["15654"],
+        variant: "exception",
+        note: "여수시 공개 목록 포함",
       },
     ],
   },
   {
     group: "인천",
     clusters: [
-      { zone: "중구 섬권역", areas: "중구 섬지역", postalRanges: ["22386-22388"] },
-      { zone: "강화 섬권역", areas: "강화 섬지역", postalRanges: ["23004-23010"] },
-      { zone: "옹진 섬권역", areas: "옹진 섬지역", postalRanges: ["23100-23116", "23124-23136"] },
+      {
+        zone: "중구 섬권역",
+        areas: "중구 섬지역",
+        postalRanges: ["22386-22388"],
+        variant: "main",
+        note: "상업몰 공지 다수 일치, 여수시 목록 일부 미노출",
+      },
+      {
+        zone: "강화 섬권역",
+        areas: "강화 섬지역",
+        postalRanges: ["23008-23010"],
+        variant: "conflict",
+        note: "여수시 23008-23010 / 상업몰 공지 다수 23004-23010",
+      },
+      {
+        zone: "옹진 섬권역",
+        areas: "옹진 섬지역",
+        postalRanges: ["23100-23116", "23124-23136"],
+        variant: "main",
+      },
     ],
   },
   {
     group: "충남",
     clusters: [
-      { zone: "충남 서해안 섬권역", areas: "당진·태안·보령", postalRanges: ["31708", "32133", "33411"] },
+      {
+        zone: "충남 서해안 섬권역",
+        areas: "당진·태안·보령",
+        postalRanges: ["31708", "32133", "33411"],
+        variant: "main",
+      },
     ],
   },
   {
     group: "경북",
     clusters: [
-      { zone: "울릉도 전역", areas: "울릉군", postalRanges: ["40200-40240"] },
+      { zone: "울릉도 전역", areas: "울릉군", postalRanges: ["40200-40240"], variant: "main" },
     ],
   },
   {
     group: "부산",
     clusters: [
-      { zone: "강서구 섬권역", areas: "강서구 섬지역", postalRanges: ["46768-46771"] },
+      { zone: "강서구 섬권역", areas: "강서구 섬지역", postalRanges: ["46768-46771"], variant: "main" },
     ],
   },
   {
     group: "경남",
     clusters: [
-      { zone: "사천 섬권역", areas: "사천 섬지역", postalRanges: ["52570-52571"] },
-      { zone: "통영 섬권역", areas: "통영 섬지역", postalRanges: ["53031-53033", "53089-53104", "54000"] },
+      { zone: "사천 섬권역", areas: "사천 섬지역", postalRanges: ["52570-52571"], variant: "main" },
+      {
+        zone: "통영 섬권역",
+        areas: "통영 섬지역",
+        postalRanges: ["53031-53033", "53088-53104"],
+        variant: "conflict",
+        note: "여수시 53088-53104 / 상업몰 공지 다수 53089-53104",
+      },
     ],
   },
   {
     group: "전북",
     clusters: [
-      { zone: "부안 섬권역", areas: "부안 섬지역", postalRanges: ["56347-56349"] },
+      {
+        zone: "군산 옥도면 예외",
+        areas: "군산시 옥도면",
+        postalRanges: ["54000"],
+        variant: "exception",
+        note: "여수시 공개 목록 기준, 기존 통영 분류와 상충",
+      },
+      { zone: "부안 섬권역", areas: "부안 섬지역", postalRanges: ["56347-56349"], variant: "main" },
     ],
   },
   {
     group: "전남",
     clusters: [
-      { zone: "영광 섬권역", areas: "영광 섬지역", postalRanges: ["57068-57069"] },
-      { zone: "목포 섬권역", areas: "목포 섬지역", postalRanges: ["58760-58762"] },
+      { zone: "영광 섬권역", areas: "영광 섬지역", postalRanges: ["57068-57069"], variant: "main" },
+      {
+        zone: "목포 섬권역",
+        areas: "목포 섬지역",
+        postalRanges: ["58760-58761"],
+        variant: "conflict",
+        note: "여수시 58760-58761 / 상업몰 공지 일부 58762 포함",
+      },
       {
         zone: "신안 섬권역",
         areas: "신안 섬지역",
-        postalRanges: ["58800-58810", "58816-58818", "28826", "58828-58866"],
-        note: "단일 번호 28826은 별도 확인 권장",
+        postalRanges: ["58800-58804", "58809-58810", "58816-58818", "58826", "58832", "58839-58841", "58843-58866"],
+        variant: "conflict",
+        note: "여수시는 세부 분리, 상업몰 공지 다수는 더 넓은 묶음 사용",
       },
-      { zone: "진도 섬권역", areas: "진도 섬지역", postalRanges: ["58953-58958"] },
-      { zone: "완도 섬권역", areas: "완도 섬지역", postalRanges: ["59102-59103", "59106", "59127", "59129", "59137-59166"] },
-      { zone: "여수 섬권역", areas: "여수시 섬지역", postalRanges: ["59650", "59766", "59781-59790"] },
+      { zone: "진도 섬권역", areas: "진도 섬지역", postalRanges: ["58953-58958"], variant: "main" },
+      {
+        zone: "완도 섬권역",
+        areas: "완도 섬지역",
+        postalRanges: ["59102-59103", "59127", "59137-59145", "59149-59170"],
+        variant: "conflict",
+        note: "여수시는 세부 분리, 상업몰 공지 일부는 59106·59129·59137-59166으로 단순화",
+      },
+      {
+        zone: "보성 예외",
+        areas: "보성군 벌교읍 섬지역",
+        postalRanges: ["59421"],
+        variant: "exception",
+        note: "여수시 공개 목록 포함",
+      },
+      {
+        zone: "고흥 예외",
+        areas: "고흥군 섬지역",
+        postalRanges: ["59531", "59551", "59563", "59568"],
+        variant: "exception",
+        note: "여수시 공개 목록 포함",
+      },
+      { zone: "여수 섬권역", areas: "여수시 섬지역", postalRanges: ["59650", "59766", "59781-59790"], variant: "main" },
     ],
   },
 ];

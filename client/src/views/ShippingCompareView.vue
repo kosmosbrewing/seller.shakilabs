@@ -78,6 +78,18 @@ const remoteAreaPostalCodeCount = computed(() =>
     0
   )
 );
+const remoteAreaExceptionCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
+    (sum, group) => sum + group.clusters.filter((cluster) => cluster.variant === "exception").length,
+    0
+  )
+);
+const remoteAreaConflictCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
+    (sum, group) => sum + group.clusters.filter((cluster) => cluster.variant === "conflict").length,
+    0
+  )
+);
 
 const jsonLd = computed(() => [
   {
@@ -184,6 +196,22 @@ function getPostalRangeKinds(ranges: string[]): string {
 
 function formatPostalRanges(ranges: string[]): string {
   return ranges.join(", ");
+}
+
+function getClusterVariantLabel(variant?: "main" | "exception" | "conflict"): string {
+  if (variant === "exception") return "예외 구간";
+  if (variant === "conflict") return "교차검증 상충";
+  return "대표 묶음";
+}
+
+function getClusterVariantClass(variant?: "main" | "exception" | "conflict"): string {
+  if (variant === "exception") {
+    return "border-sky-300/70 bg-sky-50 text-sky-700 dark:border-sky-400/35 dark:bg-sky-950/20 dark:text-sky-200";
+  }
+  if (variant === "conflict") {
+    return "border-amber-300/70 bg-amber-50 text-amber-700 dark:border-amber-400/35 dark:bg-amber-950/20 dark:text-amber-200";
+  }
+  return "border-emerald-300/70 bg-emerald-50 text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-200";
 }
 </script>
 
@@ -465,7 +493,7 @@ function formatPostalRanges(ranges: string[]): string {
         <div class="retro-titlebar rounded-t-2xl">
           <div class="flex flex-col gap-1">
             <span class="retro-title">제주·도서산간 우편번호 정리표</span>
-            <p class="text-tiny text-muted-foreground">세부 구간을 섬권역 단위로 묶어 다시 정리한 내부 참고표입니다.</p>
+            <p class="text-tiny text-muted-foreground">여수시 공개 목록을 우선 기준으로 삼고, 상업몰 공개 공지를 보조 기준으로 교차 정리한 탐색용 참고표입니다.</p>
           </div>
         </div>
 
@@ -473,6 +501,8 @@ function formatPostalRanges(ranges: string[]): string {
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaGroupCount }}개 권역</span>
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaClusterCount }}개 섬권역 묶음</span>
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaRangeCount }}개 원시 구간</span>
+          <span class="rounded-full border border-sky-300/70 bg-sky-50 px-2.5 py-1 text-sky-700 dark:border-sky-400/35 dark:bg-sky-950/20 dark:text-sky-200">{{ remoteAreaExceptionCount }}개 예외 구간</span>
+          <span class="rounded-full border border-amber-300/70 bg-amber-50 px-2.5 py-1 text-amber-700 dark:border-amber-400/35 dark:bg-amber-950/20 dark:text-amber-200">{{ remoteAreaConflictCount }}개 상충 구간</span>
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">총 {{ remoteAreaPostalCodeCount.toLocaleString('ko-KR') }}개 우편번호</span>
         </div>
 
@@ -495,6 +525,12 @@ function formatPostalRanges(ranges: string[]): string {
                     <p class="mt-0.5 text-[11px] text-muted-foreground">{{ cluster.areas }}</p>
                   </div>
                   <div class="flex flex-wrap justify-end gap-1">
+                    <span
+                      class="rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                      :class="getClusterVariantClass(cluster.variant)"
+                    >
+                      {{ getClusterVariantLabel(cluster.variant) }}
+                    </span>
                     <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
                       {{ getPostalRangeKinds(cluster.postalRanges) }}
                     </span>
@@ -539,6 +575,12 @@ function formatPostalRanges(ranges: string[]): string {
                   <td class="px-4 py-3 text-body font-semibold tracking-[-0.01em] text-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</td>
                   <td class="px-4 py-3">
                     <div class="flex flex-wrap gap-1.5">
+                      <span
+                        class="rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                        :class="getClusterVariantClass(cluster.variant)"
+                      >
+                        {{ getClusterVariantLabel(cluster.variant) }}
+                      </span>
                       <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
                         {{ getPostalRangeKinds(cluster.postalRanges) }}
                       </span>

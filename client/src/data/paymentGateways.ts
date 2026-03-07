@@ -17,7 +17,6 @@ export interface PaymentGatewayMeta {
   shortName: string;
   badge: string;
   color: string;
-  accentClass: string;
   microBusinessRate: number;
   setupFee: CompareCell;
   annualFee: CompareCell;
@@ -35,7 +34,6 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "토스PG",
     badge: "PG 인프라",
     color: "#0064FF",
-    accentClass: "text-[#0064FF]",
     microBusinessRate: 3.4,
     setupFee: {
       core: "약 22만원(1회)",
@@ -61,7 +59,6 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "주문형",
     badge: "네이버쇼핑 연동",
     color: "#03C75A",
-    accentClass: "text-[#03C75A]",
     microBusinessRate: 1.98,
     setupFee: {
       core: "무료",
@@ -87,7 +84,6 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "결제형",
     badge: "자사몰 결제 연동",
     color: "#00A862",
-    accentClass: "text-[#00A862]",
     microBusinessRate: 2.2,
     setupFee: {
       core: "무료",
@@ -113,7 +109,6 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "카카오",
     badge: "간편결제 중심",
     color: "#FFCD00",
-    accentClass: "text-[#C79300]",
     microBusinessRate: 0.89,
     setupFee: {
       core: "무료",
@@ -140,7 +135,6 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "PAYCO",
     badge: "포인트 결제 특화",
     color: "#FA2828",
-    accentClass: "text-[#FA2828]",
     microBusinessRate: 1.5,
     setupFee: {
       core: "무료",

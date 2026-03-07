@@ -14,7 +14,6 @@ export interface OpenMarketCompareMeta {
   name: string;
   shortName: string;
   color: string;
-  accentClass: string;
   microBusinessRate: number;
   setupFee: CompareCell;
   salesFeeRange: CompareCell;
@@ -31,7 +30,6 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "스마트스토어",
     shortName: "네쇼",
     color: "#03C75A",
-    accentClass: "text-[#03C75A]",
     microBusinessRate: 1.95,
     setupFee: {
       core: "무료",
@@ -58,7 +56,6 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "쿠팡",
     shortName: "쿠팡",
     color: "#E31937",
-    accentClass: "text-[#E31937]",
     microBusinessRate: 7.8,
     setupFee: {
       core: "무료",
@@ -84,7 +81,6 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "11번가",
     shortName: "11번",
     color: "#FF6B00",
-    accentClass: "text-[#FF6B00]",
     microBusinessRate: 10,
     setupFee: {
       core: "무료",
@@ -109,7 +105,6 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "G마켓/옥션",
     shortName: "G마켓",
     color: "#00B050",
-    accentClass: "text-[#00B050]",
     microBusinessRate: 9,
     setupFee: {
       core: "무료",

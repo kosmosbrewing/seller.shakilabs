@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
-import { BadgeCheck } from "lucide-vue-next";
+import { BadgeCheck, CircleHelp } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
@@ -9,6 +9,7 @@ import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   PAYMENT_DATA_UPDATED,
   PAYMENT_GATEWAYS,
+  type CompareCell,
   type PaymentGatewayKey,
 } from "@/data/paymentGateways";
 
@@ -32,17 +33,10 @@ const compareColumns: CompareColumn[] = [
   { key: "note", label: "비고" },
 ];
 
-function parseFirstRate(value: string): number | null {
-  const match = value.match(/(\d+(?:\.\d+)?)%/);
-  if (!match) return null;
-  return Number.parseFloat(match[1]);
-}
-
 const lowestCardFeeGateway = computed<PaymentGatewayKey | null>(() => {
   let lowest: { key: PaymentGatewayKey; rate: number } | null = null;
   for (const gateway of PAYMENT_GATEWAYS) {
-    const rate = parseFirstRate(gateway.cardFee);
-    if (rate == null) continue;
+    const rate = gateway.microBusinessRate;
     if (!lowest || rate < lowest.rate) {
       lowest = { key: gateway.key, rate };
     }
@@ -54,9 +48,9 @@ const lowestCardFeeLabel = computed<string | null>(() => {
   const gatewayKey = lowestCardFeeGateway.value;
   if (!gatewayKey) return null;
   const gateway = PAYMENT_GATEWAYS.find((entry) => entry.key === gatewayKey);
-  const rate = gateway ? parseFirstRate(gateway.cardFee) : null;
+  const rate = gateway?.microBusinessRate ?? null;
   if (!gateway || rate == null) return null;
-  return `${gateway.shortName} ${rate}%`;
+  return `${gateway.shortName} ${formatRate(rate)}%`;
 });
 
 const jsonLd = computed(() => [
@@ -86,26 +80,30 @@ const jsonLd = computed(() => [
       "item": {
         "@type": "FinancialProduct",
         "name": gateway.name,
-        "description": `${gateway.cardFee} · ${gateway.settlementCycle}`,
+        "description": `${gateway.cardFee.core} · ${gateway.settlementCycle.core}`,
       },
     })),
   },
 ]);
 
 const freeEntryCount = computed(
-  () => PAYMENT_GATEWAYS.filter((gateway) => gateway.setupFee === "무료").length
+  () => PAYMENT_GATEWAYS.filter((gateway) => gateway.setupFee.core === "무료").length
 );
+
+function formatRate(rate: number): string {
+  return rate.toFixed(2).replace(/\.?0+$/, "");
+}
 
 function isFreeValue(value: string): boolean {
   return value.includes("무료") || value.includes("없음");
 }
 
-function getCellBg(columnKey: CompareColumnKey, value: string, gatewayKey: PaymentGatewayKey): string {
-  if ((columnKey === "setupFee" || columnKey === "annualFee") && isFreeValue(value)) {
-    return "bg-emerald-50/60 dark:bg-emerald-950/15";
+function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: PaymentGatewayKey): string {
+  if ((columnKey === "setupFee" || columnKey === "annualFee") && isFreeValue(cell.core)) {
+    return "compare-cell-highlight";
   }
   if (columnKey === "cardFee" && gatewayKey === lowestCardFeeGateway.value) {
-    return "bg-emerald-50/60 dark:bg-emerald-950/15";
+    return "compare-cell-highlight";
   }
   return "";
 }
@@ -138,7 +136,7 @@ function getCellBg(columnKey: CompareColumnKey, value: string, gatewayKey: Payme
             class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
           >
             <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            최저 시작 수수료 {{ lowestCardFeeLabel }}
+            영세 기준 최저 시작 수수료 {{ lowestCardFeeLabel }}
           </span>
         </div>
 
@@ -191,11 +189,36 @@ function getCellBg(columnKey: CompareColumnKey, value: string, gatewayKey: Payme
                   v-for="col in compareColumns"
                   :key="`${gateway.key}-${col.key}`"
                   class="px-4 py-3 align-top"
-                  :class="getCellBg(col.key, gateway[col.key], gateway.key)"
                 >
-                  <p class="whitespace-pre-line text-[12px] leading-[1.45] font-semibold text-foreground">
-                    {{ gateway[col.key] }}
-                  </p>
+                  <div class="compare-cell" :class="getCellBg(col.key, gateway[col.key], gateway.key)">
+                    <div class="flex items-start gap-1.5">
+                      <p class="compare-cell-value">
+                        {{ gateway[col.key].core }}
+                      </p>
+                      <div
+                        v-if="gateway[col.key].tooltip || gateway[col.key].condition"
+                        class="relative group shrink-0"
+                      >
+                        <button
+                          type="button"
+                          class="compare-tooltip-trigger"
+                          aria-label="상세 설명 보기"
+                        >
+                          <CircleHelp class="h-3.5 w-3.5" />
+                        </button>
+                        <div class="compare-tooltip-panel">
+                          <p class="compare-tooltip-title">상세 설명</p>
+                          <p v-if="gateway[col.key].tooltip" class="mt-1.5">{{ gateway[col.key].tooltip }}</p>
+                          <p
+                            v-if="gateway[col.key].condition"
+                            class="compare-tooltip-condition"
+                          >
+                            조건: {{ gateway[col.key].condition }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>

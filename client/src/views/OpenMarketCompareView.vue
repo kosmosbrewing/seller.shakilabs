@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
-import { BadgeCheck } from "lucide-vue-next";
+import { BadgeCheck, CircleHelp } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
@@ -9,6 +9,7 @@ import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   MARKET_COMPARE_UPDATED,
   OPEN_MARKETS,
+  type CompareCell,
   type OpenMarketKey,
 } from "@/data/openMarketCompare";
 
@@ -33,20 +34,13 @@ const compareColumns: CompareColumn[] = [
 ];
 
 const freeEntryCount = computed(
-  () => OPEN_MARKETS.filter((m) => m.setupFee === "무료").length
+  () => OPEN_MARKETS.filter((m) => m.setupFee.core === "무료").length
 );
-
-function parseFirstRate(value: string): number | null {
-  const match = value.match(/(\d+(?:\.\d+)?)%/);
-  if (!match) return null;
-  return Number.parseFloat(match[1]);
-}
 
 const lowestFeeMarket = computed<OpenMarketKey | null>(() => {
   let lowest: { key: OpenMarketKey; rate: number } | null = null;
   for (const market of OPEN_MARKETS) {
-    const rate = parseFirstRate(market.salesFeeRange);
-    if (rate == null) continue;
+    const rate = market.microBusinessRate;
     if (!lowest || rate < lowest.rate) {
       lowest = { key: market.key, rate };
     }
@@ -58,9 +52,9 @@ const lowestFeeLabel = computed<string | null>(() => {
   const key = lowestFeeMarket.value;
   if (!key) return null;
   const market = OPEN_MARKETS.find((m) => m.key === key);
-  const rate = market ? parseFirstRate(market.salesFeeRange) : null;
+  const rate = market?.microBusinessRate ?? null;
   if (!market || rate == null) return null;
-  return `${market.shortName} ${rate}%~`;
+  return `${market.shortName} ${formatRate(rate)}%~`;
 });
 
 const jsonLd = computed(() => [
@@ -90,28 +84,32 @@ const jsonLd = computed(() => [
       "item": {
         "@type": "Service",
         "name": market.name,
-        "description": `${market.salesFeeRange.replace(/\n/g, " / ")} · ${market.settlementCycle}`,
+        "description": `${market.salesFeeRange.core} · ${market.settlementCycle.core}`,
       },
     })),
   },
 ]);
 
+function formatRate(rate: number): string {
+  return rate.toFixed(2).replace(/\.?0+$/, "");
+}
+
 function isFreeValue(value: string): boolean {
   return value.includes("무료") || value.includes("없음");
 }
 
-function getCellBg(columnKey: CompareColumnKey, value: string, marketKey: OpenMarketKey): string {
-  if (columnKey === "setupFee" && isFreeValue(value)) {
-    return "bg-emerald-50/60 dark:bg-emerald-950/15";
+function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: OpenMarketKey): string {
+  if (columnKey === "setupFee" && isFreeValue(cell.core)) {
+    return "compare-cell-highlight";
   }
   if (columnKey === "salesFeeRange" && marketKey === lowestFeeMarket.value) {
-    return "bg-emerald-50/60 dark:bg-emerald-950/15";
+    return "compare-cell-highlight";
   }
-  if (columnKey === "shippingFeeRate" && value.includes("미적용")) {
-    return "bg-emerald-50/60 dark:bg-emerald-950/15";
+  if (columnKey === "shippingFeeRate" && cell.core.includes("주문관리만")) {
+    return "compare-cell-highlight";
   }
-  if (columnKey === "note" && value.includes("물류비 별도")) {
-    return "bg-orange-50/60 dark:bg-orange-950/15";
+  if (columnKey === "note" && cell.core.includes("물류비")) {
+    return "compare-cell-caution";
   }
   return "";
 }
@@ -138,6 +136,13 @@ function getCellBg(columnKey: CompareColumnKey, value: string, marketKey: OpenMa
         <div class="flex flex-wrap gap-1.5 text-caption">
           <span class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 font-semibold text-foreground">
             무료 입점 {{ freeEntryCount }} / {{ OPEN_MARKETS.length }}
+          </span>
+          <span
+            v-if="lowestFeeLabel"
+            class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
+          >
+            <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            영세 기준 최저 시작 수수료 {{ lowestFeeLabel }}
           </span>
         </div>
 
@@ -189,11 +194,36 @@ function getCellBg(columnKey: CompareColumnKey, value: string, marketKey: OpenMa
                   v-for="col in compareColumns"
                   :key="`${market.key}-${col.key}`"
                   class="px-4 py-3 align-top"
-                  :class="getCellBg(col.key, market[col.key], market.key)"
                 >
-                  <p class="whitespace-pre-line text-[12px] leading-[1.45] font-semibold text-foreground">
-                    {{ market[col.key] }}
-                  </p>
+                  <div class="compare-cell" :class="getCellBg(col.key, market[col.key], market.key)">
+                    <div class="flex items-start gap-1.5">
+                      <p class="compare-cell-value">
+                        {{ market[col.key].core }}
+                      </p>
+                      <div
+                        v-if="market[col.key].tooltip || market[col.key].condition"
+                        class="relative group shrink-0"
+                      >
+                        <button
+                          type="button"
+                          class="compare-tooltip-trigger"
+                          aria-label="상세 설명 보기"
+                        >
+                          <CircleHelp class="h-3.5 w-3.5" />
+                        </button>
+                        <div class="compare-tooltip-panel">
+                          <p class="compare-tooltip-title">상세 설명</p>
+                          <p v-if="market[col.key].tooltip" class="mt-1.5">{{ market[col.key].tooltip }}</p>
+                          <p
+                            v-if="market[col.key].condition"
+                            class="compare-tooltip-condition"
+                          >
+                            조건: {{ market[col.key].condition }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </td>
               </tr>
             </tbody>
