@@ -5,7 +5,7 @@ import { RouterLink } from "vue-router";
 
 <template>
   <SEOHead
-    title="페이지를 찾을 수 없습니다 | ShakiLabs"
+    title="페이지를 찾을 수 없습니다"
     description="요청하신 페이지를 찾을 수 없습니다."
     :noindex="true"
   />

@@ -66,10 +66,6 @@ const bestVsRunnerUp = computed(() => {
 
 <template>
   <div class="retro-panel">
-    <div class="retro-titlebar rounded-t-2xl">
-      <h3 class="retro-title">월간 시뮬레이션</h3>
-    </div>
-
     <div class="retro-panel-content space-y-4">
       <div class="grid gap-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.2fr)]">
         <div class="retro-panel-muted p-3.5 sm:p-4">

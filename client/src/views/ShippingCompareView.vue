@@ -6,7 +6,8 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import {
-  REMOTE_AREA_GUIDE,
+  REMOTE_AREA_POSTAL_CODE_REFERENCE,
+  REMOTE_AREA_REFERENCE_SOURCE,
   SHIPPING_DATA_UPDATED,
   SHIPPING_SIZE_LABELS,
   SHIPPING_SIZE_ORDER,
@@ -20,7 +21,7 @@ import {
 } from "@/data/shippingRates";
 import { formatNumber, formatWon } from "@/lib/utils";
 
-const seoTitle = "택배비 비교 계산기 | 8개 택배사 예상 운임 비교";
+const seoTitle = "8개 택배사 예상 운임 택배비 비교 계산기";
 const seoDescription =
   "CJ대한통운, 한진, 로젠, 우체국, 경동, 롯데, CU, GS25의 예상 택배비를 무게와 크기 기준으로 비교합니다.";
 
@@ -41,9 +42,6 @@ watch(sumCm, (value) => {
 
 const resolvedSize = computed<ShippingSizeKey>(() => resolveShippingSize(sumCm.value) ?? selectedSize.value);
 const resolvedSizeLabel = computed(() => SHIPPING_SIZE_LABELS[resolvedSize.value]);
-const carrierMap = computed(
-  () => new Map(SHIPPING_CARRIERS.map((carrier) => [carrier.key, carrier]))
-);
 
 const allResults = computed(() =>
   estimateShippingRates({
@@ -58,6 +56,16 @@ const convenienceResults = computed(() => allResults.value.filter((item) => item
 const cheapestOverall = computed(() => allResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestGeneral = computed(() => generalResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestConvenience = computed(() => convenienceResults.value.find((item) => item.isAvailable) ?? null);
+const remoteAreaGroupCount = computed(() => REMOTE_AREA_POSTAL_CODE_REFERENCE.length);
+const remoteAreaEntryCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_REFERENCE.reduce((sum, group) => sum + group.entries.length, 0)
+);
+const remoteAreaPostalCodeCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_REFERENCE.reduce(
+    (sum, group) => sum + group.entries.reduce((groupSum, entry) => groupSum + getPostalCodeCount(entry.postalRange), 0),
+    0
+  )
+);
 
 function handleWeightInput(event: Event): void {
   const raw = (event.target as HTMLInputElement).value.replace(/[^0-9.]/g, "");
@@ -93,6 +101,18 @@ function handleSumBlur(): void {
 function selectSize(size: ShippingSizeKey): void {
   selectedSize.value = size;
   sumCm.value = null;
+}
+
+function getPostalCodeCount(range: string): number {
+  if (!range.includes("-")) return 1;
+
+  const [start, end] = range.split("-").map((value) => Number.parseInt(value, 10));
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return 1;
+  return end - start + 1;
+}
+
+function getPostalRangeKind(range: string): string {
+  return range.includes("-") ? "연속 구간" : "단일 번호";
 }
 </script>
 
@@ -231,20 +251,15 @@ function selectSize(size: ShippingSizeKey): void {
       </div>
     </div>
 
-    <section class="space-y-3">
-      <div>
-        <span class="section-eyebrow">Section A</span>
-        <h2 class="section-title">일반 택배 6사 비교</h2>
-        <p class="section-description">
-          일반 택배는 부피와 중량에 따라 운임 차이가 커집니다. 같은 조건에서 가장 유리한 택배사를 먼저 확인하세요.
-        </p>
-      </div>
-
+    <section>
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
-          <div class="flex items-center gap-2">
-            <Truck class="h-4.5 w-4.5" />
-            <span class="retro-title">일반 택배 예상 운임</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <Truck class="h-4.5 w-4.5" />
+              <span class="retro-title">일반 택배 6사 비교</span>
+            </div>
+            <p class="mt-1 text-tiny text-muted-foreground">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
           </div>
           <span v-if="cheapestGeneral" class="inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-caption font-semibold text-white">
             <BadgeCheck class="h-3.5 w-3.5" />
@@ -305,20 +320,15 @@ function selectSize(size: ShippingSizeKey): void {
       </div>
     </section>
 
-    <section class="space-y-3">
-      <div>
-        <span class="section-eyebrow">Section B</span>
-        <h2 class="section-title">편의점 택배 2종 비교</h2>
-        <p class="section-description">
-          소형 발송은 편의점 택배가 간단하지만, 중량과 부피 제한을 먼저 확인해야 합니다.
-        </p>
-      </div>
-
+    <section>
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
-          <div class="flex items-center gap-2">
-            <Package2 class="h-4.5 w-4.5" />
-            <span class="retro-title">편의점 택배 예상 운임</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <Package2 class="h-4.5 w-4.5" />
+              <span class="retro-title">편의점 택배 2종 비교</span>
+            </div>
+            <p class="mt-1 text-tiny text-muted-foreground">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
           </div>
           <span v-if="cheapestConvenience" class="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-caption font-semibold text-primary-foreground">
             <BadgeCheck class="h-3.5 w-3.5" />
@@ -379,52 +389,103 @@ function selectSize(size: ShippingSizeKey): void {
       </div>
     </section>
 
-    <section class="space-y-3">
-      <div>
-        <span class="section-eyebrow">Section C</span>
-        <h2 class="section-title">도서산간 참고표</h2>
-        <p class="section-description">
-          도서산간 추가운임은 실제 발송비를 크게 바꿉니다. 아래 표는 택배사별 제주/도서산간 추가 여부를 빠르게 확인하기 위한 정보성 정리입니다.
-        </p>
-      </div>
-
+    <section>
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
-          <span class="retro-title">지역 추가운임 안내</span>
+          <div class="flex flex-col gap-1">
+            <span class="retro-title">제주·도서산간 우편번호 기준표</span>
+            <p class="text-tiny text-muted-foreground">추가운임 판정에 쓰는 우편번호 구간 레퍼런스입니다.</p>
+            <a
+              :href="REMOTE_AREA_REFERENCE_SOURCE"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-caption font-semibold text-primary hover:text-primary/80 hover:underline underline-offset-2"
+            >
+              기준 출처 보기
+            </a>
+          </div>
         </div>
-        <div class="overflow-x-auto px-4 pb-4 pt-4">
-          <table class="min-w-[920px] w-full text-body">
+
+        <div class="flex flex-wrap gap-1.5 border-b border-border/60 px-4 py-3 text-tiny text-muted-foreground">
+          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaGroupCount }}개 권역</span>
+          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaEntryCount }}개 세부 지역</span>
+          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">총 {{ remoteAreaPostalCodeCount.toLocaleString('ko-KR') }}개 우편번호</span>
+        </div>
+
+        <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
+          <article
+            v-for="group in REMOTE_AREA_POSTAL_CODE_REFERENCE"
+            :key="group.group"
+            class="rounded-2xl border border-border/70 bg-background px-3.5 py-3"
+          >
+            <p class="text-body font-bold text-foreground">{{ group.group }}</p>
+            <div class="mt-3 space-y-2">
+              <div
+                v-for="entry in group.entries"
+                :key="`${group.group}-${entry.area}-${entry.postalRange}`"
+                class="rounded-xl border border-border/60 bg-muted/10 px-3 py-2.5"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <p class="text-caption font-bold text-foreground">{{ entry.area }}</p>
+                  <div class="flex flex-wrap justify-end gap-1">
+                    <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                      {{ getPostalRangeKind(entry.postalRange) }}
+                    </span>
+                    <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                      {{ getPostalCodeCount(entry.postalRange) }}개
+                    </span>
+                  </div>
+                </div>
+                <p class="mt-1 text-[12px] font-semibold tracking-[-0.01em] text-foreground">{{ entry.postalRange }}</p>
+                <p v-if="entry.note" class="mt-1 text-[11px] text-muted-foreground">{{ entry.note }}</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="hidden overflow-x-auto px-4 pb-4 pt-4 md:block">
+          <table class="min-w-[880px] w-full text-body">
             <thead>
               <tr class="border-b border-border/80 bg-card/95">
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">택배사</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">제주 추가</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">도서산간 추가</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">기준 메모</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">권역</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">세부 지역</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">우편번호 구간</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">구간 정보</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="row in REMOTE_AREA_GUIDE"
-                :key="row.carrierKey"
-                class="border-b border-border/40"
-              >
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2.5">
-                    <span
-                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold text-white"
-                      :style="{ backgroundColor: carrierMap.get(row.carrierKey)?.color || '#64748B' }"
-                    >
-                      {{ carrierMap.get(row.carrierKey)?.shortName || row.carrierKey }}
-                    </span>
-                    <span class="font-semibold text-foreground">
-                      {{ carrierMap.get(row.carrierKey)?.name || row.carrierKey }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-caption font-semibold text-foreground">{{ row.jejuCharge }}</td>
-                <td class="px-4 py-3 text-caption font-semibold text-foreground">{{ row.remoteCharge }}</td>
-                <td class="px-4 py-3 text-caption text-muted-foreground">{{ row.criteriaNote }}</td>
-              </tr>
+              <template v-for="group in REMOTE_AREA_POSTAL_CODE_REFERENCE" :key="group.group">
+                <tr class="border-b border-border/40 bg-muted/10">
+                  <td colspan="4" class="px-4 py-2.5 text-body font-bold text-foreground">
+                    {{ group.group }}
+                  </td>
+                </tr>
+                <tr
+                  v-for="entry in group.entries"
+                  :key="`${group.group}-${entry.area}-${entry.postalRange}`"
+                  class="border-b border-border/40"
+                >
+                  <td class="px-4 py-3 text-caption text-muted-foreground">{{ group.group }}</td>
+                  <td class="px-4 py-3 text-body font-semibold text-foreground">{{ entry.area }}</td>
+                  <td class="px-4 py-3 text-body font-semibold tracking-[-0.01em] text-foreground">{{ entry.postalRange }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex flex-wrap gap-1.5">
+                      <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+                        {{ getPostalRangeKind(entry.postalRange) }}
+                      </span>
+                      <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
+                        {{ getPostalCodeCount(entry.postalRange) }}개
+                      </span>
+                      <span
+                        v-if="entry.note"
+                        class="rounded-full border border-orange-300/70 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-foreground dark:border-orange-400/35 dark:bg-orange-950/20"
+                      >
+                        {{ entry.note }}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>

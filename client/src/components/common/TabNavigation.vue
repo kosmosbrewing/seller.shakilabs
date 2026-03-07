@@ -5,26 +5,20 @@ import { useRoute, RouterLink } from "vue-router";
 const route = useRoute();
 
 const tabs = [
-  { key: "home", label: "실시간 계산기", to: "/" },
-  { key: "category", label: "카테고리 비교", to: "/clothing-fee-compare" },
-  { key: "price", label: "가격대 비교", to: "/price/30000" },
+  { key: "home", label: "수수료 계산기", to: "/" },
+  { key: "market", label: "오픈마켓 비교", to: "/market-compare" },
   { key: "payment", label: "결제 수수료", to: "/payment-compare" },
   { key: "shipping", label: "택배비 비교", to: "/shipping-compare" },
-  { key: "market", label: "마켓 가이드", to: "/smartstore" },
 ] as const;
 
 const activePath = computed(() => route.path);
 
 function isActiveTab(key: (typeof tabs)[number]["key"]): boolean {
   if (key === "home") return activePath.value === "/";
-  if (key === "category") return activePath.value.includes("-fee-compare");
-  if (key === "price") return activePath.value.startsWith("/price");
+  if (key === "market") return activePath.value === "/market-compare";
   if (key === "payment") return activePath.value === "/payment-compare";
   if (key === "shipping") return activePath.value === "/shipping-compare";
-  // 마켓 가이드: /smartstore, /coupang, /11st, /gmarket
-  return ["/smartstore", "/coupang", "/11st", "/gmarket"].some((p) =>
-    activePath.value === p
-  );
+  return false;
 }
 </script>
 

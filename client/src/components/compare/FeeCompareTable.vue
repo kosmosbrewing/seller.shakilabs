@@ -32,40 +32,36 @@ const spread = computed(() => {
 
 <template>
   <div class="retro-panel">
-    <div class="retro-titlebar rounded-t-2xl">
-      <div class="space-y-0.5">
-        <h3 class="retro-title">수수료 비교표</h3>
-        <p class="text-tiny text-muted-foreground">같은 조건에서 어떤 마켓이 더 유리한지 숫자로 비교합니다.</p>
+    <div class="px-4 pt-4 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="text-caption text-muted-foreground">현재 입력값 기준 총 수수료와 건당 순이익을 정렬해서 봅니다.</p>
+        <div class="flex gap-1.5">
+          <button
+            type="button"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-tiny font-semibold transition-colors',
+              'touch-target',
+              sortKey === 'feeAsc' ? 'bg-primary text-primary-foreground' : 'border border-border bg-background text-muted-foreground hover:text-foreground'
+            ]"
+            @click="sortKey = 'feeAsc'"
+          >
+            <ArrowDownUp class="h-3.5 w-3.5" />
+            수수료 낮은순
+          </button>
+          <button
+            type="button"
+            :class="[
+              'inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-tiny font-semibold transition-colors',
+              'touch-target',
+              sortKey === 'profitDesc' ? 'bg-primary text-primary-foreground' : 'border border-border bg-background text-muted-foreground hover:text-foreground'
+            ]"
+            @click="sortKey = 'profitDesc'"
+          >
+            <ArrowDownUp class="h-3.5 w-3.5" />
+            순이익 높은순
+          </button>
+        </div>
       </div>
-      <div class="flex gap-1.5">
-        <button
-          type="button"
-          :class="[
-            'inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-tiny font-semibold transition-colors',
-            'touch-target',
-            sortKey === 'feeAsc' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'
-          ]"
-          @click="sortKey = 'feeAsc'"
-        >
-          <ArrowDownUp class="h-3.5 w-3.5" />
-          수수료 낮은순
-        </button>
-        <button
-          type="button"
-          :class="[
-            'inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-tiny font-semibold transition-colors',
-            'touch-target',
-            sortKey === 'profitDesc' ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground hover:text-foreground'
-          ]"
-          @click="sortKey = 'profitDesc'"
-        >
-          <ArrowDownUp class="h-3.5 w-3.5" />
-          순이익 높은순
-        </button>
-      </div>
-    </div>
-
-    <div class="px-4 pt-4">
       <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         <div class="rounded-[1.2rem] border border-profit/20 bg-profit/8 px-3.5 py-3">
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-profit/80">현재 1위</p>

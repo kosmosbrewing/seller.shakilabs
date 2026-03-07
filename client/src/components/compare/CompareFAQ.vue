@@ -61,11 +61,10 @@ useHead(() => ({
 </script>
 
 <template>
-  <div class="retro-panel">
+  <div class="retro-panel overflow-hidden">
     <div class="retro-titlebar rounded-t-2xl">
-      <h3 class="retro-title">자주 묻는 질문</h3>
+      <h2 class="retro-title">자주 묻는 질문</h2>
     </div>
-
     <div class="retro-panel-content">
       <Accordion type="single" collapsible>
         <AccordionItem v-for="(faq, idx) in faqs" :key="idx" :value="`faq-${idx}`">

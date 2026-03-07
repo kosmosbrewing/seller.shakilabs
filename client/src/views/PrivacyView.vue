@@ -4,7 +4,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 
 <template>
   <SEOHead
-    title="개인정보 처리방침 | 오픈마켓 수수료 비교 계산기"
+    title="개인정보 처리방침"
     description="seller.shakilabs.com의 개인정보 처리방침입니다."
   />
 

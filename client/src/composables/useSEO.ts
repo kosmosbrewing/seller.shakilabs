@@ -1,6 +1,13 @@
 import { useHead } from "@vueuse/head";
 import { toValue, type MaybeRefOrGetter } from "vue";
 
+const TITLE_SUFFIX = " | 오픈마켓 수수료 계산기";
+const LEGACY_TITLE_SUFFIXES = [
+  " | 오픈마켓 수수료 비교 계산기",
+  " | ShakiLabs",
+  TITLE_SUFFIX,
+] as const;
+
 type SEOOptions = {
   title: MaybeRefOrGetter<string>;
   description: MaybeRefOrGetter<string>;
@@ -11,6 +18,24 @@ type SEOOptions = {
   >;
 };
 
+function normalizeTitle(rawTitle: string): string {
+  const trimmed = rawTitle.trim();
+  let baseTitle = trimmed;
+
+  for (const suffix of LEGACY_TITLE_SUFFIXES) {
+    if (baseTitle.endsWith(suffix)) {
+      baseTitle = baseTitle.slice(0, -suffix.length).trimEnd();
+      break;
+    }
+  }
+
+  if (!baseTitle) {
+    return `오픈마켓 수수료 비교${TITLE_SUFFIX}`;
+  }
+
+  return `${baseTitle}${TITLE_SUFFIX}`;
+}
+
 export function useSEO({
   title,
   description,
@@ -19,7 +44,7 @@ export function useSEO({
   jsonLd,
 }: SEOOptions): void {
   useHead(() => {
-    const resolvedTitle = toValue(title);
+    const resolvedTitle = normalizeTitle(toValue(title));
     const resolvedDescription = toValue(description);
     const resolvedNoindex = Boolean(toValue(noindex));
     const resolvedOgImage = toValue(ogImage);

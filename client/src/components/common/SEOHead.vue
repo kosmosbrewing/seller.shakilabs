@@ -17,5 +17,4 @@ useSEO({
 </script>
 
 <template>
-  <!-- SEO 메타태그만 주입, DOM 렌더링 없음 -->
 </template>

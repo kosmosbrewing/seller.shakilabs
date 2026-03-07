@@ -63,11 +63,15 @@ export interface ShippingEstimateResult {
   unavailableReason?: string;
 }
 
-export interface RemoteAreaGuideRow {
-  carrierKey: ShippingCarrierKey;
-  jejuCharge: string;
-  remoteCharge: string;
-  criteriaNote: string;
+export interface RemoteAreaPostalCodeReferenceEntry {
+  area: string;
+  postalRange: string;
+  note?: string;
+}
+
+export interface RemoteAreaPostalCodeReferenceGroup {
+  group: string;
+  entries: RemoteAreaPostalCodeReferenceEntry[];
 }
 
 export const SHIPPING_DATA_UPDATED = "2026.03";
@@ -90,54 +94,82 @@ export const SIZE_SUM_THRESHOLDS: Record<ShippingSizeKey, number> = {
   xlarge: 160,
 };
 
-export const REMOTE_AREA_GUIDE: RemoteAreaGuideRow[] = [
+export const REMOTE_AREA_REFERENCE_SOURCE =
+  "https://help.campaignus.me/ko/articles/%EC%A0%9C%EC%A3%BC%EB%8F%84-%EB%B0%8F-%EB%8F%84%EC%84%9C%EC%82%B0%EA%B0%84-%EC%A7%80%EC%97%AD-%EA%B8%B0%EC%A4%80%ED%91%9C-342d2e5e";
+
+export const REMOTE_AREA_POSTAL_CODE_REFERENCE: RemoteAreaPostalCodeReferenceGroup[] = [
   {
-    carrierKey: "cj",
-    jejuCharge: "추가 가능",
-    remoteCharge: "추가 가능",
-    criteriaNote: "개인택배 예약 화면/집하 기사 확인 필요",
+    group: "제주",
+    entries: [
+      {
+        area: "제주도",
+        postalRange: "63000-63644",
+      },
+    ],
   },
   {
-    carrierKey: "hanjin",
-    jejuCharge: "별도 추가",
-    remoteCharge: "별도 추가",
-    criteriaNote: "공식 요금안내는 동일권 최저 운임 기준, 지역별 추가",
+    group: "인천",
+    entries: [
+      { area: "중구 섬지역", postalRange: "22386-22388" },
+      { area: "강화 섬지역", postalRange: "23004-23010" },
+      { area: "옹진 섬지역 1", postalRange: "23100-23116" },
+      { area: "옹진 섬지역 2", postalRange: "23124-23136" },
+    ],
   },
   {
-    carrierKey: "logen",
-    jejuCharge: "중량별 차등 추가",
-    remoteCharge: "연륙·도서·산간 별도 추가",
-    criteriaNote: "로젠 요금안내에 제주/도서/산간 별도 명시",
+    group: "충남",
+    entries: [
+      { area: "당진 섬지역", postalRange: "31708" },
+      { area: "태안 섬지역", postalRange: "32133" },
+      { area: "보령 섬지역", postalRange: "33411" },
+    ],
   },
   {
-    carrierKey: "epost",
-    jejuCharge: "접수 채널별 상이",
-    remoteCharge: "배달 기한/요금 별도 가능",
-    criteriaNote: "창구소포/방문접수/익일배달 여부에 따라 상이",
+    group: "경북",
+    entries: [
+      { area: "울릉도 전지역", postalRange: "40200-40240" },
+    ],
   },
   {
-    carrierKey: "kdexp",
-    jejuCharge: "영업점 확인",
-    remoteCharge: "영업점 확인",
-    criteriaNote: "부피·중량·지역 편차가 커서 영업점 기준 우선",
+    group: "부산",
+    entries: [
+      { area: "강서구 섬지역", postalRange: "46768-46771" },
+    ],
   },
   {
-    carrierKey: "lotte",
-    jejuCharge: "별도 추가",
-    remoteCharge: "별도 추가 가능",
-    criteriaNote: "택배요금조회는 동일구역 기준, 제주/도서산간 별도",
+    group: "경남",
+    entries: [
+      { area: "사천 섬지역", postalRange: "52570-52571" },
+      { area: "통영 섬지역 1", postalRange: "53031-53033" },
+      { area: "통영 섬지역 2", postalRange: "53089-53104" },
+      { area: "통영 섬지역 3", postalRange: "54000" },
+    ],
   },
   {
-    carrierKey: "cu",
-    jejuCharge: "+4,000원",
-    remoteCharge: "+4,000원",
-    criteriaNote: "국내택배 동일권 기준, 착불 0~2kg은 +300원",
+    group: "전북",
+    entries: [
+      { area: "부안 섬지역", postalRange: "56347-56349" },
+    ],
   },
   {
-    carrierKey: "gs25",
-    jejuCharge: "+3,000원 ~ +4,000원",
-    remoteCharge: "+4,000원",
-    criteriaNote: "서비스 유형에 따라 제주 추가운임 범위 차이",
+    group: "전남",
+    entries: [
+      { area: "영광 섬지역", postalRange: "57068-57069" },
+      { area: "목포 섬지역", postalRange: "58760-58762" },
+      { area: "신안 섬지역 1", postalRange: "58800-58810" },
+      { area: "신안 섬지역 2", postalRange: "58816-58818" },
+      { area: "신안 섬지역 3", postalRange: "28826", note: "출처 원문 표기 유지" },
+      { area: "신안 섬지역 4", postalRange: "58828-58866" },
+      { area: "진도 섬지역", postalRange: "58953-58958" },
+      { area: "완도 섬지역 1", postalRange: "59102-59103" },
+      { area: "완도 섬지역 2", postalRange: "59106" },
+      { area: "완도 섬지역 3", postalRange: "59127" },
+      { area: "완도 섬지역 4", postalRange: "59129" },
+      { area: "완도 섬지역 5", postalRange: "59137-59166" },
+      { area: "여수시 섬지역 1", postalRange: "59650" },
+      { area: "여수시 섬지역 2", postalRange: "59766" },
+      { area: "여수시 섬지역 3", postalRange: "59781-59790" },
+    ],
   },
 ];
 

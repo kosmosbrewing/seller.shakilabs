@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import SEOHead from "@/components/common/SEOHead.vue";
 import { RouterLink } from "vue-router";
+import { FEE_DATA_UPDATED } from "@/data/marketFees";
+import { PAYMENT_DATA_UPDATED } from "@/data/paymentGateways";
+import { SHIPPING_DATA_UPDATED } from "@/data/shippingRates";
 </script>
 
 <template>
   <SEOHead
-    title="서비스 안내 | 오픈마켓 수수료 비교 계산기"
+    title="서비스 안내"
     description="seller.shakilabs.com은 스마트스토어, 쿠팡, 11번가, G마켓의 수수료를 무료로 비교하는 셀러 전용 도구입니다."
   />
 
@@ -32,9 +35,14 @@ import { RouterLink } from "vue-router";
         </ul>
 
         <h2 class="text-heading font-bold">수수료 데이터 기준</h2>
+        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+          <li>마켓 수수료: {{ FEE_DATA_UPDATED }} 기준</li>
+          <li>결제 수수료: {{ PAYMENT_DATA_UPDATED }} 기준</li>
+          <li>택배비: {{ SHIPPING_DATA_UPDATED }} 기준</li>
+        </ul>
         <p class="text-body text-muted-foreground">
-          현재 반영 데이터는 2025년 6월 기준 각 마켓 공식 수수료율을 기반으로 합니다.
-          수수료 변경 시 업데이트되며, 프로모션 할인, 광고비, 반품/교환 비용 등은 포함되지 않습니다.
+          각 마켓·서비스 공식 수수료율을 기반으로 하며, 수수료 변경 시 업데이트됩니다.
+          프로모션 할인, 광고비, 반품/교환 비용 등은 포함되지 않습니다.
         </p>
 
         <h2 class="text-heading font-bold">문의</h2>

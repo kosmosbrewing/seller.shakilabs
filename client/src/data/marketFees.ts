@@ -116,7 +116,7 @@ export const ELEVENST = {
   shippingFeeRate: 0.033,
 } as const;
 
-// G마켓/옥션 수수료
+// G마켓/옥션 수수료 (대표값 기준 합산 — 세부 카테고리는 G마켓·옥션 별도 확인 필요)
 export const GMARKET = {
   categoryFee: {
     clothing: 0.13,

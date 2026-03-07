@@ -13,10 +13,10 @@ import CompareFAQ from "@/components/compare/CompareFAQ.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { MARKET_META } from "@/data/marketFees";
-import { formatWon, formatWonShort } from "@/lib/utils";
+import { formatWon } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { RouterLink } from "vue-router";
-import { CATEGORY_MAP, CATEGORIES } from "@/data/categories";
+import { CATEGORY_MAP } from "@/data/categories";
 
 const calc = useMarketFeeCalc();
 const share = useShare(calc);
@@ -199,13 +199,12 @@ const jsonLd = computed(() => ({
 
 <template>
   <SEOHead
-    title="오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가"
+    title="스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 수수료 비교"
     description="같은 상품인데 마켓마다 수수료가 이렇게 다릅니다. 스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교하세요."
     :json-ld="jsonLd"
   />
 
   <div class="container py-5 space-y-5">
-    <!-- 핵심 가치/사용 흐름 -->
     <section class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">오픈마켓 수수료를 30초 안에 비교해보세요</h1>
@@ -231,7 +230,6 @@ const jsonLd = computed(() => ({
       </div>
     </section>
 
-    <!-- 입력 영역 -->
     <section id="input">
       <CompareInput
         v-model:price="calc.price.value"
@@ -244,46 +242,7 @@ const jsonLd = computed(() => ({
       />
     </section>
 
-    <section class="retro-panel-muted px-3 py-2.5 space-y-2">
-      <div class="flex items-center justify-between gap-2">
-        <p class="text-caption font-bold text-foreground">빠른 이동</p>
-        <span class="text-tiny text-muted-foreground">계산 결과와 비용 비교 도구로 바로 이동</span>
-      </div>
-      <div class="flex flex-wrap items-center justify-center gap-1.5">
-        <button type="button" class="retro-button-subtle touch-target text-caption" @click="moveToSection('results', 'quick_nav')">
-          1. 핵심 결론
-        </button>
-        <button type="button" class="retro-button-subtle touch-target text-caption" @click="moveToSection('simulation', 'quick_nav')">
-          2. 월간 시뮬레이션
-        </button>
-        <button type="button" class="retro-button-subtle touch-target text-caption" @click="moveToSection('fee-table', 'quick_nav')">
-          3. 상세 비교표
-        </button>
-        <RouterLink
-          to="/payment-compare"
-          class="retro-button-subtle touch-target text-caption"
-          @click="trackCostAxisClick('payment')"
-        >
-          4. 결제 수수료
-        </RouterLink>
-        <RouterLink
-          to="/shipping-compare"
-          class="retro-button-subtle touch-target text-caption"
-          @click="trackCostAxisClick('shipping')"
-        >
-          5. 택배비 비교
-        </RouterLink>
-      </div>
-    </section>
-
-    <section id="results" class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 1</span>
-        <h2 class="section-title">핵심 결론</h2>
-        <p class="section-description">
-          현재 조건에서 가장 유리한 마켓과 절감 가능한 금액을 먼저 확인하세요.
-        </p>
-      </div>
+    <section id="results">
       <SummaryBanner
         :title="summaryTitle"
         :leader-value="summaryLeaderValue"
@@ -302,13 +261,6 @@ const jsonLd = computed(() => ({
     </section>
 
     <section class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 1-A</span>
-        <h2 class="section-title">마켓별 결과 비교</h2>
-        <p class="section-description">
-          순이익 기준으로 자동 정렬했습니다. 각 카드에서 1위와의 차이, 총 수수료, 수수료율을 한 번에 비교해보세요.
-        </p>
-      </div>
       <MarketCardGrid
         :results="calc.results.value"
         :best-market-key="calc.bestMarket.value?.marketKey ?? null"
@@ -318,20 +270,12 @@ const jsonLd = computed(() => ({
       </p>
     </section>
 
-    <!-- 광고 -->
     <AdSlot slot="top" label="광고" />
 
-    <section class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 2</span>
-        <h2 class="section-title">월간 시뮬레이션</h2>
-        <p class="section-description">
-          판매량을 바꿔보면 마켓별 연 수수료와 월 순이익 차이가 얼마나 벌어지는지 바로 확인할 수 있습니다.
-        </p>
-      </div>
+    <section>
       <details id="simulation" class="retro-details" :open="showSim || undefined">
         <summary class="retro-details-summary" @click.prevent="showSim = !showSim">
-          <span>판매량 기준으로 월간 차이 계산</span>
+          <span>월간 시뮬레이션</span>
           <ChevronDown class="retro-details-chevron" :class="{ 'rotate-180': showSim }" />
         </summary>
         <div v-if="showSim">
@@ -344,17 +288,10 @@ const jsonLd = computed(() => ({
       </details>
     </section>
 
-    <section class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 3</span>
-        <h2 class="section-title">상세 비교표</h2>
-        <p class="section-description">
-          총 수수료와 순이익을 정렬 기준별로 비교하면서, 어느 마켓이 왜 유리한지 숫자로 확인하세요.
-        </p>
-      </div>
+    <section>
       <details id="fee-table" class="retro-details" :open="showTable || undefined">
         <summary class="retro-details-summary" @click.prevent="showTable = !showTable">
-          <span>수수료 항목별 상세 내역 확인</span>
+          <span>상세 비교표</span>
           <ChevronDown class="retro-details-chevron" :class="{ 'rotate-180': showTable }" />
         </summary>
         <div v-if="showTable">
@@ -363,16 +300,16 @@ const jsonLd = computed(() => ({
       </details>
     </section>
 
-    <section class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 3-A</span>
-        <h2 class="section-title">셀러 비용 3축</h2>
-        <p class="section-description">
-          수익성 판단은 마켓 수수료만으로 끝나지 않습니다. 결제 수수료와 택배비까지 같은 흐름에서 바로 비교해보세요.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 gap-3 lg:grid-cols-3">
+    <section>
+      <div class="retro-panel overflow-hidden">
+        <div class="retro-titlebar rounded-t-2xl">
+          <h2 class="retro-title">셀러 비용 3축</h2>
+        </div>
+        <div class="retro-panel-content">
+          <p class="text-caption text-muted-foreground mb-3">
+            수익성 판단은 마켓 수수료만으로 끝나지 않습니다. 결제 수수료와 택배비까지 같은 흐름에서 바로 비교해보세요.
+          </p>
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-3">
         <button
           type="button"
           class="group rounded-[1.6rem] border border-primary/20 bg-primary/10 p-4 text-left transition-colors hover:border-primary/35 hover:bg-primary/12"
@@ -423,50 +360,28 @@ const jsonLd = computed(() => ({
           </p>
           <p class="mt-3 text-caption font-semibold text-foreground">택배비 계산기로 이동</p>
         </RouterLink>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- 내부 링크: 카테고리별 + 마켓별 통합 -->
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h3 class="retro-title">더 알아보기</h3>
       </div>
-      <div class="retro-panel-content space-y-3">
-        <div class="flex flex-wrap gap-1.5">
-          <RouterLink
-            v-for="cat in CATEGORIES"
-            :key="cat.key"
-            :to="`/${cat.slug}-fee-compare`"
-            class="retro-button-subtle text-caption"
-          >
-            {{ cat.emoji }} {{ cat.label }}
-          </RouterLink>
-        </div>
-        <div class="flex flex-wrap gap-1.5">
-          <RouterLink to="/smartstore" class="retro-button-subtle text-caption">스마트스토어</RouterLink>
-          <RouterLink to="/coupang" class="retro-button-subtle text-caption">쿠팡</RouterLink>
-          <RouterLink to="/11st" class="retro-button-subtle text-caption">11번가</RouterLink>
-          <RouterLink to="/gmarket" class="retro-button-subtle text-caption">G마켓/옥션</RouterLink>
-        </div>
+      <div class="retro-panel-content">
+        <RouterLink to="/market-compare" class="retro-button-subtle text-caption">
+          오픈마켓 수수료 한눈에 비교
+        </RouterLink>
       </div>
     </div>
 
-    <!-- FAQ -->
-    <section class="space-y-3">
-      <div class="section-heading-block">
-        <span class="section-eyebrow">Section 4</span>
-        <h2 class="section-title">자주 묻는 질문</h2>
-        <p class="section-description">
-          계산 기준과 수수료 반영 범위를 빠르게 확인할 수 있도록 자주 묻는 질문을 정리했습니다.
-        </p>
-      </div>
+    <section>
       <CompareFAQ />
     </section>
 
-    <!-- 광고 하단 -->
     <AdSlot slot="bottom" />
 
-    <!-- 공유 모달 -->
     <ShareModal
       :show="share.showShareModal.value"
       :kakao-busy="share.kakaoBusy.value"

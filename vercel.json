@@ -2,6 +2,18 @@
   "installCommand": "cd client && npm ci",
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
+  "redirects": [
+    { "source": "/smartstore", "destination": "/market-compare", "permanent": true },
+    { "source": "/coupang", "destination": "/market-compare", "permanent": true },
+    { "source": "/11st", "destination": "/market-compare", "permanent": true },
+    { "source": "/gmarket", "destination": "/market-compare", "permanent": true },
+    { "source": "/clothing-fee-compare", "destination": "/market-compare", "permanent": true },
+    { "source": "/food-fee-compare", "destination": "/market-compare", "permanent": true },
+    { "source": "/electronics-fee-compare", "destination": "/market-compare", "permanent": true },
+    { "source": "/beauty-fee-compare", "destination": "/market-compare", "permanent": true },
+    { "source": "/living-fee-compare", "destination": "/market-compare", "permanent": true },
+    { "source": "/price/:amount", "destination": "/market-compare", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
