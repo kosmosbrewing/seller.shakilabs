@@ -1,5 +1,7 @@
-import { useHead } from "@vueuse/head";
+import { useHead } from "@unhead/vue";
 import { toValue, type MaybeRefOrGetter } from "vue";
+import { useRoute } from "vue-router";
+import { getSiteUrl } from "@/lib/site";
 
 const TITLE_SUFFIX = " | 오픈마켓 수수료 계산기";
 const LEGACY_TITLE_SUFFIXES = [
@@ -43,6 +45,8 @@ export function useSEO({
   noindex = false,
   jsonLd,
 }: SEOOptions): void {
+  const route = useRoute();
+
   useHead(() => {
     const resolvedTitle = normalizeTitle(toValue(title));
     const resolvedDescription = toValue(description);
@@ -57,23 +61,22 @@ export function useSEO({
       : resolvedJsonLd && typeof resolvedJsonLd === "object"
         ? [resolvedJsonLd]
         : [];
-    const currentUrl =
-      typeof window !== "undefined"
-        ? (() => {
-            try {
-              const url = new URL(window.location.href);
-              url.search = "";
-              url.hash = "";
-              return url.toString();
-            } catch {
-              return window.location.href.split("#")[0].split("?")[0];
-            }
-          })()
-        : undefined;
+    const siteUrl = getSiteUrl().replace(/\/+$/, "");
+    const currentPath = route.path || "/";
+    const currentUrl = currentPath === "/" ? siteUrl : `${siteUrl}${currentPath}`;
 
     return {
+      htmlAttrs: {
+        lang: "ko",
+      },
       title: resolvedTitle,
-      link: currentUrl ? [{ rel: "canonical", href: currentUrl }] : [],
+      link: currentUrl
+        ? [
+            { rel: "canonical", href: currentUrl },
+            { rel: "alternate", hreflang: "ko", href: currentUrl },
+            { rel: "alternate", hreflang: "x-default", href: currentUrl },
+          ]
+        : [],
       meta: [
         { name: "description", content: resolvedDescription },
         { property: "og:title", content: resolvedTitle },

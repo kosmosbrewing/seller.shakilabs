@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import { nextTick } from "vue";
+import type { Router, RouteRecordRaw } from "vue-router";
 import { showAlert } from "@/composables/useAlert";
 import { trackPageView } from "@/lib/analytics";
 import { useAuthStore } from "@/stores/auth";
 
-const routes: RouteRecordRaw[] = [
+export const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Home",
@@ -55,51 +55,59 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-  scrollBehavior(to, _from, savedPosition) {
+function isBrowser(): boolean {
+  return typeof window !== "undefined" && typeof document !== "undefined";
+}
+
+export function createScrollBehavior(): Router["options"]["scrollBehavior"] {
+  return (to, _from, savedPosition) => {
     if (savedPosition) return savedPosition;
     if (to.hash) return { el: to.hash, behavior: "smooth", top: 80 };
     return { top: 0 };
-  },
-});
+  };
+}
 
-router.beforeEach(async (to) => {
-  const authStore = useAuthStore();
-  const needsAuthState = Boolean(to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guestOnly);
+export function setupRouterGuards(router: Router): void {
+  router.beforeEach(async (to) => {
+    const authStore = useAuthStore();
+    const needsAuthState = Boolean(to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guestOnly);
 
-  if (needsAuthState && !authStore.isInitialized) {
-    try {
-      await authStore.loadUser({ throwOnError: true });
-    } catch {
-      showAlert("사용자 정보를 불러오지 못했습니다.", { type: "error" });
-      return false;
+    if (needsAuthState && !authStore.isInitialized) {
+      try {
+        await authStore.loadUser({ throwOnError: true });
+      } catch {
+        if (isBrowser()) {
+          showAlert("사용자 정보를 불러오지 못했습니다.", { type: "error" });
+        }
+        return false;
+      }
     }
-  }
 
-  if (to.meta.guestOnly && authStore.isAuthenticated) {
-    return "/";
-  }
+    if (to.meta.guestOnly && authStore.isAuthenticated) {
+      return "/";
+    }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    showAlert("로그인이 필요합니다.", { type: "error" });
-    return "/";
-  }
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+      if (isBrowser()) {
+        showAlert("로그인이 필요합니다.", { type: "error" });
+      }
+      return "/";
+    }
 
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    showAlert("관리자 권한이 필요합니다.", { type: "error" });
-    return "/";
-  }
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+      if (isBrowser()) {
+        showAlert("관리자 권한이 필요합니다.", { type: "error" });
+      }
+      return "/";
+    }
 
-  return true;
-});
-
-router.afterEach((to, _from, failure) => {
-  if (failure) return;
-  void nextTick(() => {
-    trackPageView(to.fullPath, document.title);
+    return true;
   });
-});
 
-export default router;
+  router.afterEach((to, _from, failure) => {
+    if (failure || !isBrowser()) return;
+    void nextTick(() => {
+      trackPageView(to.fullPath, document.title);
+    });
+  });
+}

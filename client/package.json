@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite-ssg build",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -13,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vueuse/head": "^2.0.0",
+    "@unhead/vue": "^2.1.10",
     "autoprefixer": "^10.4.24",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -32,6 +32,7 @@
     "@vitejs/plugin-vue": "^6.0.2",
     "typescript": "^5.7.3",
     "vite": "^7.3.1",
+    "vite-ssg": "^28.3.0",
     "vitest": "^4.0.18",
     "vue-tsc": "^2.2.0"
   }

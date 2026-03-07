@@ -47,4 +47,16 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 500,
   },
+  ssgOptions: {
+    includedRoutes() {
+      return [
+        "/",
+        "/market-compare",
+        "/payment-compare",
+        "/shipping-compare",
+        "/about",
+        "/privacy",
+      ];
+    },
+  },
 });

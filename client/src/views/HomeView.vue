@@ -310,56 +310,56 @@ const jsonLd = computed(() => ({
             수익성 판단은 마켓 수수료만으로 끝나지 않습니다. 결제 수수료와 택배비까지 같은 흐름에서 바로 비교해보세요.
           </p>
           <div class="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        <button
-          type="button"
-          class="group rounded-[1.6rem] border border-primary/20 bg-primary/10 p-4 text-left transition-colors hover:border-primary/35 hover:bg-primary/12"
-          @click="
-            trackCostAxisClick('market');
-            moveToSection('input', 'cost_axis');
-          "
-        >
-          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Store class="h-5 w-5" />
-          </span>
-          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">Axis 1</p>
-          <h3 class="mt-1.5 text-body font-bold text-foreground">마켓 수수료</h3>
-          <p class="mt-2 text-caption text-muted-foreground">
-            지금 이 페이지에서 판매가, 배송비, 카테고리 기준으로 오픈마켓 순이익을 바로 계산합니다.
-          </p>
-          <p class="mt-3 text-caption font-semibold text-primary">현재 계산기로 이동</p>
-        </button>
+            <button
+              type="button"
+              class="group rounded-[1.6rem] border border-primary/20 bg-primary/10 p-4 text-left transition-colors hover:border-primary/35 hover:bg-primary/12"
+              @click="
+                trackCostAxisClick('market');
+                moveToSection('input', 'cost_axis');
+              "
+            >
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+                <Store class="h-5 w-5" />
+              </span>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">Axis 1</p>
+              <h3 class="mt-1.5 text-body font-bold text-foreground">마켓 수수료</h3>
+              <p class="mt-2 text-caption text-muted-foreground">
+                지금 이 페이지에서 판매가, 배송비, 카테고리 기준으로 오픈마켓 순이익을 바로 계산합니다.
+              </p>
+              <p class="mt-3 text-caption font-semibold text-primary">현재 계산기로 이동</p>
+            </button>
 
-        <RouterLink
-          to="/payment-compare"
-          class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
-          @click="trackCostAxisClick('payment')"
-        >
-          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#03C75A]/12 text-[#03C75A]">
-            <CreditCard class="h-5 w-5" />
-          </span>
-          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#03C75A]">Axis 2</p>
-          <h3 class="mt-1.5 text-body font-bold text-foreground">결제 수수료</h3>
-          <p class="mt-2 text-caption text-muted-foreground">
-            토스페이먼츠, 네이버페이, 카카오페이, PAYCO의 가입비·연회비·카드 수수료를 한눈에 비교합니다.
-          </p>
-          <p class="mt-3 text-caption font-semibold text-foreground">결제 서비스 비교 보기</p>
-        </RouterLink>
+            <RouterLink
+              to="/payment-compare"
+              class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
+              @click="trackCostAxisClick('payment')"
+            >
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#03C75A]/12 text-[#03C75A]">
+                <CreditCard class="h-5 w-5" />
+              </span>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#03C75A]">Axis 2</p>
+              <h3 class="mt-1.5 text-body font-bold text-foreground">결제 수수료</h3>
+              <p class="mt-2 text-caption text-muted-foreground">
+                토스페이먼츠, 네이버페이, 카카오페이, PAYCO의 가입비·연회비·카드 수수료를 한눈에 비교합니다.
+              </p>
+              <p class="mt-3 text-caption font-semibold text-foreground">결제 서비스 비교 보기</p>
+            </RouterLink>
 
-        <RouterLink
-          to="/shipping-compare"
-          class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
-          @click="trackCostAxisClick('shipping')"
-        >
-          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1D4ED8]/12 text-[#1D4ED8]">
-            <PackageCheck class="h-5 w-5" />
-          </span>
-          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#1D4ED8]">Axis 3</p>
-          <h3 class="mt-1.5 text-body font-bold text-foreground">택배비 비교</h3>
-          <p class="mt-2 text-caption text-muted-foreground">
-            일반 택배 6사와 편의점 택배 2개의 예상 운임을 무게와 크기 조건에 따라 바로 계산합니다.
-          </p>
-          <p class="mt-3 text-caption font-semibold text-foreground">택배비 계산기로 이동</p>
-        </RouterLink>
+            <RouterLink
+              to="/shipping-compare"
+              class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
+              @click="trackCostAxisClick('shipping')"
+            >
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1D4ED8]/12 text-[#1D4ED8]">
+                <PackageCheck class="h-5 w-5" />
+              </span>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#1D4ED8]">Axis 3</p>
+              <h3 class="mt-1.5 text-body font-bold text-foreground">택배비 비교</h3>
+              <p class="mt-2 text-caption text-muted-foreground">
+                일반 택배 6사와 편의점 택배 2개의 예상 운임을 무게와 크기 조건에 따라 바로 계산합니다.
+              </p>
+              <p class="mt-3 text-caption font-semibold text-foreground">택배비 계산기로 이동</p>
+            </RouterLink>
           </div>
         </div>
       </div>

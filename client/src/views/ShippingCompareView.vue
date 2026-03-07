@@ -5,9 +5,9 @@ import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
+import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
-  REMOTE_AREA_POSTAL_CODE_REFERENCE,
-  REMOTE_AREA_REFERENCE_SOURCE,
+  REMOTE_AREA_POSTAL_CODE_SUMMARY,
   SHIPPING_DATA_UPDATED,
   SHIPPING_SIZE_LABELS,
   SHIPPING_SIZE_ORDER,
@@ -24,6 +24,7 @@ import { formatNumber, formatWon } from "@/lib/utils";
 const seoTitle = "8개 택배사 예상 운임 택배비 비교 계산기";
 const seoDescription =
   "CJ대한통운, 한진, 로젠, 우체국, 경동, 롯데, CU, GS25의 예상 택배비를 무게와 크기 기준으로 비교합니다.";
+const pageUrl = `${DEFAULT_SITE_URL}/shipping-compare`;
 
 const weightKg = ref(3);
 const selectedSize = ref<ShippingSizeKey>("medium");
@@ -56,16 +57,73 @@ const convenienceResults = computed(() => allResults.value.filter((item) => item
 const cheapestOverall = computed(() => allResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestGeneral = computed(() => generalResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestConvenience = computed(() => convenienceResults.value.find((item) => item.isAvailable) ?? null);
-const remoteAreaGroupCount = computed(() => REMOTE_AREA_POSTAL_CODE_REFERENCE.length);
-const remoteAreaEntryCount = computed(() =>
-  REMOTE_AREA_POSTAL_CODE_REFERENCE.reduce((sum, group) => sum + group.entries.length, 0)
+const remoteAreaGroupCount = computed(() => REMOTE_AREA_POSTAL_CODE_SUMMARY.length);
+const remoteAreaClusterCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce((sum, group) => sum + group.clusters.length, 0)
 );
-const remoteAreaPostalCodeCount = computed(() =>
-  REMOTE_AREA_POSTAL_CODE_REFERENCE.reduce(
-    (sum, group) => sum + group.entries.reduce((groupSum, entry) => groupSum + getPostalCodeCount(entry.postalRange), 0),
+const remoteAreaRangeCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
+    (sum, group) => sum + group.clusters.reduce((clusterSum, cluster) => clusterSum + cluster.postalRanges.length, 0),
     0
   )
 );
+const remoteAreaPostalCodeCount = computed(() =>
+  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
+    (sum, group) =>
+      sum + group.clusters.reduce(
+        (groupSum, cluster) =>
+          groupSum + cluster.postalRanges.reduce((rangeSum, postalRange) => rangeSum + getPostalCodeCount(postalRange), 0),
+        0
+      ),
+    0
+  )
+);
+
+const jsonLd = computed(() => [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": seoTitle,
+    "description": seoDescription,
+    "url": pageUrl,
+    "inLanguage": "ko-KR",
+    "dateModified": "2026-03-07",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "오픈마켓 수수료 계산기",
+      "url": DEFAULT_SITE_URL,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "택배사 비교 목록",
+    "url": pageUrl,
+    "numberOfItems": SHIPPING_CARRIERS.length,
+    "itemListElement": SHIPPING_CARRIERS.map((carrier, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Service",
+        "name": carrier.name,
+        "description": `${carrier.estimateNote} · ${carrier.restrictionNote}`,
+      },
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "제주·도서산간 우편번호 내부 정리표",
+    "description": `제주 및 도서산간 우편번호 묶음 ${remoteAreaClusterCount.value}건, 총 ${remoteAreaPostalCodeCount.value}개 우편번호 참고 데이터`,
+    "url": pageUrl,
+    "inLanguage": "ko-KR",
+    "dateModified": "2026-03-07",
+    "creator": {
+      "@type": "Organization",
+      "name": "ShakiLabs",
+    },
+  },
+]);
 
 function handleWeightInput(event: Event): void {
   const raw = (event.target as HTMLInputElement).value.replace(/[^0-9.]/g, "");
@@ -114,10 +172,23 @@ function getPostalCodeCount(range: string): number {
 function getPostalRangeKind(range: string): string {
   return range.includes("-") ? "연속 구간" : "단일 번호";
 }
+
+function getPostalRangesCount(ranges: string[]): number {
+  return ranges.reduce((sum, range) => sum + getPostalCodeCount(range), 0);
+}
+
+function getPostalRangeKinds(ranges: string[]): string {
+  if (ranges.length === 1) return getPostalRangeKind(ranges[0]);
+  return "복합 구간";
+}
+
+function formatPostalRanges(ranges: string[]): string {
+  return ranges.join(", ");
+}
 </script>
 
 <template>
-  <SEOHead :title="seoTitle" :description="seoDescription" />
+  <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
@@ -393,51 +464,47 @@ function getPostalRangeKind(range: string): string {
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
           <div class="flex flex-col gap-1">
-            <span class="retro-title">제주·도서산간 우편번호 기준표</span>
-            <p class="text-tiny text-muted-foreground">추가운임 판정에 쓰는 우편번호 구간 레퍼런스입니다.</p>
-            <a
-              :href="REMOTE_AREA_REFERENCE_SOURCE"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-caption font-semibold text-primary hover:text-primary/80 hover:underline underline-offset-2"
-            >
-              기준 출처 보기
-            </a>
+            <span class="retro-title">제주·도서산간 우편번호 정리표</span>
+            <p class="text-tiny text-muted-foreground">세부 구간을 섬권역 단위로 묶어 다시 정리한 내부 참고표입니다.</p>
           </div>
         </div>
 
         <div class="flex flex-wrap gap-1.5 border-b border-border/60 px-4 py-3 text-tiny text-muted-foreground">
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaGroupCount }}개 권역</span>
-          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaEntryCount }}개 세부 지역</span>
+          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaClusterCount }}개 섬권역 묶음</span>
+          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaRangeCount }}개 원시 구간</span>
           <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">총 {{ remoteAreaPostalCodeCount.toLocaleString('ko-KR') }}개 우편번호</span>
         </div>
 
         <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
           <article
-            v-for="group in REMOTE_AREA_POSTAL_CODE_REFERENCE"
+            v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY"
             :key="group.group"
             class="rounded-2xl border border-border/70 bg-background px-3.5 py-3"
           >
             <p class="text-body font-bold text-foreground">{{ group.group }}</p>
             <div class="mt-3 space-y-2">
               <div
-                v-for="entry in group.entries"
-                :key="`${group.group}-${entry.area}-${entry.postalRange}`"
+                v-for="cluster in group.clusters"
+                :key="`${group.group}-${cluster.zone}`"
                 class="rounded-xl border border-border/60 bg-muted/10 px-3 py-2.5"
               >
                 <div class="flex items-start justify-between gap-3">
-                  <p class="text-caption font-bold text-foreground">{{ entry.area }}</p>
+                  <div>
+                    <p class="text-caption font-bold text-foreground">{{ cluster.zone }}</p>
+                    <p class="mt-0.5 text-[11px] text-muted-foreground">{{ cluster.areas }}</p>
+                  </div>
                   <div class="flex flex-wrap justify-end gap-1">
                     <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                      {{ getPostalRangeKind(entry.postalRange) }}
+                      {{ getPostalRangeKinds(cluster.postalRanges) }}
                     </span>
                     <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                      {{ getPostalCodeCount(entry.postalRange) }}개
+                      {{ getPostalRangesCount(cluster.postalRanges) }}개
                     </span>
                   </div>
                 </div>
-                <p class="mt-1 text-[12px] font-semibold tracking-[-0.01em] text-foreground">{{ entry.postalRange }}</p>
-                <p v-if="entry.note" class="mt-1 text-[11px] text-muted-foreground">{{ entry.note }}</p>
+                <p class="mt-1 text-[12px] font-semibold tracking-[-0.01em] text-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</p>
+                <p v-if="cluster.note" class="mt-1 text-[11px] text-muted-foreground">{{ cluster.note }}</p>
               </div>
             </div>
           </article>
@@ -448,39 +515,41 @@ function getPostalRangeKind(range: string): string {
             <thead>
               <tr class="border-b border-border/80 bg-card/95">
                 <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">권역</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">세부 지역</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">우편번호 구간</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">구간 정보</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">섬권역 묶음</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">포함 지역</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">우편번호 묶음</th>
+                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">묶음 정보</th>
               </tr>
             </thead>
             <tbody>
-              <template v-for="group in REMOTE_AREA_POSTAL_CODE_REFERENCE" :key="group.group">
+              <template v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY" :key="group.group">
                 <tr class="border-b border-border/40 bg-muted/10">
-                  <td colspan="4" class="px-4 py-2.5 text-body font-bold text-foreground">
+                  <td colspan="5" class="px-4 py-2.5 text-body font-bold text-foreground">
                     {{ group.group }}
                   </td>
                 </tr>
                 <tr
-                  v-for="entry in group.entries"
-                  :key="`${group.group}-${entry.area}-${entry.postalRange}`"
+                  v-for="cluster in group.clusters"
+                  :key="`${group.group}-${cluster.zone}`"
                   class="border-b border-border/40"
                 >
                   <td class="px-4 py-3 text-caption text-muted-foreground">{{ group.group }}</td>
-                  <td class="px-4 py-3 text-body font-semibold text-foreground">{{ entry.area }}</td>
-                  <td class="px-4 py-3 text-body font-semibold tracking-[-0.01em] text-foreground">{{ entry.postalRange }}</td>
+                  <td class="px-4 py-3 text-body font-semibold text-foreground">{{ cluster.zone }}</td>
+                  <td class="px-4 py-3 text-caption text-muted-foreground">{{ cluster.areas }}</td>
+                  <td class="px-4 py-3 text-body font-semibold tracking-[-0.01em] text-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</td>
                   <td class="px-4 py-3">
                     <div class="flex flex-wrap gap-1.5">
                       <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                        {{ getPostalRangeKind(entry.postalRange) }}
+                        {{ getPostalRangeKinds(cluster.postalRanges) }}
                       </span>
                       <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                        {{ getPostalCodeCount(entry.postalRange) }}개
+                        {{ getPostalRangesCount(cluster.postalRanges) }}개
                       </span>
                       <span
-                        v-if="entry.note"
+                        v-if="cluster.note"
                         class="rounded-full border border-orange-300/70 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-foreground dark:border-orange-400/35 dark:bg-orange-950/20"
                       >
-                        {{ entry.note }}
+                        {{ cluster.note }}
                       </span>
                     </div>
                   </td>

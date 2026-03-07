@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { useHead } from "@vueuse/head";
+import { useHead } from "@unhead/vue";
 
 const faqs = [
   {

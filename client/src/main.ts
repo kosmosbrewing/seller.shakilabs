@@ -1,11 +1,12 @@
-import { createApp } from "vue";
-import { createHead } from "@vueuse/head";
+import { ViteSSG } from "vite-ssg";
 import { createPinia } from "pinia";
 import App from "./App.vue";
-import router from "./router";
+import { createScrollBehavior, routes, setupRouterGuards } from "./router";
 import "./assets/css/main.css";
 import { initAnalytics, trackEvent } from "./lib/analytics";
 import { useConstantsStore } from "@/stores/constants";
+
+let hasRegisteredGlobalErrorTracking = false;
 
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -17,18 +18,8 @@ function normalizeErrorMessage(error: unknown): string {
   }
 }
 
-async function bootstrap(): Promise<void> {
-  const app = createApp(App);
-  const head = createHead();
-  const pinia = createPinia();
-
-  app.config.errorHandler = (error, _instance, info) => {
-    console.error("[global-error]", error, info);
-    trackEvent("app_error", {
-      message: normalizeErrorMessage(error),
-      info,
-    });
-  };
+function registerGlobalErrorTracking(): void {
+  if (import.meta.env.SSR || typeof window === "undefined" || hasRegisteredGlobalErrorTracking) return;
 
   window.addEventListener("error", (event) => {
     trackEvent("app_error", {
@@ -44,21 +35,12 @@ async function bootstrap(): Promise<void> {
     });
   });
 
-  app.use(pinia);
-  app.use(router);
-  app.use(head);
+  hasRegisteredGlobalErrorTracking = true;
+}
 
-  const constantsStore = useConstantsStore(pinia);
-  try {
-    await constantsStore.loadConstants();
-  } catch (error) {
-    console.warn("[constants] load failed, fallback applied", error);
-  }
+function scheduleAnalyticsInit(): void {
+  if (import.meta.env.SSR) return;
 
-  await router.isReady();
-  app.mount("#app");
-
-  // GA 초기화를 LCP 이후로 미룸
   if (typeof requestIdleCallback === "function") {
     requestIdleCallback(() => initAnalytics(), { timeout: 4000 });
   } else {
@@ -66,6 +48,43 @@ async function bootstrap(): Promise<void> {
   }
 }
 
-void bootstrap().catch((error) => {
-  console.error("[bootstrap] failed", error);
-});
+export const createApp = ViteSSG(
+  App,
+  {
+    routes,
+    scrollBehavior: createScrollBehavior(),
+  },
+  async ({ app, router, isClient, initialState }) => {
+    const pinia = createPinia();
+
+    app.config.errorHandler = (error, _instance, info) => {
+      console.error("[global-error]", error, info);
+      trackEvent("app_error", {
+        message: normalizeErrorMessage(error),
+        info,
+      });
+    };
+
+    app.use(pinia);
+    setupRouterGuards(router);
+
+    if (import.meta.env.SSR) {
+      initialState.pinia = pinia.state.value;
+    } else {
+      pinia.state.value = initialState.pinia || {};
+    }
+
+    registerGlobalErrorTracking();
+
+    if (isClient) {
+      const constantsStore = useConstantsStore(pinia);
+      try {
+        await constantsStore.loadConstants();
+      } catch (error) {
+        console.warn("[constants] load failed, fallback applied", error);
+      }
+
+      scheduleAnalyticsInit();
+    }
+  }
+);

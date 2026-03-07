@@ -9,6 +9,11 @@ interface ImportMetaEnv {
   readonly VITE_GA4_MEASUREMENT_ID?: string;
   readonly VITE_GA_DEBUG?: string;
   readonly VITE_ADSENSE_PUBLISHER_ID?: string;
+  readonly VITE_ADSENSE_SLOT_TOP?: string;
+  readonly VITE_ADSENSE_SLOT_BOTTOM?: string;
+  readonly VITE_ADSENSE_SLOT_MARKET_COMPARE?: string;
+  readonly VITE_ADSENSE_SLOT_PAYMENT_COMPARE?: string;
+  readonly VITE_ADSENSE_SLOT_SHIPPING_COMPARE?: string;
   readonly VITE_KAKAO_JS_KEY?: string;
 }
 

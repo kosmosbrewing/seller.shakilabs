@@ -69,9 +69,16 @@ export interface RemoteAreaPostalCodeReferenceEntry {
   note?: string;
 }
 
-export interface RemoteAreaPostalCodeReferenceGroup {
+export interface RemoteAreaPostalCodeSummaryCluster {
+  zone: string;
+  areas: string;
+  postalRanges: string[];
+  note?: string;
+}
+
+export interface RemoteAreaPostalCodeSummaryGroup {
   group: string;
-  entries: RemoteAreaPostalCodeReferenceEntry[];
+  clusters: RemoteAreaPostalCodeSummaryCluster[];
 }
 
 export const SHIPPING_DATA_UPDATED = "2026.03";
@@ -94,81 +101,70 @@ export const SIZE_SUM_THRESHOLDS: Record<ShippingSizeKey, number> = {
   xlarge: 160,
 };
 
-export const REMOTE_AREA_REFERENCE_SOURCE =
-  "https://help.campaignus.me/ko/articles/%EC%A0%9C%EC%A3%BC%EB%8F%84-%EB%B0%8F-%EB%8F%84%EC%84%9C%EC%82%B0%EA%B0%84-%EC%A7%80%EC%97%AD-%EA%B8%B0%EC%A4%80%ED%91%9C-342d2e5e";
-
-export const REMOTE_AREA_POSTAL_CODE_REFERENCE: RemoteAreaPostalCodeReferenceGroup[] = [
+export const REMOTE_AREA_POSTAL_CODE_SUMMARY: RemoteAreaPostalCodeSummaryGroup[] = [
   {
     group: "제주",
-    entries: [
+    clusters: [
       {
-        area: "제주도",
-        postalRange: "63000-63644",
+        zone: "제주도 전역",
+        areas: "제주시·서귀포시",
+        postalRanges: ["63000-63644"],
       },
     ],
   },
   {
     group: "인천",
-    entries: [
-      { area: "중구 섬지역", postalRange: "22386-22388" },
-      { area: "강화 섬지역", postalRange: "23004-23010" },
-      { area: "옹진 섬지역 1", postalRange: "23100-23116" },
-      { area: "옹진 섬지역 2", postalRange: "23124-23136" },
+    clusters: [
+      { zone: "중구 섬권역", areas: "중구 섬지역", postalRanges: ["22386-22388"] },
+      { zone: "강화 섬권역", areas: "강화 섬지역", postalRanges: ["23004-23010"] },
+      { zone: "옹진 섬권역", areas: "옹진 섬지역", postalRanges: ["23100-23116", "23124-23136"] },
     ],
   },
   {
     group: "충남",
-    entries: [
-      { area: "당진 섬지역", postalRange: "31708" },
-      { area: "태안 섬지역", postalRange: "32133" },
-      { area: "보령 섬지역", postalRange: "33411" },
+    clusters: [
+      { zone: "충남 서해안 섬권역", areas: "당진·태안·보령", postalRanges: ["31708", "32133", "33411"] },
     ],
   },
   {
     group: "경북",
-    entries: [
-      { area: "울릉도 전지역", postalRange: "40200-40240" },
+    clusters: [
+      { zone: "울릉도 전역", areas: "울릉군", postalRanges: ["40200-40240"] },
     ],
   },
   {
     group: "부산",
-    entries: [
-      { area: "강서구 섬지역", postalRange: "46768-46771" },
+    clusters: [
+      { zone: "강서구 섬권역", areas: "강서구 섬지역", postalRanges: ["46768-46771"] },
     ],
   },
   {
     group: "경남",
-    entries: [
-      { area: "사천 섬지역", postalRange: "52570-52571" },
-      { area: "통영 섬지역 1", postalRange: "53031-53033" },
-      { area: "통영 섬지역 2", postalRange: "53089-53104" },
-      { area: "통영 섬지역 3", postalRange: "54000" },
+    clusters: [
+      { zone: "사천 섬권역", areas: "사천 섬지역", postalRanges: ["52570-52571"] },
+      { zone: "통영 섬권역", areas: "통영 섬지역", postalRanges: ["53031-53033", "53089-53104", "54000"] },
     ],
   },
   {
     group: "전북",
-    entries: [
-      { area: "부안 섬지역", postalRange: "56347-56349" },
+    clusters: [
+      { zone: "부안 섬권역", areas: "부안 섬지역", postalRanges: ["56347-56349"] },
     ],
   },
   {
     group: "전남",
-    entries: [
-      { area: "영광 섬지역", postalRange: "57068-57069" },
-      { area: "목포 섬지역", postalRange: "58760-58762" },
-      { area: "신안 섬지역 1", postalRange: "58800-58810" },
-      { area: "신안 섬지역 2", postalRange: "58816-58818" },
-      { area: "신안 섬지역 3", postalRange: "28826", note: "출처 원문 표기 유지" },
-      { area: "신안 섬지역 4", postalRange: "58828-58866" },
-      { area: "진도 섬지역", postalRange: "58953-58958" },
-      { area: "완도 섬지역 1", postalRange: "59102-59103" },
-      { area: "완도 섬지역 2", postalRange: "59106" },
-      { area: "완도 섬지역 3", postalRange: "59127" },
-      { area: "완도 섬지역 4", postalRange: "59129" },
-      { area: "완도 섬지역 5", postalRange: "59137-59166" },
-      { area: "여수시 섬지역 1", postalRange: "59650" },
-      { area: "여수시 섬지역 2", postalRange: "59766" },
-      { area: "여수시 섬지역 3", postalRange: "59781-59790" },
+    clusters: [
+      { zone: "영광 섬권역", areas: "영광 섬지역", postalRanges: ["57068-57069"] },
+      { zone: "목포 섬권역", areas: "목포 섬지역", postalRanges: ["58760-58762"] },
+      {
+        zone: "신안 섬권역",
+        areas: "신안 섬지역",
+        postalRanges: ["58800-58810", "58816-58818", "28826", "58828-58866"],
+        note: "단일 번호 28826은 별도 확인 권장",
+      },
+      { zone: "진도 섬권역", areas: "진도 섬지역", postalRanges: ["58953-58958"] },
+      { zone: "완도 섬권역", areas: "완도 섬지역", postalRanges: ["59102-59103", "59106", "59127", "59129", "59137-59166"] },
+      { zone: "여수 섬권역", areas: "여수시 섬지역", postalRanges: ["59650", "59766", "59781-59790"] },
     ],
   },
 ];

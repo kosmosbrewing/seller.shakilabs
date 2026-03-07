@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 
 declare global {
   interface Window {
@@ -14,6 +14,15 @@ const props = defineProps<{
 
 const publisherId = (import.meta.env.VITE_ADSENSE_PUBLISHER_ID || "").trim();
 const isDev = import.meta.env.DEV;
+const slotAliasMap: Record<string, string> = {
+  top: (import.meta.env.VITE_ADSENSE_SLOT_TOP || "").trim(),
+  bottom: (import.meta.env.VITE_ADSENSE_SLOT_BOTTOM || "").trim(),
+  "market-compare": (import.meta.env.VITE_ADSENSE_SLOT_MARKET_COMPARE || "").trim(),
+  "payment-compare": (import.meta.env.VITE_ADSENSE_SLOT_PAYMENT_COMPARE || "").trim(),
+  "shipping-compare": (import.meta.env.VITE_ADSENSE_SLOT_SHIPPING_COMPARE || "").trim(),
+};
+const resolvedSlot = computed(() => slotAliasMap[props.slot]?.trim() || props.slot.trim());
+const canRenderRealAd = computed(() => Boolean(publisherId && resolvedSlot.value));
 
 function ensureAdsenseScript(): void {
   if (!publisherId) return;
@@ -30,8 +39,9 @@ function ensureAdsenseScript(): void {
 }
 
 onMounted(() => {
+  if (!canRenderRealAd.value) return;
+
   ensureAdsenseScript();
-  if (!publisherId) return;
 
   try {
     (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -47,19 +57,19 @@ onMounted(() => {
       {{ label || "광고 영역" }}
     </p>
 
-    <div v-if="publisherId" class="min-h-[80px]">
+    <div v-if="canRenderRealAd" class="min-h-[80px]">
       <ins
         class="adsbygoogle"
         style="display:block"
         :data-ad-client="publisherId"
-        :data-ad-slot="slot"
+        :data-ad-slot="resolvedSlot"
         data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
     </div>
 
     <div v-else-if="isDev" class="flex min-h-[80px] items-center justify-center border border-dashed border-border/60 rounded-lg text-caption text-muted-foreground">
-      광고 영역 (개발 모드)
+      광고 영역 (개발 모드{{ resolvedSlot ? ` · slot ${resolvedSlot}` : "" }})
     </div>
   </section>
 </template>

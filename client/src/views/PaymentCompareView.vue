@@ -5,6 +5,7 @@ import { BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
+import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   PAYMENT_DATA_UPDATED,
   PAYMENT_GATEWAYS,
@@ -21,6 +22,7 @@ interface CompareColumn {
 const seoTitle = "토스페이먼츠·네이버페이·카카오페이·PAYCO 간편결제 수수료 비교";
 const seoDescription =
   "토스페이먼츠, 네이버페이 주문형·결제형, 카카오페이, PAYCO의 가입비·연회비·카드 수수료·정산 조건을 한눈에 비교합니다.";
+const pageUrl = `${DEFAULT_SITE_URL}/payment-compare`;
 
 const compareColumns: CompareColumn[] = [
   { key: "setupFee", label: "가입비" },
@@ -57,6 +59,39 @@ const lowestCardFeeLabel = computed<string | null>(() => {
   return `${gateway.shortName} ${rate}%`;
 });
 
+const jsonLd = computed(() => [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": seoTitle,
+    "description": seoDescription,
+    "url": pageUrl,
+    "inLanguage": "ko-KR",
+    "dateModified": "2026-03-07",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "오픈마켓 수수료 계산기",
+      "url": DEFAULT_SITE_URL,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "간편결제 서비스 비교 항목",
+    "url": pageUrl,
+    "numberOfItems": PAYMENT_GATEWAYS.length,
+    "itemListElement": PAYMENT_GATEWAYS.map((gateway, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "FinancialProduct",
+        "name": gateway.name,
+        "description": `${gateway.cardFee} · ${gateway.settlementCycle}`,
+      },
+    })),
+  },
+]);
+
 const freeEntryCount = computed(
   () => PAYMENT_GATEWAYS.filter((gateway) => gateway.setupFee === "무료").length
 );
@@ -77,22 +112,15 @@ function getCellBg(columnKey: CompareColumnKey, value: string, gatewayKey: Payme
 </script>
 
 <template>
-  <SEOHead :title="seoTitle" :description="seoDescription" />
+  <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <div>
-          <h1 class="retro-title">간편결제 비교</h1>
+        <h1 class="retro-title">간편결제 비교</h1>
+        <div class="flex flex-col items-end gap-1.5">
           <FreshBadge :message="`${PAYMENT_DATA_UPDATED} 결제 수수료 비교 반영`" />
         </div>
-        <span
-          v-if="lowestCardFeeLabel"
-          class="inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-caption font-semibold text-white"
-        >
-          <BadgeCheck class="h-3.5 w-3.5" />
-          최저 수수료 {{ lowestCardFeeLabel }}
-        </span>
       </div>
 
       <div class="retro-panel-content space-y-4">
@@ -107,8 +135,9 @@ function getCellBg(columnKey: CompareColumnKey, value: string, gatewayKey: Payme
           </span>
           <span
             v-if="lowestCardFeeLabel"
-            class="rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
+            class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
           >
+            <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             최저 시작 수수료 {{ lowestCardFeeLabel }}
           </span>
         </div>

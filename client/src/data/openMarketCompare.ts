@@ -3,17 +3,24 @@
 
 export type OpenMarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
 
+export interface CompareCell {
+  core: string;
+  tooltip?: string;
+  condition?: string;
+}
+
 export interface OpenMarketCompareMeta {
   key: OpenMarketKey;
   name: string;
   shortName: string;
   color: string;
   accentClass: string;
-  setupFee: string;
-  salesFeeRange: string;
-  shippingFeeRate: string;
-  settlementCycle: string;
-  note: string;
+  microBusinessRate: number;
+  setupFee: CompareCell;
+  salesFeeRange: CompareCell;
+  shippingFeeRate: CompareCell;
+  settlementCycle: CompareCell;
+  note: CompareCell;
 }
 
 export const MARKET_COMPARE_UPDATED = "2025.10";
@@ -25,11 +32,26 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shortName: "네쇼",
     color: "#03C75A",
     accentClass: "text-[#03C75A]",
-    setupFee: "무료",
-    salesFeeRange: "주문관리 1.95% ~ 3.63%\n+ 판매 0.91% ~ 2.73%\n합산 약 2.86% ~ 6.36%",
-    shippingFeeRate: "주문관리 수수료만 적용\n(판매 수수료 미적용)",
-    settlementCycle: "구매확정 후\n1~2 영업일",
-    note: "등급+유입경로 분리형\n스타트 제로수수료\n(신규 12개월)",
+    microBusinessRate: 1.95,
+    setupFee: {
+      core: "무료",
+    },
+    salesFeeRange: {
+      core: "영세 1.95%~",
+      tooltip: "주문관리 1.95~3.63% + 판매 0.91~2.73% (유입/등급별).",
+      condition: "스타트 제로수수료(신규 12개월) 별도 적용.",
+    },
+    shippingFeeRate: {
+      core: "유료배송 주문관리만 과금",
+      tooltip: "배송비에는 판매 수수료가 적용되지 않습니다.",
+    },
+    settlementCycle: {
+      core: "구매확정 후 1~2영업일",
+    },
+    note: {
+      core: "등급+유입경로 분리형",
+      tooltip: "실제 과금률은 매출 등급과 유입 경로 조합으로 결정됩니다.",
+    },
   },
   {
     key: "coupang",
@@ -37,11 +59,25 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shortName: "쿠팡",
     color: "#E31937",
     accentClass: "text-[#E31937]",
-    setupFee: "무료",
-    salesFeeRange: "7.8% ~ 10.6%\n(카테고리별 상이)",
-    shippingFeeRate: "3.3%\n(유료배송 시)",
-    settlementCycle: "D+1 ~ D+2 영업일\n(요일별 차이)",
-    note: "로켓그로스 이용 시\n물류비 별도\n(700 ~ 4,300원/건)",
+    microBusinessRate: 7.8,
+    setupFee: {
+      core: "무료",
+    },
+    salesFeeRange: {
+      core: "영세 7.8%~",
+      tooltip: "카테고리에 따라 7.8~10.6% 범위에서 적용됩니다.",
+    },
+    shippingFeeRate: {
+      core: "유료배송 3.3%",
+    },
+    settlementCycle: {
+      core: "D+1~D+2 영업일",
+      tooltip: "요일/정산 캘린더에 따라 실제 입금일이 달라질 수 있습니다.",
+    },
+    note: {
+      core: "로켓그로스 물류비 별도",
+      condition: "건당 700~4,300원 추가 발생 가능.",
+    },
   },
   {
     key: "elevenst",
@@ -49,11 +85,24 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shortName: "11번",
     color: "#FF6B00",
     accentClass: "text-[#FF6B00]",
-    setupFee: "무료",
-    salesFeeRange: "10% ~ 13%\n(카테고리별 상이)",
-    shippingFeeRate: "3.3%\n(유료배송 시)",
-    settlementCycle: "구매확정 후\n익영업일",
-    note: "카테고리 수수료 단일 구조\n전자기기 10%\n나머지 13%",
+    microBusinessRate: 10,
+    setupFee: {
+      core: "무료",
+    },
+    salesFeeRange: {
+      core: "영세 10%~",
+      tooltip: "전자기기 10%, 기타 주요 카테고리 13% 수준.",
+    },
+    shippingFeeRate: {
+      core: "유료배송 3.3%",
+    },
+    settlementCycle: {
+      core: "구매확정 후 익영업일",
+    },
+    note: {
+      core: "카테고리 단일형 구조",
+      tooltip: "세부 카테고리별 수수료 코드는 판매자센터에서 확인이 필요합니다.",
+    },
   },
   {
     key: "gmarket",
@@ -61,10 +110,23 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shortName: "G마켓",
     color: "#00B050",
     accentClass: "text-[#00B050]",
-    setupFee: "무료",
-    salesFeeRange: "9% ~ 13%\n(카테고리별 상이)",
-    shippingFeeRate: "3.3%\n(유료배송 시)",
-    settlementCycle: "구매확정 후\n익영업일",
-    note: "대표값 기준 합산 표기\n세부 카테고리는\nG마켓·옥션 별도 확인",
+    microBusinessRate: 9,
+    setupFee: {
+      core: "무료",
+    },
+    salesFeeRange: {
+      core: "영세 9%~",
+      tooltip: "카테고리별 9~13% 범위의 대표값입니다.",
+    },
+    shippingFeeRate: {
+      core: "유료배송 3.3%",
+    },
+    settlementCycle: {
+      core: "구매확정 후 익영업일",
+    },
+    note: {
+      core: "대표값 기준 표기",
+      condition: "G마켓·옥션 정책이 세부적으로 다를 수 있습니다.",
+    },
   },
 ];

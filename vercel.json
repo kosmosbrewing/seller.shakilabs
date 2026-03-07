@@ -14,9 +14,6 @@
     { "source": "/living-fee-compare", "destination": "/market-compare", "permanent": true },
     { "source": "/price/:amount", "destination": "/market-compare", "permanent": true }
   ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
   "headers": [
     {
       "source": "/fonts/(.*)",

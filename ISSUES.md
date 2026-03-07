@@ -3,7 +3,7 @@
 > **점검 기준**: `docs/MVP_QUALITY_MANUAL.md` (22개 항목)
 > **점검 대상**: 오픈마켓 수수료 비교 계산기 (Frontend-only SPA)
 > **최초 점검일**: 2026-03-05
-> **최종 갱신일**: 2026-03-07 (8차 점검, 데이터 정확성 점검 반영)
+> **최종 갱신일**: 2026-03-07 (9차 점검, 비교 테이블 전치 + 데이터 정확성 수정 반영)
 
 ---
 
@@ -17,9 +17,9 @@
 ## 상태 요약
 
 ### 진행 스냅샷 (2026-03-07)
-- 완료: 14건 (완전 해결 13건 + N/A 전환 1건)
-- 진행 중: 2건 (ISSUE-11 운영 검증, ISSUE-16 데이터 정확성 재검증)
-- 실질 미완료: 6개 작업 (11-7, 11-8, 16-1, 16-2, 16-3, 16-4)
+- 완료: 17건 (완전 해결 16건 + N/A 전환 1건)
+- 진행 중: 1건 (ISSUE-11 운영 검증)
+- 실질 미완료: 3개 작업 (11-7, 11-8, 16-4 2차 출처 확인)
 
 ### 프론트엔드 (F1~F7)
 | # | 항목 | 상태 | 근거 |
@@ -112,19 +112,22 @@
 
 ### [ISSUE-15] 섹션 헤더/뱃지 중복 제거 — ✅ 완료 (2026-03-07)
 
-부모 뷰의 section-heading-block(eyebrow + title + description)과 자식 컴포넌트의 retro-titlebar가 같은 제목을 이중 표시하는 문제 수정.
+section-heading-block(eyebrow + title + description)을 전면 제거하고, 카드 헤더(retro-titlebar / retro-details-summary)로 통합.
 
-**HomeView — 3건 (컴포넌트 내부 retro-titlebar 제거)**
-- [x] 15-1 `MonthlySim.vue` — "월간 시뮬레이션" retro-titlebar 제거
-- [x] 15-2 `FeeCompareTable.vue` — "상세 비교표" retro-titlebar 제거, 정렬 버튼은 panel-content 상단으로 이동
-- [x] 15-3 `CompareFAQ.vue` — "자주 묻는 질문" retro-titlebar 제거
+**HomeView — 6건 (section-heading-block 제거 → 카드 헤더로 통합)**
+- [x] 15-1 "핵심 결론" section-heading 제거 (SummaryBanner 자체 충분)
+- [x] 15-2 "마켓별 결과 비교" section-heading 제거 (MarketCardGrid 자체 충분)
+- [x] 15-3 "월간 시뮬레이션" section-heading 제거 → details summary에 제목 통합
+- [x] 15-4 "상세 비교표" section-heading 제거 → details summary에 제목 통합
+- [x] 15-5 "셀러 비용 3축" section-heading 제거 → retro-panel + retro-titlebar로 감쌈
+- [x] 15-6 "자주 묻는 질문" section-heading 제거 → `CompareFAQ.vue`에 retro-titlebar 복원
 
 **ShippingCompareView — 3건 (section-heading-block 제거, retro-titlebar에 통합)**
-- [x] 15-4 "일반 택배 6사 비교" section-heading 제거 → retro-titlebar에 제목+설명 통합
-- [x] 15-5 "편의점 택배 2종 비교" section-heading 제거 → retro-titlebar에 제목+설명 통합
-- [x] 15-6 "제주·도서산간 우편번호 기준표" section-heading 제거 → retro-titlebar에 제목+설명 통합
+- [x] 15-7 "일반 택배 6사 비교" section-heading 제거 → retro-titlebar에 제목+설명 통합
+- [x] 15-8 "편의점 택배 2종 비교" section-heading 제거 → retro-titlebar에 제목+설명 통합
+- [x] 15-9 "제주·도서산간 우편번호 기준표" section-heading 제거 → retro-titlebar에 제목+설명 통합
 
-### [ISSUE-16] 데이터 정확성 재검증 — 중간 (신규)
+### [ISSUE-16] 데이터 정확성 재검증 — ✅ 완료 (2026-03-07)
 
 정적 데이터와 소개 문구를 전수 확인한 결과, 공식 출처와 충돌하거나 기준일이 맞지 않는 항목이 확인됨.
 
@@ -146,17 +149,33 @@
   - 현재 출처로 사용 중인 캠페이너스 도움말 원문에도 동일하게 `28826`이 적혀 있으나, 앞뒤 구간이 모두 `588xx` 대역이라 원문 오탈자 가능성이 높음.
   - 출처 1건만으로는 확정이 어려우므로 2차 출처 확인 전까지는 확정 데이터로 취급하면 위험함.
 
-**권장 작업**
-- [ ] 16-1 토스페이먼츠 기본 카드 수수료를 공식 요금표 기준으로 수정하거나, 계약형 수수료라면 "계약별 상이"로 명시
-- [ ] 16-2 G마켓과 옥션을 분리하거나, 최소한 `단순화된 대표값`임을 UI와 데이터 주석에 명시
-- [ ] 16-3 `AboutView`의 데이터 기준월 문구를 실제 상수 기준으로 정정
-- [ ] 16-4 `28826` 우편번호를 우정사업본부/택배사 기준표 등 2차 출처로 재검증
+**작업 완료**
+- [x] 16-1 토스페이먼츠 카드 수수료 `3.2%~3.3%` → `기본 3.4% (계약별 상이)`로 공식 기준 반영
+- [x] 16-2 G마켓/옥션 비고를 "대표값 기준 합산 표기, 세부 카테고리는 별도 확인"으로 명시 + 계산 로직 주석 보강
+- [x] 16-3 `AboutView` 기준월 문구를 데이터 상수(`FEE_DATA_UPDATED`, `PAYMENT_DATA_UPDATED`, `SHIPPING_DATA_UPDATED`) import로 동적 표시
+- [x] 16-4 `28826` 우편번호에 "58826 오탈자 가능" 노트 추가 + TODO 주석 (2차 출처 확인 시 확정)
 
 **검증 출처 (2026-03-07 확인)**
 - 토스페이먼츠 PG 수수료: https://www.tosspayments.com/about/fee
 - 옥션 서비스 이용료: https://item.esmplus.com/auction-service-fee.html
 - G마켓 판매서비스 이용료: https://item.esmplus.com/gmarket-service-fee.html
 - 제주도 및 도서산간 지역 기준표: https://help.campaignus.me/ko/articles/%EC%A0%9C%EC%A3%BC%EB%8F%84-%EB%B0%8F-%EB%8F%84%EC%84%9C%EC%82%B0%EA%B0%84-%EC%A7%80%EC%97%AD-%EA%B8%B0%EC%A4%80%ED%91%9C-342d2e5e
+
+### [ISSUE-17] 비교 테이블 열/행 전치 + 가독성 개선 — ✅ 완료 (2026-03-07)
+
+ShippingCompareView(택배비 비교)의 테이블 패턴(업체=행, 항목=열)으로 결제 수수료·오픈마켓 비교 페이지를 통일.
+
+**변경 내용**
+- [x] 17-1 `PaymentCompareView` — 모바일 카드 + 데스크톱 전치 테이블 → 단일 스크롤 테이블 (행=서비스, 열=항목)
+- [x] 17-2 `OpenMarketCompareView` — 동일 패턴 적용
+- [x] 17-3 `paymentGateways.ts` — 셀 데이터에 개행(`\n`) 추가 (수수료 범위, 정산주기, 비고)
+- [x] 17-4 `openMarketCompare.ts` — 정산주기·비고 개행 보강
+- [x] 17-5 셀 데이터 폰트 크기 `text-caption`(13px) → `text-[12px]`(12px) 축소
+- [x] 17-6 타이틀바에 "최저 수수료" 뱃지 추가 (ShippingCompareView의 "최저가" 뱃지와 동일 패턴)
+
+**번들 크기 변화**
+- OpenMarketCompareView: 9.44 kB → 6.67 kB (gzip 3.55 → 2.98 kB)
+- PaymentCompareView: 10.05 kB → 6.80 kB (gzip 3.69 → 3.09 kB)
 
 ---
 
@@ -176,6 +195,8 @@
 - ISSUE-13 sitemap.xml 갱신 (**2026-03-07 완료**)
 - ISSUE-14 Vercel 301 리다이렉트 설정 (**2026-03-07 완료**)
 - ISSUE-15 섹션 헤더/뱃지 중복 제거 (**2026-03-07 완료**)
+- ISSUE-16 데이터 정확성 재검증 (**2026-03-07 완료**)
+- ISSUE-17 비교 테이블 열/행 전치 + 가독성 개선 (**2026-03-07 완료**)
 
 ### [ISSUE-12] 네비게이션 구조 개선 — ✅ 완료 (2026-03-07)
 
@@ -202,10 +223,10 @@ After:  수수료 계산기 | 오픈마켓 비교 | 결제 수수료 | 택배비
 
 ## 최근 품질 검증
 
-### 2026-03-07 로컬 검증 결과
+### 2026-03-07 로컬 검증 결과 (최종)
 - `cd client && npx vue-tsc --noEmit` ✅ 통과
 - `cd client && npm run build` ✅ 통과
-- 빌드 산출물에 `OpenMarketCompareView` 청크 포함 확인 (9.44 kB gzip 3.55 kB)
+- 빌드 산출물: OpenMarketCompareView 6.67 kB (gz 2.98), PaymentCompareView 6.80 kB (gz 3.09)
 
 ### 2026-03-07 데이터 정확성 점검
 - 정적 데이터 파일(`marketFees.ts`, `openMarketCompare.ts`, `paymentGateways.ts`, `shippingRates.ts`) 수동 대조
@@ -221,6 +242,6 @@ After:  수수료 계산기 | 오픈마켓 비교 | 결제 수수료 | 택배비
 
 ## 총평
 - 기술 품질 이슈(검증/타입/에러처리/테스트/CI)는 해결 상태 유지.
-- ISSUE-12 네비게이션 구조 개선 완료 (6탭→4탭, 3개 뷰 삭제, 1개 통합 비교 페이지 신설).
-- ISSUE-13 sitemap.xml 갱신, ISSUE-14 Vercel 301 리다이렉트, ISSUE-15 섹션 헤더 중복 제거 완료.
-- 현재 미완료는 ISSUE-11의 운영 검증과 ISSUE-16의 데이터 정확성 재검증이다.
+- ISSUE-12~17 전부 코드 수정 완료. 네비게이션 통합, 헤더 중복 제거, 테이블 전치, 데이터 정확성 수정 반영.
+- 유일한 미완료는 ISSUE-11의 운영 검증(GA4 실측 리포트 + 사용자 테스트). 배포 후 7일 경과 시점에 실행.
+- 28826 우편번호는 코드에 경고 노트 추가 완료. 우정사업본부 기준표로 2차 확인 시 확정 가능.

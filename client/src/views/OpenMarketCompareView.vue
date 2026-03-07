@@ -5,6 +5,7 @@ import { BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
+import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   MARKET_COMPARE_UPDATED,
   OPEN_MARKETS,
@@ -21,6 +22,7 @@ interface CompareColumn {
 const seoTitle = "스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 오픈마켓 비교";
 const seoDescription =
   "스마트스토어, 쿠팡, 11번가, G마켓의 입점비·판매 수수료·배송비 수수료·정산주기를 한눈에 비교합니다.";
+const pageUrl = `${DEFAULT_SITE_URL}/market-compare`;
 
 const compareColumns: CompareColumn[] = [
   { key: "setupFee", label: "입점비" },
@@ -61,6 +63,39 @@ const lowestFeeLabel = computed<string | null>(() => {
   return `${market.shortName} ${rate}%~`;
 });
 
+const jsonLd = computed(() => [
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": seoTitle,
+    "description": seoDescription,
+    "url": pageUrl,
+    "inLanguage": "ko-KR",
+    "dateModified": "2026-03-07",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "오픈마켓 수수료 계산기",
+      "url": DEFAULT_SITE_URL,
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "오픈마켓 비교 항목",
+    "url": pageUrl,
+    "numberOfItems": OPEN_MARKETS.length,
+    "itemListElement": OPEN_MARKETS.map((market, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Service",
+        "name": market.name,
+        "description": `${market.salesFeeRange.replace(/\n/g, " / ")} · ${market.settlementCycle}`,
+      },
+    })),
+  },
+]);
+
 function isFreeValue(value: string): boolean {
   return value.includes("무료") || value.includes("없음");
 }
@@ -83,22 +118,15 @@ function getCellBg(columnKey: CompareColumnKey, value: string, marketKey: OpenMa
 </script>
 
 <template>
-  <SEOHead :title="seoTitle" :description="seoDescription" />
+  <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <div>
-          <h1 class="retro-title">오픈마켓 비교</h1>
+        <h1 class="retro-title">오픈마켓 비교</h1>
+        <div class="flex flex-col items-end gap-1.5">
           <FreshBadge :message="`${MARKET_COMPARE_UPDATED} 수수료 데이터 반영`" />
         </div>
-        <span
-          v-if="lowestFeeLabel"
-          class="inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-caption font-semibold text-white"
-        >
-          <BadgeCheck class="h-3.5 w-3.5" />
-          최저 수수료 {{ lowestFeeLabel }}
-        </span>
       </div>
 
       <div class="retro-panel-content space-y-4">
@@ -110,12 +138,6 @@ function getCellBg(columnKey: CompareColumnKey, value: string, marketKey: OpenMa
         <div class="flex flex-wrap gap-1.5 text-caption">
           <span class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 font-semibold text-foreground">
             무료 입점 {{ freeEntryCount }} / {{ OPEN_MARKETS.length }}
-          </span>
-          <span
-            v-if="lowestFeeLabel"
-            class="rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
-          >
-            최저 시작 수수료 {{ lowestFeeLabel }}
           </span>
         </div>
 
