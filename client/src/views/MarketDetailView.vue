@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import {
   MARKET_META,
+  MARKET_ORDER,
   SMARTSTORE,
   COUPANG,
   ELEVENST,
@@ -29,6 +30,14 @@ const props = defineProps<{
 }>();
 
 const meta = computed(() => MARKET_META[props.marketKey]);
+
+// 마켓 키 → URL 매핑
+const MARKET_PATHS: Record<MarketKey, string> = {
+  smartstore: "/smartstore",
+  coupang: "/coupang",
+  elevenst: "/11st",
+  gmarket: "/gmarket",
+};
 
 // SEO
 const seoTitle = computed(() => {
@@ -67,6 +76,24 @@ const faqs = computed(() => {
   <SEOHead :title="seoTitle" :description="seoDescription" />
 
   <div class="container py-5 space-y-5">
+    <!-- 마켓 전환 탭 -->
+    <div class="flex flex-wrap gap-1.5">
+      <RouterLink
+        v-for="key in MARKET_ORDER"
+        :key="key"
+        :to="MARKET_PATHS[key]"
+        :class="[
+          'px-3 py-1.5 rounded-lg text-caption font-semibold transition-all duration-200',
+          marketKey === key
+            ? 'text-white'
+            : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
+        ]"
+        :style="marketKey === key ? { backgroundColor: MARKET_META[key].color } : {}"
+      >
+        {{ MARKET_META[key].name }}
+      </RouterLink>
+    </div>
+
     <!-- 마켓 헤더 -->
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">

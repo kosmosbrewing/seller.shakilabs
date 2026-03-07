@@ -15,7 +15,7 @@ import { RouterLink } from "vue-router";
         <h1 class="retro-title">서비스 안내</h1>
       </div>
 
-      <div class="retro-panel-content prose prose-sm max-w-none space-y-4">
+      <div class="retro-panel-content space-y-4">
         <h2 class="text-heading font-bold">오픈마켓 수수료 비교 계산기</h2>
         <p class="text-body text-muted-foreground">
           seller.shakilabs.com은 오픈마켓 셀러를 위한 무료 수수료 비교 도구입니다.

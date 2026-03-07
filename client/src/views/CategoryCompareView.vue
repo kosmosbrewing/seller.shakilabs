@@ -4,7 +4,7 @@ import { RouterLink } from "vue-router";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
-import { SLUG_TO_CATEGORY, CATEGORY_MAP } from "@/data/categories";
+import { SLUG_TO_CATEGORY, CATEGORY_MAP, CATEGORIES } from "@/data/categories";
 import { MARKET_META, MARKET_ORDER, type CategoryKey } from "@/data/marketFees";
 import { PRICE_PRESETS } from "@/data/pricePresets";
 import { calcAllMarkets, findBestMarket, type FeeBreakdown } from "@/utils/calculator";
@@ -52,6 +52,23 @@ const seoDescription = computed(() => {
   <SEOHead :title="seoTitle" :description="seoDescription" />
 
   <div class="container py-5 space-y-5">
+    <!-- 카테고리 탭 -->
+    <div class="flex flex-wrap gap-1.5">
+      <RouterLink
+        v-for="cat in CATEGORIES"
+        :key="cat.key"
+        :to="`/${cat.slug}-fee-compare`"
+        :class="[
+          'px-3 py-1.5 rounded-lg text-caption font-semibold transition-all duration-200',
+          categoryKey === cat.key
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+        ]"
+      >
+        {{ cat.emoji }} {{ cat.label }}
+      </RouterLink>
+    </div>
+
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">{{ categoryInfo.emoji }} {{ categoryInfo.label }} 수수료 비교</h1>

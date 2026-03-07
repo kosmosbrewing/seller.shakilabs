@@ -14,7 +14,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
         <h1 class="retro-title">개인정보 처리방침</h1>
       </div>
 
-      <div class="retro-panel-content prose prose-sm max-w-none space-y-4">
+      <div class="retro-panel-content space-y-4">
         <p class="text-body text-muted-foreground">
           seller.shakilabs.com(이하 "본 서비스")은 이용자의 개인정보를 중요하게 생각하며,
           다음과 같이 개인정보를 처리합니다.

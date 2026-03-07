@@ -42,7 +42,7 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 
 const alertStyles = computed(() => {
   if (props.confirmMode) return "";
-  if (props.type === "error") return "bg-primary text-destructive-foreground";
+  if (props.type === "error") return "bg-destructive text-destructive-foreground";
   return "bg-primary text-primary-foreground";
 });
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { CheckCircle2 } from "lucide-vue-next";
+import { FEE_DATA_UPDATED } from "@/data/marketFees";
 
 const props = defineProps<{
   message?: string;
 }>();
 
-const defaultMessage = "2025.06 수수료 개편 반영";
+const defaultMessage = `${FEE_DATA_UPDATED} 수수료 개편 반영`;
 </script>
 
 <template>

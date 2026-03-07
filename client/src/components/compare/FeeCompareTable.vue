@@ -31,6 +31,7 @@ const sortedResults = computed(() => {
           type="button"
           :class="[
             'px-2.5 py-1 rounded-md text-tiny font-semibold transition-colors',
+            'touch-target',
             sortKey === 'feeAsc' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
           ]"
           @click="sortKey = 'feeAsc'"
@@ -41,6 +42,7 @@ const sortedResults = computed(() => {
           type="button"
           :class="[
             'px-2.5 py-1 rounded-md text-tiny font-semibold transition-colors',
+            'touch-target',
             sortKey === 'profitDesc' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
           ]"
           @click="sortKey = 'profitDesc'"
@@ -50,6 +52,7 @@ const sortedResults = computed(() => {
       </div>
     </div>
 
+    <p class="scroll-hint">표가 잘리지 않도록 좌우 스크롤을 지원합니다.</p>
     <div class="overflow-x-auto">
       <table class="w-full text-body">
         <thead>
@@ -73,7 +76,7 @@ const sortedResults = computed(() => {
             <td class="px-4 py-2.5">
               <div class="flex items-center gap-2">
                 <span
-                  class="inline-flex h-5 w-5 items-center justify-center rounded text-tiny font-bold text-white"
+                  class="inline-flex h-5 w-5 items-center justify-center rounded-lg text-tiny font-bold text-white"
                   :style="{ backgroundColor: MARKET_META[result.marketKey].color }"
                 >
                   {{ MARKET_META[result.marketKey].name.charAt(0) }}
@@ -81,7 +84,7 @@ const sortedResults = computed(() => {
                 <span class="text-body font-semibold">{{ MARKET_META[result.marketKey].name }}</span>
               </div>
             </td>
-            <td class="px-4 py-2.5 text-right font-semibold tabular-nums text-red-500 dark:text-red-400">
+            <td class="px-4 py-2.5 text-right font-semibold tabular-nums text-fee">
               {{ formatWon(result.totalFee) }}
             </td>
             <td class="px-4 py-2.5 text-right tabular-nums text-muted-foreground">

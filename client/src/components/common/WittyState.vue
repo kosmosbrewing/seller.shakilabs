@@ -15,15 +15,15 @@ const props = withDefaults(
 );
 
 const defaultTitle = computed(() => {
-  if (props.type === "loading") return "데이터 정리 중";
-  if (props.type === "empty") return "아직 첫 댓글이 없어요";
-  return "잠깐 삐끗했어요";
+  if (props.type === "loading") return "수수료를 계산하는 중";
+  if (props.type === "empty") return "비교할 데이터가 없어요";
+  return "계산 중 문제가 발생했어요";
 });
 
 const defaultDescription = computed(() => {
-  if (props.type === "loading") return "계산기를 예열하는 중입니다.";
-  if (props.type === "empty") return "첫 한마디를 남기면 분위기가 살아납니다.";
-  return "잠시 후 다시 시도해주세요.";
+  if (props.type === "loading") return "잠깐만 기다려주세요.";
+  if (props.type === "empty") return "상품 정보를 입력해주세요.";
+  return "입력값을 확인해주세요.";
 });
 
 const iconComponent = computed(() => {

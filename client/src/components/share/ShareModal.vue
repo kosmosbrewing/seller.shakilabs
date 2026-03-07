@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, MessageCircle } from "lucide-vue-next";
+import { Link, MessageCircle, X } from "lucide-vue-next";
 
 const props = defineProps<{
   show: boolean;
@@ -34,7 +34,7 @@ function handleAction(action: "kakao" | "link"): void {
         <div class="relative z-10 w-full max-w-sm mx-4 retro-panel">
           <div class="retro-titlebar flex items-center justify-between">
             <h3 id="share-modal-title" class="retro-title text-body">공유하기</h3>
-            <button class="retro-kbd" aria-label="공유 모달 닫기" @click="emit('close')">ESC</button>
+            <button class="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors" aria-label="공유 모달 닫기" @click="emit('close')"><X class="h-4 w-4" /></button>
           </div>
 
           <div class="p-4 space-y-3">

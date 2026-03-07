@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import MarketCard from "./MarketCard.vue";
 import type { FeeBreakdown } from "@/utils/calculator";
 import type { MarketKey } from "@/data/marketFees";
@@ -7,6 +8,20 @@ const props = defineProps<{
   results: FeeBreakdown[];
   bestMarketKey: MarketKey | null;
 }>();
+
+const sortedByNetProfit = computed(() =>
+  [...props.results].sort((a, b) => b.netProfit - a.netProfit)
+);
+
+const rankMap = computed(() => {
+  const map = new Map<MarketKey, number>();
+  sortedByNetProfit.value.forEach((item, index) => {
+    map.set(item.marketKey, index + 1);
+  });
+  return map;
+});
+
+const bestNetProfit = computed(() => sortedByNetProfit.value[0]?.netProfit ?? 0);
 </script>
 
 <template>
@@ -16,11 +31,9 @@ const props = defineProps<{
       :key="result.marketKey"
       :result="result"
       :is-best="result.marketKey === bestMarketKey"
+      :rank="rankMap.get(result.marketKey) ?? null"
+      :net-gap="Math.max(0, bestNetProfit - result.netProfit)"
     />
   </div>
 
-  <!-- 모바일 스크롤 힌트 -->
-  <p class="scroll-hint text-center mt-1">
-    좌우로 스크롤하여 비교하세요
-  </p>
 </template>

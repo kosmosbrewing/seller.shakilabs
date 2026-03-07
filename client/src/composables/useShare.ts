@@ -2,6 +2,7 @@ import { computed, ref } from "vue";
 import { showAlert } from "./useAlert";
 import { formatWon, formatWonShort } from "@/lib/utils";
 import { buildAbsoluteUrl, copyToClipboard } from "@/lib/routeState";
+import { trackEvent } from "@/lib/analytics";
 import type { FeeBreakdown } from "@/utils/calculator";
 import { MARKET_META, type MarketKey } from "@/data/marketFees";
 import type { CategoryKey } from "@/data/marketFees";
@@ -32,6 +33,17 @@ export function useShare(ctx: ShareContext) {
   const showShareModal = ref(false);
   const kakaoBusy = ref(false);
 
+  function trackShareEvent(eventName: string, params?: Record<string, unknown>): void {
+    trackEvent(eventName, {
+      page: "home",
+      price: ctx.price.value,
+      category: ctx.category.value,
+      monthly_qty: ctx.monthlyQty.value,
+      best_market: ctx.bestMarket.value?.marketKey ?? "unknown",
+      ...params,
+    });
+  }
+
   const shareSummary = computed(() => {
     const cat = CATEGORY_MAP[ctx.category.value]?.label ?? "";
     const best = ctx.bestMarket.value;
@@ -41,6 +53,7 @@ export function useShare(ctx: ShareContext) {
   });
 
   function openShare(): void {
+    trackShareEvent("ux_share_modal_open");
     showShareModal.value = true;
   }
 
@@ -72,8 +85,10 @@ export function useShare(ctx: ShareContext) {
       if (!copied) {
         throw new Error("Clipboard API unavailable");
       }
+      trackShareEvent("ux_share_link_copy_success");
       showAlert("링크가 복사되었습니다");
     } catch {
+      trackShareEvent("ux_share_link_copy_fail");
       showAlert("링크 복사에 실패했습니다", { type: "error" });
     }
   }
@@ -136,7 +151,9 @@ export function useShare(ctx: ShareContext) {
           },
         ],
       });
+      trackShareEvent("ux_share_kakao_success");
     } catch {
+      trackShareEvent("ux_share_kakao_fail");
       showAlert("카카오톡 공유에 실패했습니다", { type: "error" });
     } finally {
       kakaoBusy.value = false;

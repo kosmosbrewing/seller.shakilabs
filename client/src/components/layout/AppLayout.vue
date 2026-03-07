@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppHeader from "@/components/layout/AppHeader.vue";
 import AppFooter from "@/components/layout/AppFooter.vue";
+import TabNavigation from "@/components/common/TabNavigation.vue";
 </script>
 
 <template>
@@ -12,6 +13,7 @@ import AppFooter from "@/components/layout/AppFooter.vue";
       본문 바로가기
     </a>
     <AppHeader />
+    <TabNavigation />
     <main id="main-content" tabindex="-1" class="flex-1 relative">
       <slot />
     </main>

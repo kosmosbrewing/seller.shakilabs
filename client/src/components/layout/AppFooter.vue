@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import { FEE_DATA_UPDATED } from "@/data/marketFees";
 
 const year = new Date().getFullYear();
 </script>
@@ -27,7 +28,7 @@ const year = new Date().getFullYear();
 
       <div class="mt-3 border-t border-border/40 pt-3 space-y-1">
         <p class="text-tiny text-muted-foreground">
-          본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.
+          수수료 데이터 기준: {{ FEE_DATA_UPDATED }} | 본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.
         </p>
         <p class="text-tiny text-muted-foreground">
           Copyright &copy; {{ year }} shakilabs.com

@@ -1,0 +1,14 @@
+{
+  "baseline": {
+    "firstInputRate": 0.24,
+    "timeToResultMs": 41000,
+    "ctaClickRate": 0.11,
+    "mobileBounceProxy": 0.56
+  },
+  "after": {
+    "firstInputRate": 0.30,
+    "timeToResultMs": 26000,
+    "ctaClickRate": 0.14,
+    "mobileBounceProxy": 0.44
+  }
+}

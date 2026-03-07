@@ -12,15 +12,16 @@ export type MarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
 export interface MarketMeta {
   key: MarketKey;
   name: string;
+  shortName: string;
   color: string;
 }
 
 // 마켓 메타 정보
 export const MARKET_META: Record<MarketKey, MarketMeta> = {
-  smartstore: { key: "smartstore", name: "스마트스토어", color: "#03C75A" },
-  coupang: { key: "coupang", name: "쿠팡", color: "#E31937" },
-  elevenst: { key: "elevenst", name: "11번가", color: "#FF0B0B" },
-  gmarket: { key: "gmarket", name: "G마켓/옥션", color: "#00B050" },
+  smartstore: { key: "smartstore", name: "스마트스토어", shortName: "네쇼", color: "#03C75A" },
+  coupang: { key: "coupang", name: "쿠팡", shortName: "쿠팡", color: "#E31937" },
+  elevenst: { key: "elevenst", name: "11번가", shortName: "11번", color: "#FF6B00" },
+  gmarket: { key: "gmarket", name: "G마켓/옥션", shortName: "G마켓", color: "#00B050" },
 };
 
 export const MARKET_ORDER: MarketKey[] = ["smartstore", "coupang", "elevenst", "gmarket"];

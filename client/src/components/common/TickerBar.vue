@@ -20,7 +20,7 @@ let motionChangeHandler: ((event: MediaQueryListEvent) => void) | null = null;
 const safeMessages = computed(() =>
   props.messages.length > 0
     ? props.messages
-    : ["세율과 보험료율은 해마다 달라질 수 있어요."]
+    : ["마켓 수수료는 정기적으로 변경될 수 있어요."]
 );
 
 const currentMessage = computed(

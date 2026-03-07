@@ -5,6 +5,7 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import { CATEGORIES } from "@/data/categories";
+import { PRICE_PRESETS } from "@/data/pricePresets";
 import { MARKET_META, MARKET_ORDER } from "@/data/marketFees";
 import { calcAllMarkets, findBestMarket, calcMonthlySim } from "@/utils/calculator";
 import { formatWon, formatPercent, formatWonShort } from "@/lib/utils";
@@ -48,6 +49,23 @@ const seoDescription = computed(() =>
   <SEOHead :title="seoTitle" :description="seoDescription" />
 
   <div class="container py-5 space-y-5">
+    <!-- 가격 프리셋 탭 -->
+    <div class="flex flex-wrap gap-1.5">
+      <RouterLink
+        v-for="preset in PRICE_PRESETS"
+        :key="preset.value"
+        :to="`/price/${preset.value}`"
+        :class="[
+          'px-3 py-1.5 rounded-lg text-caption font-semibold transition-all duration-200',
+          price === preset.value
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+        ]"
+      >
+        {{ preset.label }}
+      </RouterLink>
+    </div>
+
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">판매가 {{ formatWon(price) }} 수수료 비교</h1>
@@ -83,7 +101,7 @@ const seoDescription = computed(() =>
                       {{ MARKET_META[result.marketKey].name }}
                     </span>
                   </td>
-                  <td class="px-3 py-2 text-right tabular-nums text-red-500 dark:text-red-400 font-semibold">
+                  <td class="px-3 py-2 text-right tabular-nums text-red-500 dark:text-red-300 font-semibold">
                     {{ formatWon(result.totalFee) }}
                   </td>
                   <td class="px-3 py-2 text-right tabular-nums text-muted-foreground">
