@@ -42,7 +42,7 @@ const MARKET_PATHS: Record<MarketKey, string> = {
 // SEO
 const seoTitle = computed(() => {
   const name = meta.value.name;
-  return `${name} 수수료 총정리 | 2025.06 기준`;
+  return `${name} 수수료 총정리 | 반영 데이터 기준`;
 });
 
 const seoDescription = computed(() => {
@@ -56,7 +56,7 @@ const faqs = computed(() => {
     return [
       { q: "스마트스토어 수수료는 어떻게 구성되나요?", a: "주문관리 수수료(매출등급별 1.98~3.63%)와 판매 수수료(유입경로별 0.91~2.73%)로 구성됩니다. 카테고리별 추가 수수료는 없습니다." },
       { q: "스타트 제로수수료란?", a: "신규 사업자 대상으로 12개월간 주문관리 수수료가 면제되는 혜택입니다. 페이백 방식으로 운영됩니다." },
-      { q: "2025.06 개편 내용은?", a: "기존 네이버쇼핑 유입 2% 추가 수수료가 폐지되고, 판매 수수료 체계가 단순화되었습니다." },
+      { q: "반영된 개편 내용은?", a: "네이버쇼핑 유입 2% 추가 수수료 폐지 이후의 판매 수수료 체계를 기준으로 반영했습니다." },
     ];
   }
   if (props.marketKey === "coupang") {

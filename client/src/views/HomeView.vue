@@ -16,7 +16,7 @@ import { MARKET_META } from "@/data/marketFees";
 import { formatWon, formatWonShort } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { RouterLink } from "vue-router";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORY_MAP, CATEGORIES } from "@/data/categories";
 
 const calc = useMarketFeeCalc();
 const share = useShare(calc);
@@ -28,36 +28,62 @@ const hasTrackedFirstInput = ref(false);
 const hasTrackedResultsViewed = ref(false);
 let resultsObserver: IntersectionObserver | null = null;
 
-// SummaryBanner 메시지
-const summaryMessage = computed(() => {
-  const best = calc.bestMarket.value;
-  if (!best) return "";
-  const bestName = MARKET_META[best.marketKey].name;
+const sortedResults = computed(() => [...calc.results.value].sort((a, b) => a.totalFee - b.totalFee));
 
-  // 두 번째로 유리한 마켓과 차이
-  const sorted = [...calc.results.value].sort((a, b) => a.totalFee - b.totalFee);
-  if (sorted.length < 2) return `${bestName}가 가장 유리해요`;
-
-  const second = sorted[1];
-  const diff = second.totalFee - best.totalFee;
-  const secondName = MARKET_META[second.marketKey].name;
-  return `${bestName}가 가장 유리해요 — ${secondName}보다 건당 ${formatWon(diff)} 더 남아요`;
+const summaryBest = computed(() => sortedResults.value[0] ?? null);
+const summaryRunnerUp = computed(() => sortedResults.value[1] ?? null);
+const summaryWorst = computed(() => {
+  if (sortedResults.value.length === 0) return null;
+  return sortedResults.value[sortedResults.value.length - 1];
 });
 
-const summaryHeadline = computed(() => {
-  const best = calc.bestMarket.value;
-  if (!best) return "현재 조건 기준";
-  return `${MARKET_META[best.marketKey].name} 추천`;
+const summaryLeaderValue = computed(() => {
+  if (!summaryBest.value) return "계산 중";
+  return MARKET_META[summaryBest.value.marketKey].name;
 });
 
-const summarySubMessage = computed(() => {
-  if (calc.results.value.length < 2) return "입력값을 바꾸면 다른 마켓과의 차이도 바로 확인할 수 있어요.";
-  const sorted = [...calc.results.value].sort((a, b) => a.totalFee - b.totalFee);
-  const best = sorted[0];
-  const worst = sorted[sorted.length - 1];
-  const delta = worst.totalFee - best.totalFee;
-  return `가장 불리한 ${MARKET_META[worst.marketKey].name} 대비 건당 ${formatWonShort(delta)} 절감`;
+const summaryTitle = computed(() => {
+  if (!summaryBest.value) return "입력값을 바꾸면 가장 유리한 마켓이 바로 계산됩니다.";
+  if (!summaryRunnerUp.value) return `${summaryLeaderValue.value}가 현재 조건에서 가장 유리합니다.`;
+
+  const secondName = MARKET_META[summaryRunnerUp.value.marketKey].name;
+  return `${secondName}보다 같은 상품 기준으로 더 많은 순이익이 남습니다.`;
 });
+
+const summaryDelta = computed(() => {
+  if (!summaryBest.value || !summaryRunnerUp.value) return 0;
+  return Math.max(0, summaryRunnerUp.value.totalFee - summaryBest.value.totalFee);
+});
+
+const summaryMonthlyDelta = computed(() => summaryDelta.value * calc.monthlyQty.value);
+
+const summaryContext = computed(() => {
+  if (!summaryWorst.value || !summaryBest.value) {
+    return "현재 입력값 기준으로 마켓별 수수료 차이를 즉시 비교합니다.";
+  }
+
+  const worstName = MARKET_META[summaryWorst.value.marketKey].name;
+  return `${worstName}와의 최대 차이까지 포함한 결과입니다. 아래 상세 비교표에서 수수료 구성과 순이익을 바로 검증하세요.`;
+});
+
+const summaryFacts = computed(() => [
+  {
+    label: "판매가",
+    value: formatWon(calc.price.value),
+  },
+  {
+    label: "카테고리",
+    value: CATEGORY_MAP[calc.category.value].label,
+  },
+  {
+    label: "배송비",
+    value: formatWon(calc.shippingFee.value),
+  },
+  {
+    label: `월 ${calc.monthlyQty.value.toLocaleString("ko-KR")}건 추가`,
+    value: formatWon(summaryMonthlyDelta.value),
+  },
+]);
 
 function elapsedMs(): number {
   return Math.round(performance.now() - sessionStartedAt);
@@ -169,7 +195,7 @@ const jsonLd = computed(() => ({
 
 <template>
   <SEOHead
-    title="오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가 2025"
+    title="오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가"
     description="같은 상품인데 마켓마다 수수료가 이렇게 다릅니다. 스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교하세요."
     :json-ld="jsonLd"
   />
@@ -233,16 +259,21 @@ const jsonLd = computed(() => ({
     </section>
 
     <section id="results" class="space-y-3">
-      <div class="space-y-1">
-        <h2 class="text-heading font-bold text-foreground">1. 핵심 결론</h2>
-        <p class="text-caption text-muted-foreground">
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 1</span>
+        <h2 class="section-title">핵심 결론</h2>
+        <p class="section-description">
           현재 조건에서 가장 유리한 마켓과 절감 가능한 금액을 먼저 확인하세요.
         </p>
       </div>
       <SummaryBanner
-        :headline="summaryHeadline"
-        :message="summaryMessage"
-        :sub-message="summarySubMessage"
+        :title="summaryTitle"
+        :leader-value="summaryLeaderValue"
+        leader-label="지금 선택할 1위 마켓"
+        :delta-value="formatWon(summaryDelta)"
+        :delta-label="summaryRunnerUp ? '건당 더 남는 금액' : '비교 대상 없음'"
+        :context="summaryContext"
+        :facts="summaryFacts"
         highlight
         show-share
         show-detail
@@ -253,10 +284,11 @@ const jsonLd = computed(() => ({
     </section>
 
     <section class="space-y-3">
-      <div class="space-y-1">
-        <h2 class="text-heading font-bold text-foreground">마켓별 결과 비교</h2>
-        <p class="text-caption text-muted-foreground">
-          각 카드에서 순위와 1위 대비 차이를 보고, 상세 버튼으로 수수료 구성까지 확인할 수 있습니다.
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 1-A</span>
+        <h2 class="section-title">마켓별 결과 비교</h2>
+        <p class="section-description">
+          순이익 기준으로 자동 정렬했습니다. 각 카드에서 1위와의 차이, 총 수수료, 수수료율을 한 번에 비교해보세요.
         </p>
       </div>
       <MarketCardGrid
@@ -269,7 +301,13 @@ const jsonLd = computed(() => ({
     <AdSlot slot="top" label="광고" />
 
     <section class="space-y-3">
-      <h2 class="text-heading font-bold text-foreground">2. 월간 시뮬레이션</h2>
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 2</span>
+        <h2 class="section-title">월간 시뮬레이션</h2>
+        <p class="section-description">
+          판매량을 바꿔보면 마켓별 연 수수료와 월 순이익 차이가 얼마나 벌어지는지 바로 확인할 수 있습니다.
+        </p>
+      </div>
       <details id="simulation" class="retro-details" :open="showSim || undefined">
         <summary class="retro-details-summary" @click.prevent="showSim = !showSim">
           <span>판매량 기준으로 월간 차이 계산</span>
@@ -286,7 +324,13 @@ const jsonLd = computed(() => ({
     </section>
 
     <section class="space-y-3">
-      <h2 class="text-heading font-bold text-foreground">3. 상세 비교표</h2>
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 3</span>
+        <h2 class="section-title">상세 비교표</h2>
+        <p class="section-description">
+          총 수수료와 순이익을 정렬 기준별로 비교하면서, 어느 마켓이 왜 유리한지 숫자로 확인하세요.
+        </p>
+      </div>
       <details id="fee-table" class="retro-details" :open="showTable || undefined">
         <summary class="retro-details-summary" @click.prevent="showTable = !showTable">
           <span>수수료 항목별 상세 내역 확인</span>
@@ -324,7 +368,16 @@ const jsonLd = computed(() => ({
     </div>
 
     <!-- FAQ -->
-    <CompareFAQ />
+    <section class="space-y-3">
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 4</span>
+        <h2 class="section-title">자주 묻는 질문</h2>
+        <p class="section-description">
+          계산 기준과 수수료 반영 범위를 빠르게 확인할 수 있도록 자주 묻는 질문을 정리했습니다.
+        </p>
+      </div>
+      <CompareFAQ />
+    </section>
 
     <!-- 광고 하단 -->
     <AdSlot slot="bottom" />

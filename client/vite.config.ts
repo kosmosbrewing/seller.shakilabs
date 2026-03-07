@@ -40,16 +40,7 @@ export default defineConfig({
         entryFileNames: "assets/[name].[hash].js",
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("vue") || id.includes("vue-router")) {
-              return "vendor";
-            }
-            if (id.includes("lucide-vue-next")) {
-              return "icons";
-            }
-            if (id.includes("radix-vue")) {
-              return "ui";
-            }
-            return "libs";
+            return "vendor";
           }
         },
       },

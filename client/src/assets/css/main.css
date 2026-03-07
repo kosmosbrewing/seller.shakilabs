@@ -264,6 +264,26 @@
   .retro-board-item {
     @apply flex items-center justify-between gap-3 px-4 py-2 sm:px-5 sm:py-2.5 text-body transition-colors hover:bg-accent/25;
   }
+
+  .section-heading-block {
+    @apply flex flex-col gap-1.5;
+  }
+
+  .section-eyebrow {
+    @apply inline-flex w-fit items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-primary;
+  }
+
+  .section-title {
+    @apply text-heading font-bold text-foreground;
+  }
+
+  .section-description {
+    @apply text-caption text-muted-foreground sm:text-body;
+  }
+
+  .section-frame {
+    @apply retro-panel-muted px-3.5 py-3 sm:px-4;
+  }
 }
 
 /* Vue Transition — 공통 전환 애니메이션 */

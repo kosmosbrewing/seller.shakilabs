@@ -38,7 +38,7 @@ const categoryResults = computed(() => {
 });
 
 const seoTitle = computed(() =>
-  `판매가 ${formatWonShort(price.value)} 상품 마켓별 수수료 비교 | 2025년 기준`
+  `판매가 ${formatWonShort(price.value)} 상품 마켓별 수수료 비교 | 반영 데이터 기준`
 );
 const seoDescription = computed(() =>
   `${formatWonShort(price.value)} 상품을 스마트스토어, 쿠팡, 11번가, G마켓에서 팔면 수수료와 순이익이 얼마나 차이날까요?`

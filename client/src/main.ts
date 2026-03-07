@@ -1,9 +1,11 @@
 import { createApp } from "vue";
 import { createHead } from "@vueuse/head";
+import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import "./assets/css/main.css";
 import { initAnalytics, trackEvent } from "./lib/analytics";
+import { useConstantsStore } from "@/stores/constants";
 
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -15,9 +17,10 @@ function normalizeErrorMessage(error: unknown): string {
   }
 }
 
-function bootstrap(): void {
+async function bootstrap(): Promise<void> {
   const app = createApp(App);
   const head = createHead();
+  const pinia = createPinia();
 
   app.config.errorHandler = (error, _instance, info) => {
     console.error("[global-error]", error, info);
@@ -41,8 +44,18 @@ function bootstrap(): void {
     });
   });
 
+  app.use(pinia);
   app.use(router);
   app.use(head);
+
+  const constantsStore = useConstantsStore(pinia);
+  try {
+    await constantsStore.loadConstants();
+  } catch (error) {
+    console.warn("[constants] load failed, fallback applied", error);
+  }
+
+  await router.isReady();
   app.mount("#app");
 
   // GA 초기화를 LCP 이후로 미룸
@@ -53,8 +66,6 @@ function bootstrap(): void {
   }
 }
 
-try {
-  bootstrap();
-} catch (error) {
+void bootstrap().catch((error) => {
   console.error("[bootstrap] failed", error);
-}
+});

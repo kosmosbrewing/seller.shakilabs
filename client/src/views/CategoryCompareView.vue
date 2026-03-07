@@ -39,7 +39,7 @@ const priceCompareResults = computed(() => {
 
 const seoTitle = computed(() => {
   const cat = categoryInfo.value;
-  return `2025 ${cat.label} 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가`;
+  return `${cat.label} 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가`;
 });
 
 const seoDescription = computed(() => {

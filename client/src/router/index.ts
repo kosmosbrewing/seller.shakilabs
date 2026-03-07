@@ -1,19 +1,21 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import { showAlert } from "@/composables/useAlert";
 import { trackPageView } from "@/lib/analytics";
+import { useAuthStore } from "@/stores/auth";
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "Home",
     component: () => import("@/views/HomeView.vue"),
-    meta: { title: "오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가 2025" },
+    meta: { title: "오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/smartstore",
     name: "Smartstore",
     component: () => import("@/views/MarketDetailView.vue"),
     props: { marketKey: "smartstore" },
-    meta: { title: "스마트스토어 수수료 총정리 | 2025.06 개편 반영" },
+    meta: { title: "스마트스토어 수수료 총정리 | 반영 데이터 기준" },
   },
   {
     path: "/coupang",
@@ -41,35 +43,35 @@ const routes: RouteRecordRaw[] = [
     name: "ClothingCompare",
     component: () => import("@/views/CategoryCompareView.vue"),
     props: { categorySlug: "clothing" },
-    meta: { title: "2025 의류 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
+    meta: { title: "의류 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/food-fee-compare",
     name: "FoodCompare",
     component: () => import("@/views/CategoryCompareView.vue"),
     props: { categorySlug: "food" },
-    meta: { title: "2025 식품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
+    meta: { title: "식품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/electronics-fee-compare",
     name: "ElectronicsCompare",
     component: () => import("@/views/CategoryCompareView.vue"),
     props: { categorySlug: "electronics" },
-    meta: { title: "2025 전자기기 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
+    meta: { title: "전자기기 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/beauty-fee-compare",
     name: "BeautyCompare",
     component: () => import("@/views/CategoryCompareView.vue"),
     props: { categorySlug: "beauty" },
-    meta: { title: "2025 화장품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
+    meta: { title: "화장품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/living-fee-compare",
     name: "LivingCompare",
     component: () => import("@/views/CategoryCompareView.vue"),
     props: { categorySlug: "living" },
-    meta: { title: "2025 생활용품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
+    meta: { title: "생활용품 판매 수수료 비교 | 스마트스토어 vs 쿠팡 vs 11번가" },
   },
   {
     path: "/price/:amount(\\d+)",
@@ -78,7 +80,7 @@ const routes: RouteRecordRaw[] = [
     props: (route) => ({
       priceAmount: Number.parseInt(String(route.params.amount), 10),
     }),
-    meta: { title: "판매가별 마켓 수수료 비교 | 2025년 기준" },
+    meta: { title: "판매가별 마켓 수수료 비교 | 반영 데이터 기준" },
   },
   {
     path: "/about",
@@ -110,13 +112,40 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to) => {
   const title =
     typeof to.meta.title === "string"
       ? to.meta.title
       : "오픈마켓 수수료 비교 계산기 | 스마트스토어 vs 쿠팡 vs 11번가";
   document.title = title;
-  next();
+
+  const authStore = useAuthStore();
+  const needsAuthState = Boolean(to.meta.requiresAuth || to.meta.requiresAdmin || to.meta.guestOnly);
+
+  if (needsAuthState && !authStore.isInitialized) {
+    try {
+      await authStore.loadUser({ throwOnError: true });
+    } catch {
+      showAlert("사용자 정보를 불러오지 못했습니다.", { type: "error" });
+      return false;
+    }
+  }
+
+  if (to.meta.guestOnly && authStore.isAuthenticated) {
+    return "/";
+  }
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    showAlert("로그인이 필요합니다.", { type: "error" });
+    return "/";
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    showAlert("관리자 권한이 필요합니다.", { type: "error" });
+    return "/";
+  }
+
+  return true;
 });
 
 router.afterEach((to, _from, failure) => {

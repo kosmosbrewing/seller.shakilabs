@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { CheckCircle2 } from "lucide-vue-next";
-import { FEE_DATA_UPDATED } from "@/data/marketFees";
+import { useConstantsStore } from "@/stores/constants";
 
 const props = defineProps<{
   message?: string;
 }>();
 
-const defaultMessage = `${FEE_DATA_UPDATED} 수수료 개편 반영`;
+const constantsStore = useConstantsStore();
+const defaultMessage = computed(() => `${constantsStore.feeDataUpdated} 수수료 개편 반영`);
 </script>
 
 <template>

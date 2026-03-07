@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
-import { FEE_DATA_UPDATED } from "@/data/marketFees";
+import { useConstantsStore } from "@/stores/constants";
 
 const year = new Date().getFullYear();
+const constantsStore = useConstantsStore();
 </script>
 
 <template>
@@ -18,7 +19,7 @@ const year = new Date().getFullYear();
             개인정보 처리방침
           </RouterLink>
           <a
-            href="mailto:skdba1313@gmail.com"
+            :href="`mailto:${constantsStore.supportEmail}`"
             class="text-muted-foreground hover:text-foreground transition-colors"
           >
             문의
@@ -28,7 +29,7 @@ const year = new Date().getFullYear();
 
       <div class="mt-3 border-t border-border/40 pt-3 space-y-1">
         <p class="text-tiny text-muted-foreground">
-          수수료 데이터 기준: {{ FEE_DATA_UPDATED }} | 본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.
+          수수료 데이터 기준: {{ constantsStore.feeDataUpdated }} | 본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.
         </p>
         <p class="text-tiny text-muted-foreground">
           Copyright &copy; {{ year }} shakilabs.com

@@ -75,7 +75,7 @@ export function useShare(ctx: ShareContext) {
     if (!best) return "오픈마켓 수수료 비교 계산기";
     const marketName = MARKET_META[best.marketKey].name;
     const cat = CATEGORY_MAP[ctx.category.value]?.label ?? "";
-    return `판매가 ${formatWon(ctx.price.value)} ${cat} → ${marketName}가 가장 유리 (2025 기준)`;
+    return `판매가 ${formatWon(ctx.price.value)} ${cat} → ${marketName}가 가장 유리 (반영 데이터 기준)`;
   }
 
   async function copyLink(): Promise<void> {

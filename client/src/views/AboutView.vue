@@ -33,7 +33,7 @@ import { RouterLink } from "vue-router";
 
         <h2 class="text-heading font-bold">수수료 데이터 기준</h2>
         <p class="text-body text-muted-foreground">
-          2025년 6월 기준 각 마켓 공식 수수료율을 반영합니다.
+          현재 반영 데이터는 2025년 6월 기준 각 마켓 공식 수수료율을 기반으로 합니다.
           수수료 변경 시 업데이트되며, 프로모션 할인, 광고비, 반품/교환 비용 등은 포함되지 않습니다.
         </p>
 
