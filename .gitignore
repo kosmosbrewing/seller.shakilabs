@@ -1,2 +1,4 @@
 ISSUES.md
 client/ISSUES.md
+client/node_modules/
+client/dist/
