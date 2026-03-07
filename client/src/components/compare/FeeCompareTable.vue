@@ -69,7 +69,7 @@ const spread = computed(() => {
       <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         <div class="rounded-[1.2rem] border border-profit/20 bg-profit/8 px-3.5 py-3">
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-profit/80">현재 1위</p>
-          <p class="mt-1.5 text-body font-black text-foreground">
+          <p class="mt-1.5 text-body font-bold text-foreground">
             {{ bestResult ? MARKET_META[bestResult.marketKey].name : "-" }}
           </p>
           <p class="mt-1 text-caption text-muted-foreground">
@@ -78,12 +78,12 @@ const spread = computed(() => {
         </div>
         <div class="rounded-[1.2rem] border border-primary/20 bg-primary/8 px-3.5 py-3">
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">1위 vs 2위</p>
-          <p class="mt-1.5 text-body font-black tabular-nums text-foreground">{{ formatWon(spread) }}</p>
+          <p class="mt-1.5 text-body font-bold tabular-nums text-foreground">{{ formatWon(spread) }}</p>
           <p class="mt-1 text-caption text-muted-foreground">건당 순이익 차이</p>
         </div>
         <div class="rounded-[1.2rem] border border-border/70 bg-muted/20 px-3.5 py-3">
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">정렬 기준</p>
-          <p class="mt-1.5 text-body font-black text-foreground">
+          <p class="mt-1.5 text-body font-bold text-foreground">
             {{ sortKey === "feeAsc" ? "총 수수료 낮은순" : "건당 순이익 높은순" }}
           </p>
           <p class="mt-1 text-caption text-muted-foreground">버튼으로 언제든 바꿀 수 있습니다.</p>

@@ -83,6 +83,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "판매가별 마켓 수수료 비교 | 반영 데이터 기준" },
   },
   {
+    path: "/payment-compare",
+    name: "PaymentCompare",
+    component: () => import("@/views/PaymentCompareView.vue"),
+    meta: { title: "간편결제 수수료 비교 | 토스페이먼츠 vs 네이버페이 vs 카카오페이 vs PAYCO" },
+  },
+  {
+    path: "/shipping-compare",
+    name: "ShippingCompare",
+    component: () => import("@/views/ShippingCompareView.vue"),
+    meta: { title: "택배비 비교 계산기 | 8개 택배사 예상 운임 비교" },
+  },
+  {
     path: "/about",
     name: "About",
     component: () => import("@/views/AboutView.vue"),

@@ -1,0 +1,549 @@
+export type ShippingSizeKey = "small" | "medium" | "large" | "xlarge";
+export type ShippingCarrierCategory = "general" | "convenience";
+export type ShippingPricingMode = "profile" | "band";
+export type ShippingCarrierKey =
+  | "cj"
+  | "hanjin"
+  | "logen"
+  | "epost"
+  | "kdexp"
+  | "lotte"
+  | "cu"
+  | "gs25";
+
+export interface ShippingSizeProfile {
+  key: ShippingSizeKey;
+  label: string;
+  maxSumCm: number;
+  includedWeightKg: number;
+  baseFare: number;
+}
+
+export interface ShippingRateBand {
+  sizeKey: ShippingSizeKey;
+  label: string;
+  maxWeightKg: number;
+  maxSumCm: number;
+  fare: number;
+}
+
+export interface ShippingCarrierMeta {
+  key: ShippingCarrierKey;
+  name: string;
+  shortName: string;
+  category: ShippingCarrierCategory;
+  pricingMode: ShippingPricingMode;
+  color: string;
+  maxWeightKg: number;
+  maxSumCm: number;
+  extraWeightFeePerKg?: number;
+  restrictionNote: string;
+  estimateNote: string;
+  rateBasis: string;
+  sizeProfiles?: Record<ShippingSizeKey, ShippingSizeProfile>;
+  rateBands?: ShippingRateBand[];
+}
+
+export interface ShippingEstimateInput {
+  weightKg: number;
+  size: ShippingSizeKey;
+  sumCm?: number | null;
+}
+
+export interface ShippingEstimateResult {
+  carrier: ShippingCarrierMeta;
+  baseFare: number;
+  weightSurcharge: number;
+  totalFare: number;
+  effectiveSize: ShippingSizeKey;
+  effectiveSizeLabel: string;
+  sumCm: number | null;
+  isAvailable: boolean;
+  restrictionText: string;
+  unavailableReason?: string;
+}
+
+export interface RemoteAreaGuideRow {
+  carrierKey: ShippingCarrierKey;
+  jejuCharge: string;
+  remoteCharge: string;
+  criteriaNote: string;
+}
+
+export const SHIPPING_DATA_UPDATED = "2026.03";
+
+export const SHIPPING_WEIGHT_PRESETS = [1, 3, 5, 10, 20] as const;
+
+export const SHIPPING_SIZE_ORDER: ShippingSizeKey[] = ["small", "medium", "large", "xlarge"];
+
+export const SHIPPING_SIZE_LABELS: Record<ShippingSizeKey, string> = {
+  small: "소형",
+  medium: "중형",
+  large: "대형",
+  xlarge: "특대",
+};
+
+export const SIZE_SUM_THRESHOLDS: Record<ShippingSizeKey, number> = {
+  small: 80,
+  medium: 100,
+  large: 120,
+  xlarge: 160,
+};
+
+export const REMOTE_AREA_GUIDE: RemoteAreaGuideRow[] = [
+  {
+    carrierKey: "cj",
+    jejuCharge: "추가 가능",
+    remoteCharge: "추가 가능",
+    criteriaNote: "개인택배 예약 화면/집하 기사 확인 필요",
+  },
+  {
+    carrierKey: "hanjin",
+    jejuCharge: "별도 추가",
+    remoteCharge: "별도 추가",
+    criteriaNote: "공식 요금안내는 동일권 최저 운임 기준, 지역별 추가",
+  },
+  {
+    carrierKey: "logen",
+    jejuCharge: "중량별 차등 추가",
+    remoteCharge: "연륙·도서·산간 별도 추가",
+    criteriaNote: "로젠 요금안내에 제주/도서/산간 별도 명시",
+  },
+  {
+    carrierKey: "epost",
+    jejuCharge: "접수 채널별 상이",
+    remoteCharge: "배달 기한/요금 별도 가능",
+    criteriaNote: "창구소포/방문접수/익일배달 여부에 따라 상이",
+  },
+  {
+    carrierKey: "kdexp",
+    jejuCharge: "영업점 확인",
+    remoteCharge: "영업점 확인",
+    criteriaNote: "부피·중량·지역 편차가 커서 영업점 기준 우선",
+  },
+  {
+    carrierKey: "lotte",
+    jejuCharge: "별도 추가",
+    remoteCharge: "별도 추가 가능",
+    criteriaNote: "택배요금조회는 동일구역 기준, 제주/도서산간 별도",
+  },
+  {
+    carrierKey: "cu",
+    jejuCharge: "+4,000원",
+    remoteCharge: "+4,000원",
+    criteriaNote: "국내택배 동일권 기준, 착불 0~2kg은 +300원",
+  },
+  {
+    carrierKey: "gs25",
+    jejuCharge: "+3,000원 ~ +4,000원",
+    remoteCharge: "+4,000원",
+    criteriaNote: "서비스 유형에 따라 제주 추가운임 범위 차이",
+  },
+];
+
+const GENERAL_BASE_PROFILES: Record<ShippingSizeKey, Omit<ShippingSizeProfile, "key" | "label">> = {
+  small: { maxSumCm: 80, includedWeightKg: 1, baseFare: 4000 },
+  medium: { maxSumCm: 100, includedWeightKg: 3, baseFare: 5000 },
+  large: { maxSumCm: 120, includedWeightKg: 5, baseFare: 6200 },
+  xlarge: { maxSumCm: 160, includedWeightKg: 10, baseFare: 7800 },
+};
+
+function buildProfiles(
+  overrides: Partial<Record<ShippingSizeKey, Partial<Omit<ShippingSizeProfile, "key" | "label">>>> = {}
+): Record<ShippingSizeKey, ShippingSizeProfile> {
+  return SHIPPING_SIZE_ORDER.reduce((acc, key) => {
+    const base = GENERAL_BASE_PROFILES[key];
+    const next = {
+      ...base,
+      ...overrides[key],
+    };
+
+    acc[key] = {
+      key,
+      label: SHIPPING_SIZE_LABELS[key],
+      maxSumCm: next.maxSumCm,
+      includedWeightKg: next.includedWeightKg,
+      baseFare: next.baseFare,
+    };
+    return acc;
+  }, {} as Record<ShippingSizeKey, ShippingSizeProfile>);
+}
+
+function buildBand(
+  sizeKey: ShippingSizeKey,
+  maxWeightKg: number,
+  maxSumCm: number,
+  fare: number,
+  label = SHIPPING_SIZE_LABELS[sizeKey]
+): ShippingRateBand {
+  return { sizeKey, label, maxWeightKg, maxSumCm, fare };
+}
+
+// Verified against official public pages on 2026-03-07 where available.
+// For carriers without a directly indexed public tariff page, conservative estimate profiles are retained.
+export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
+  {
+    key: "cj",
+    name: "CJ대한통운",
+    shortName: "CJ",
+    category: "general",
+    pricingMode: "profile",
+    color: "#1F4ACC",
+    maxWeightKg: 20,
+    maxSumCm: 160,
+    extraWeightFeePerKg: 250,
+    restrictionNote: "20kg 이하 · 3변 합 160cm 이하 · 지역별 할증 별도",
+    estimateNote: "공개 운임표 비노출로 예약 화면 기준 추정 모델 적용",
+    rateBasis: "오네 예약 요금 비공개 구간 추정",
+    sizeProfiles: buildProfiles(),
+  },
+  {
+    key: "hanjin",
+    name: "한진택배",
+    shortName: "한진",
+    category: "general",
+    pricingMode: "profile",
+    color: "#005BAC",
+    maxWeightKg: 20,
+    maxSumCm: 160,
+    extraWeightFeePerKg: 0,
+    restrictionNote: "공식 요금안내 기준 동일권 최저 운임 사용 · 타권/제주 추가",
+    estimateNote: "한진 요금안내 기반 동일권 기준",
+    rateBasis: "한진 공식 요금안내(동일권 기준)",
+    sizeProfiles: buildProfiles({
+      small: { baseFare: 5000, includedWeightKg: 3, maxSumCm: 80 },
+      medium: { baseFare: 6000, includedWeightKg: 5, maxSumCm: 100 },
+      large: { baseFare: 7000, includedWeightKg: 15, maxSumCm: 120 },
+      xlarge: { baseFare: 8000, includedWeightKg: 20, maxSumCm: 160 },
+    }),
+  },
+  {
+    key: "logen",
+    name: "로젠택배",
+    shortName: "로젠",
+    category: "general",
+    pricingMode: "band",
+    color: "#D93C2F",
+    maxWeightKg: 25,
+    maxSumCm: 160,
+    restrictionNote: "타권 +1,000원 · 제주 추가운임 · 25kg 이하",
+    estimateNote: "로젠 공식 요금안내 동일권 기준",
+    rateBasis: "로젠 공식 요금안내(동일권 기준)",
+    rateBands: [
+      buildBand("small", 5, 100, 6000),
+      buildBand("medium", 10, 120, 7000),
+      buildBand("large", 20, 140, 9000),
+      buildBand("xlarge", 25, 160, 12000),
+    ],
+  },
+  {
+    key: "epost",
+    name: "우체국택배",
+    shortName: "우체국",
+    category: "general",
+    pricingMode: "band",
+    color: "#E74B2C",
+    maxWeightKg: 30,
+    maxSumCm: 160,
+    restrictionNote: "창구 일반소포 D+3 기준 · 방문접수/익일배달은 별도",
+    estimateNote: "우체국 창구 일반소포(D+3) 기준",
+    rateBasis: "인터넷우체국 창구 일반소포 요금안내",
+    rateBands: [
+      buildBand("small", 3, 80, 2700),
+      buildBand("medium", 5, 100, 3200),
+      buildBand("large", 10, 120, 4700),
+      buildBand("xlarge", 20, 160, 6700),
+    ],
+  },
+  {
+    key: "kdexp",
+    name: "경동택배",
+    shortName: "경동",
+    category: "general",
+    pricingMode: "band",
+    color: "#1E8F4D",
+    maxWeightKg: 30,
+    maxSumCm: 200,
+    restrictionNote: "부피 운임과 무게 운임 중 높은 운임 적용 · 지역별 편차 큼",
+    estimateNote: "경동 표준운임 무게 기준 적용",
+    rateBasis: "경동 표준운임(무게 기준)",
+    rateBands: [
+      buildBand("small", 6, 100, 3000),
+      buildBand("medium", 7, 120, 3400),
+      buildBand("medium", 8, 120, 3800),
+      buildBand("medium", 9, 120, 4200),
+      buildBand("large", 10, 160, 4500),
+      buildBand("large", 11, 160, 4600),
+      buildBand("large", 12, 160, 4800),
+      buildBand("large", 13, 160, 4900),
+      buildBand("large", 14, 160, 5100),
+      buildBand("large", 15, 160, 5200),
+      buildBand("xlarge", 16, 200, 5400),
+      buildBand("xlarge", 17, 200, 5500),
+      buildBand("xlarge", 18, 200, 5700),
+      buildBand("xlarge", 19, 200, 5800),
+      buildBand("xlarge", 20, 200, 6000),
+      buildBand("xlarge", 21, 200, 6300),
+      buildBand("xlarge", 22, 200, 6600),
+      buildBand("xlarge", 23, 200, 6900),
+      buildBand("xlarge", 24, 200, 7200),
+      buildBand("xlarge", 25, 200, 7500),
+      buildBand("xlarge", 26, 200, 7800),
+      buildBand("xlarge", 27, 200, 8100),
+      buildBand("xlarge", 28, 200, 8400),
+      buildBand("xlarge", 29, 200, 8700),
+      buildBand("xlarge", 30, 200, 9000),
+    ],
+  },
+  {
+    key: "lotte",
+    name: "롯데택배",
+    shortName: "롯데",
+    category: "general",
+    pricingMode: "band",
+    color: "#E4002B",
+    maxWeightKg: 20,
+    maxSumCm: 160,
+    restrictionNote: "동일구역 기준 · 타권/제주/고가품 할증 별도",
+    estimateNote: "롯데 택배요금조회·안내 기준",
+    rateBasis: "롯데글로벌로지스 택배요금조회·안내",
+    rateBands: [
+      buildBand("small", 5, 110, 5000),
+      buildBand("large", 15, 130, 6000),
+      buildBand("xlarge", 20, 160, 7000),
+    ],
+  },
+  {
+    key: "cu",
+    name: "CU 편의점택배",
+    shortName: "CU",
+    category: "convenience",
+    pricingMode: "band",
+    color: "#6A3DE8",
+    maxWeightKg: 30,
+    maxSumCm: 160,
+    restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 0~2kg +300원",
+    estimateNote: "CUpost 국내택배 운임표 동일권 기준",
+    rateBasis: "CUpost 국내택배 운임안내",
+    rateBands: [
+      buildBand("small", 0.35, 80, 2600, "초경량"),
+      buildBand("small", 0.4, 80, 2800, "초경량"),
+      buildBand("small", 0.45, 80, 2900, "초경량"),
+      buildBand("small", 0.5, 80, 3100, "초경량"),
+      buildBand("small", 0.6, 80, 3300, "소형"),
+      buildBand("small", 0.7, 80, 3400, "소형"),
+      buildBand("small", 0.8, 80, 3500, "소형"),
+      buildBand("small", 0.9, 80, 3600, "소형"),
+      buildBand("small", 1, 80, 3700, "소형"),
+      buildBand("small", 1.5, 100, 3800, "소형"),
+      buildBand("medium", 2, 100, 4100),
+      buildBand("medium", 3, 100, 4300),
+      buildBand("medium", 4, 120, 4400),
+      buildBand("medium", 5, 120, 4600),
+      buildBand("large", 10, 140, 5000),
+      buildBand("xlarge", 20, 160, 6000),
+      buildBand("xlarge", 30, 160, 7000),
+    ],
+  },
+  {
+    key: "gs25",
+    name: "GS25 편의점택배",
+    shortName: "GS25",
+    category: "convenience",
+    pricingMode: "band",
+    color: "#1D4ED8",
+    maxWeightKg: 20,
+    maxSumCm: 160,
+    restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 +300원",
+    estimateNote: "GS Postbox 국내택배 운임표 동일권 기준",
+    rateBasis: "GS Postbox 국내택배 이용운임 안내",
+    rateBands: [
+      buildBand("small", 0.35, 80, 3400, "초경량"),
+      buildBand("small", 0.4, 80, 3600, "초경량"),
+      buildBand("small", 0.45, 80, 3700, "초경량"),
+      buildBand("small", 0.5, 80, 3900, "초경량"),
+      buildBand("small", 0.6, 80, 4100, "소형"),
+      buildBand("small", 0.7, 80, 4200, "소형"),
+      buildBand("small", 0.8, 80, 4300, "소형"),
+      buildBand("small", 0.9, 80, 4400, "소형"),
+      buildBand("small", 1, 80, 4500, "소형"),
+      buildBand("small", 1.5, 100, 4800, "소형"),
+      buildBand("medium", 2, 100, 5100),
+      buildBand("medium", 3, 100, 5400),
+      buildBand("medium", 4, 120, 5500),
+      buildBand("medium", 5, 120, 5700),
+      buildBand("large", 7, 140, 6700),
+      buildBand("large", 10, 140, 7200),
+      buildBand("xlarge", 15, 160, 8000),
+      buildBand("xlarge", 20, 160, 9000),
+    ],
+  },
+];
+
+export function parseShippingWeight(value: number): number | null {
+  if (!Number.isFinite(value)) return null;
+  const normalized = Math.round(value * 10) / 10;
+  if (normalized < 0.1 || normalized > 30) return null;
+  return normalized;
+}
+
+export function parseShippingSumCm(value: number): number | null {
+  if (!Number.isFinite(value)) return null;
+  const normalized = Math.round(value);
+  if (normalized < 10 || normalized > 200) return null;
+  return normalized;
+}
+
+export function resolveShippingSize(sumCm: number | null | undefined): ShippingSizeKey | null {
+  if (sumCm == null) return null;
+  if (sumCm <= SIZE_SUM_THRESHOLDS.small) return "small";
+  if (sumCm <= SIZE_SUM_THRESHOLDS.medium) return "medium";
+  if (sumCm <= SIZE_SUM_THRESHOLDS.large) return "large";
+  if (sumCm <= SIZE_SUM_THRESHOLDS.xlarge) return "xlarge";
+  return null;
+}
+
+function estimateFromBands(
+  carrier: ShippingCarrierMeta,
+  input: ShippingEstimateInput,
+  effectiveSumCm: number,
+  normalizedSumCm: number | null
+): ShippingEstimateResult {
+  const matchingBand = carrier.rateBands?.find(
+    (band) => input.weightKg <= band.maxWeightKg && effectiveSumCm <= band.maxSumCm
+  );
+
+  if (!matchingBand) {
+    return {
+      carrier,
+      baseFare: 0,
+      weightSurcharge: 0,
+      totalFare: Number.POSITIVE_INFINITY,
+      effectiveSize: resolveShippingSize(normalizedSumCm) ?? input.size,
+      effectiveSizeLabel: SHIPPING_SIZE_LABELS[resolveShippingSize(normalizedSumCm) ?? input.size],
+      sumCm: normalizedSumCm,
+      isAvailable: false,
+      restrictionText: carrier.restrictionNote,
+      unavailableReason: `현재 조건은 ${carrier.rateBasis} 구간을 초과합니다.`,
+    };
+  }
+
+  return {
+    carrier,
+    baseFare: matchingBand.fare,
+    weightSurcharge: 0,
+    totalFare: matchingBand.fare,
+    effectiveSize: matchingBand.sizeKey,
+    effectiveSizeLabel: matchingBand.label,
+    sumCm: normalizedSumCm,
+    isAvailable: true,
+    restrictionText: carrier.restrictionNote,
+  };
+}
+
+function estimateFromProfiles(
+  carrier: ShippingCarrierMeta,
+  input: ShippingEstimateInput,
+  resolvedSize: ShippingSizeKey,
+  normalizedSumCm: number | null
+): ShippingEstimateResult {
+  const profile = carrier.sizeProfiles?.[resolvedSize];
+  if (!profile) {
+    return {
+      carrier,
+      baseFare: 0,
+      weightSurcharge: 0,
+      totalFare: Number.POSITIVE_INFINITY,
+      effectiveSize: resolvedSize,
+      effectiveSizeLabel: SHIPPING_SIZE_LABELS[resolvedSize],
+      sumCm: normalizedSumCm,
+      isAvailable: false,
+      restrictionText: carrier.restrictionNote,
+      unavailableReason: "운임 프로필이 정의되지 않았습니다.",
+    };
+  }
+
+  const exceedsWeight = input.weightKg > carrier.maxWeightKg;
+  const exceedsSum = normalizedSumCm != null && normalizedSumCm > carrier.maxSumCm;
+
+  if (exceedsWeight || exceedsSum) {
+    return {
+      carrier,
+      baseFare: 0,
+      weightSurcharge: 0,
+      totalFare: Number.POSITIVE_INFINITY,
+      effectiveSize: resolvedSize,
+      effectiveSizeLabel: profile.label,
+      sumCm: normalizedSumCm,
+      isAvailable: false,
+      restrictionText: carrier.restrictionNote,
+      unavailableReason: exceedsWeight
+        ? `최대 ${carrier.maxWeightKg}kg까지 접수 가능`
+        : `3변 합 ${carrier.maxSumCm}cm 이하만 접수 가능`,
+    };
+  }
+
+  const extraWeightKg = Math.max(0, Math.ceil(input.weightKg - profile.includedWeightKg));
+  const weightSurcharge = extraWeightKg * (carrier.extraWeightFeePerKg ?? 0);
+  const totalFare = profile.baseFare + weightSurcharge;
+
+  return {
+    carrier,
+    baseFare: profile.baseFare,
+    weightSurcharge,
+    totalFare,
+    effectiveSize: resolvedSize,
+    effectiveSizeLabel: profile.label,
+    sumCm: normalizedSumCm,
+    isAvailable: true,
+    restrictionText: carrier.restrictionNote,
+  };
+}
+
+export function estimateShippingRates(input: ShippingEstimateInput): ShippingEstimateResult[] {
+  const normalizedSumCm = input.sumCm ?? null;
+  const effectiveSumCm = normalizedSumCm ?? SIZE_SUM_THRESHOLDS[input.size];
+  const resolvedSize = resolveShippingSize(input.sumCm) ?? input.size;
+
+  return SHIPPING_CARRIERS.map((carrier) => {
+    if (input.weightKg > carrier.maxWeightKg) {
+      return {
+        carrier,
+        baseFare: 0,
+        weightSurcharge: 0,
+        totalFare: Number.POSITIVE_INFINITY,
+        effectiveSize: resolvedSize,
+        effectiveSizeLabel: SHIPPING_SIZE_LABELS[resolvedSize],
+        sumCm: normalizedSumCm,
+        isAvailable: false,
+        restrictionText: carrier.restrictionNote,
+        unavailableReason: `최대 ${carrier.maxWeightKg}kg까지 접수 가능`,
+      };
+    }
+
+    if (normalizedSumCm != null && normalizedSumCm > carrier.maxSumCm) {
+      return {
+        carrier,
+        baseFare: 0,
+        weightSurcharge: 0,
+        totalFare: Number.POSITIVE_INFINITY,
+        effectiveSize: resolvedSize,
+        effectiveSizeLabel: SHIPPING_SIZE_LABELS[resolvedSize],
+        sumCm: normalizedSumCm,
+        isAvailable: false,
+        restrictionText: carrier.restrictionNote,
+        unavailableReason: `3변 합 ${carrier.maxSumCm}cm 이하만 접수 가능`,
+      };
+    }
+
+    if (carrier.pricingMode === "band") {
+      return estimateFromBands(carrier, input, effectiveSumCm, normalizedSumCm);
+    }
+
+    return estimateFromProfiles(carrier, input, resolvedSize, normalizedSumCm);
+  }).sort((a, b) => {
+    if (a.isAvailable && !b.isAvailable) return -1;
+    if (!a.isAvailable && b.isAvailable) return 1;
+    return a.totalFare - b.totalFare;
+  });
+}

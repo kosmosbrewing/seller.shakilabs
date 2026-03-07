@@ -44,11 +44,11 @@ onMounted(() => {
               >
                 <img src="/favicon.png" alt="" class="h-4 w-4 shrink-0" />
               </span>
-              <span class="hidden sm:inline text-tiny font-semibold tracking-wide text-foreground/90">
+              <span class="hidden sm:inline font-brand text-tiny font-semibold tracking-wide text-foreground/90">
                 ShakiLabs
               </span>
             </RouterLink>
-            <div class="flex h-full flex-1 items-center justify-center text-center font-title text-caption sm:text-body overflow-hidden">
+            <div class="flex h-full flex-1 items-center justify-center text-center font-brand text-caption sm:text-body overflow-hidden">
               <TickerBar :messages="tickerMessages" />
             </div>
             <button

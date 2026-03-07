@@ -72,7 +72,7 @@ defineEmits<{
                 <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                   {{ leaderLabel ?? "가장 유리한 마켓" }}
                 </p>
-                <p class="mt-2 text-[30px] font-black leading-none sm:text-[36px]">
+                <p class="mt-2 text-[30px] font-bold leading-none sm:text-[36px]">
                   {{ leaderValue }}
                 </p>
               </div>
@@ -101,7 +101,7 @@ defineEmits<{
                 <p class="text-[11px] font-bold uppercase tracking-[0.14em] opacity-75">
                   2위 대비
                 </p>
-                <p class="mt-2 text-[30px] font-black leading-none tabular-nums sm:text-[34px]">
+                <p class="mt-2 text-[30px] font-bold leading-none tabular-nums sm:text-[34px]">
                   {{ deltaValue }}
                 </p>
               </div>

@@ -20,10 +20,10 @@ export const MONTHLY_QTY_MIN = 1;
 export const MONTHLY_QTY_MAX = 99_999;
 
 const CATEGORY_VALUES = ["clothing", "food", "electronics", "living", "beauty"] as const;
-const SMARTSTORE_TIER_VALUES = ["micro", "small", "normal"] as const;
+const SMARTSTORE_TIER_VALUES = ["micro", "small1", "small2", "small3", "normal"] as const;
 const SMARTSTORE_SOURCE_VALUES = ["naverShopping", "marketingLink"] as const;
 const COUPANG_MODE_VALUES = ["marketplace", "rocketGrowth"] as const;
-const FULFILLMENT_SIZE_VALUES = ["small", "medium", "large"] as const;
+const FULFILLMENT_SIZE_VALUES = ["xs", "small", "medium", "large", "xl", "xxl"] as const;
 
 export const DEFAULT_CATEGORY: CategoryKey = "clothing";
 export const DEFAULT_SMARTSTORE_TIER: SmartStoreTier = "micro";
@@ -80,6 +80,7 @@ interface SmartStoreValidationInput {
 
 interface CoupangValidationInput {
   price: number;
+  shippingFee: number;
   category: CategoryKey;
   mode: CoupangMode;
   fulfillmentSize: FulfillmentSize;
@@ -180,6 +181,7 @@ export function sanitizeSmartStoreInput(
 export function sanitizeCoupangInput(input: CoupangValidationInput): CoupangValidationInput {
   return {
     price: parseCalcPrice(input.price) ?? 0,
+    shippingFee: parseShippingFee(input.shippingFee) ?? DEFAULT_SHIPPING_FEE,
     category: parseCategory(input.category) ?? DEFAULT_CATEGORY,
     mode: parseCoupangMode(input.mode) ?? DEFAULT_COUPANG_MODE,
     fulfillmentSize: parseFulfillmentSize(input.fulfillmentSize) ?? DEFAULT_FULFILLMENT_SIZE,

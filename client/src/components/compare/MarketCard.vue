@@ -57,7 +57,7 @@ watch(() => props.result.totalFee, () => {
             class="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl px-2"
             :style="{ backgroundColor: meta.color + '18' }"
           >
-            <span class="text-caption font-black" :style="{ color: meta.color }">
+            <span class="text-caption font-bold" :style="{ color: meta.color }">
               {{ meta.shortName }}
             </span>
           </div>
@@ -85,7 +85,7 @@ watch(() => props.result.totalFee, () => {
         <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           건당 순이익
         </p>
-        <p class="mt-2 text-[30px] font-black leading-none tabular-nums whitespace-nowrap" :class="isBest ? 'text-profit' : 'text-foreground'">
+        <p class="mt-2 text-[30px] font-bold leading-none tabular-nums whitespace-nowrap" :class="isBest ? 'text-profit' : 'text-foreground'">
           <span class="hidden sm:inline">{{ formatWon(result.netProfit) }}</span>
           <span class="sm:hidden">{{ formatWonShort(result.netProfit) }}</span>
         </p>

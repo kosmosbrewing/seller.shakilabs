@@ -3,6 +3,11 @@ import { ref, watch } from "vue";
 import { ChevronDown } from "lucide-vue-next";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import { CATEGORIES } from "@/data/categories";
+const PRICE_QUICK = [
+  { value: 10_000, label: "1만" },
+  { value: 30_000, label: "3만" },
+  { value: 100_000, label: "10만" },
+] as const;
 import {
   SMARTSTORE_TIER_LABELS,
   SMARTSTORE_SOURCE_LABELS,
@@ -109,7 +114,8 @@ function handleShippingBlur(): void {
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <!-- 판매가 카드 -->
         <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2">
+          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
             <span class="text-caption font-bold text-foreground">판매가</span>
           </div>
           <div class="p-3 space-y-2">
@@ -124,6 +130,22 @@ function handleShippingBlur(): void {
                 @input="handlePriceInput"
                 @blur="handlePriceBlur"
               />
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <button
+                v-for="preset in PRICE_QUICK"
+                :key="preset.value"
+                type="button"
+                :class="[
+                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
+                  price === preset.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                ]"
+                @click="emit('update:price', preset.value)"
+              >
+                {{ preset.label }}
+              </button>
             </div>
             <div class="flex gap-1">
               <button
@@ -146,10 +168,11 @@ function handleShippingBlur(): void {
 
         <!-- 카테고리 카드 -->
         <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2">
+          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
             <span class="text-caption font-bold text-foreground">카테고리</span>
           </div>
-          <div class="p-2 grid grid-cols-2 gap-1.5">
+          <div class="p-3 grid grid-cols-2 gap-1.5">
             <button
               v-for="cat in CATEGORIES"
               :key="cat.key"
@@ -169,7 +192,8 @@ function handleShippingBlur(): void {
 
         <!-- 배송비 카드 -->
         <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2">
+          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
             <span class="text-caption font-bold text-foreground">배송비</span>
           </div>
           <div class="p-3 space-y-2">

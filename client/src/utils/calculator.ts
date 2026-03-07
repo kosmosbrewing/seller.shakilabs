@@ -47,6 +47,7 @@ export interface SmartStoreInput {
 // 쿠팡 계산 입력
 export interface CoupangInput {
   price: number;
+  shippingFee: number;
   category: CategoryKey;
   mode: CoupangMode;
   fulfillmentSize: FulfillmentSize;
@@ -106,7 +107,7 @@ export function calcSmartStore(input: SmartStoreInput): FeeBreakdown {
 
 // 쿠팡 수수료 계산
 export function calcCoupang(input: CoupangInput): FeeBreakdown {
-  const { price, category, mode, fulfillmentSize } = sanitizeCoupangInput(input);
+  const { price, shippingFee, category, mode, fulfillmentSize } = sanitizeCoupangInput(input);
   const items: FeeItem[] = [];
 
   // 1. 카테고리별 판매 수수료
@@ -114,7 +115,13 @@ export function calcCoupang(input: CoupangInput): FeeBreakdown {
   const categoryFee = Math.floor(price * categoryFeeRate);
   items.push({ label: "판매 수수료", amount: categoryFee, rate: categoryFeeRate });
 
-  // 2. 로켓그로스 물류비 (건당 고정)
+  // 2. 배송비 수수료 (유료배송 시 3.3%)
+  const shippingFeeAmount = Math.floor(shippingFee * COUPANG.shippingFeeRate);
+  if (shippingFeeAmount > 0) {
+    items.push({ label: "배송비 수수료", amount: shippingFeeAmount, rate: COUPANG.shippingFeeRate });
+  }
+
+  // 3. 로켓그로스 물류비 (건당 고정)
   if (mode === "rocketGrowth") {
     const fulfillmentFee = COUPANG.fulfillmentFee[fulfillmentSize];
     items.push({ label: "물류비", amount: fulfillmentFee });
@@ -202,7 +209,7 @@ export function calcAllMarkets(input: CompareInput): FeeBreakdown[] {
 
   return [
     calcSmartStore({ price, shippingFee, tier: smartstoreTier, source: smartstoreSource }),
-    calcCoupang({ price, category, mode: coupangMode, fulfillmentSize }),
+    calcCoupang({ price, shippingFee, category, mode: coupangMode, fulfillmentSize }),
     calcElevenSt({ price, shippingFee, category }),
     calcGmarket({ price, shippingFee, category }),
   ];

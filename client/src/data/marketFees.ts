@@ -1,11 +1,11 @@
-// 2025.06 기준 오픈마켓 4개 수수료 데이터
+// 2025.10 기준 오픈마켓 4개 수수료 데이터
 // 마켓별 수수료 구조가 다르므로 타입을 분리
 
 export type CategoryKey = "clothing" | "food" | "electronics" | "living" | "beauty";
-export type SmartStoreTier = "micro" | "small" | "normal";
+export type SmartStoreTier = "micro" | "small1" | "small2" | "small3" | "normal";
 export type SmartStoreSource = "naverShopping" | "marketingLink";
 export type CoupangMode = "marketplace" | "rocketGrowth";
-export type FulfillmentSize = "small" | "medium" | "large";
+export type FulfillmentSize = "xs" | "small" | "medium" | "large" | "xl" | "xxl";
 
 export type MarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
 
@@ -28,11 +28,13 @@ export const MARKET_ORDER: MarketKey[] = ["smartstore", "coupang", "elevenst", "
 
 // 스마트스토어 수수료 (2025.06 개편 반영)
 export const SMARTSTORE = {
-  // 주문관리 수수료 (매출등급별, VAT 포함)
+  // 주문관리 수수료 (매출등급별, VAT 포함, 2025.10.01 인하 반영)
   orderFee: {
-    micro: 0.0198,   // 영세 (연매출 3억 이하)
-    small: 0.0275,   // 중소 (연매출 3~30억)
-    normal: 0.0363,  // 일반 (연매출 30억 초과)
+    micro: 0.01947,   // 영세 (연매출 3억 이하)
+    small1: 0.02563,  // 중소1 (연매출 3~5억)
+    small2: 0.02728,  // 중소2 (연매출 5~10억)
+    small3: 0.03003,  // 중소3 (연매출 10~30억)
+    normal: 0.0363,   // 일반 (연매출 30억 초과)
   } as Record<SmartStoreTier, number>,
 
   // 판매 수수료 (VAT 별도 → 실제 부담은 ×1.1)
@@ -48,7 +50,9 @@ export const SMARTSTORE = {
 // 스마트스토어 매출등급 라벨
 export const SMARTSTORE_TIER_LABELS: Record<SmartStoreTier, string> = {
   micro: "영세 (3억 이하)",
-  small: "중소 (3~30억)",
+  small1: "중소1 (3~5억)",
+  small2: "중소2 (5~10억)",
+  small3: "중소3 (10~30억)",
   normal: "일반 (30억 초과)",
 };
 
@@ -61,18 +65,24 @@ export const SMARTSTORE_SOURCE_LABELS: Record<SmartStoreSource, string> = {
 // 쿠팡 수수료
 export const COUPANG = {
   categoryFee: {
-    clothing: 0.108,
-    food: 0.108,
-    electronics: 0.081,
-    living: 0.108,
-    beauty: 0.108,
+    clothing: 0.105,
+    food: 0.106,
+    electronics: 0.078,
+    living: 0.078,
+    beauty: 0.096,
   } as Record<CategoryKey, number>,
 
-  // 로켓그로스 물류비 (건당, 크기별)
+  // 배송비 수수료율 (유료배송 시)
+  shippingFeeRate: 0.033,
+
+  // 로켓그로스 물류비 (건당 입고+출고 합산, 2025.01.06 개편)
   fulfillmentFee: {
-    small: 1500,   // 소형 (60cm 이하, 2kg 이하)
-    medium: 2500,  // 중형 (90cm 이하, 10kg 이하)
-    large: 3500,   // 대형 (120cm 이하, 20kg 이하)
+    xs: 700,       // 초소형 (≤20cm, <500g)    입고 100 + 출고 600
+    small: 950,    // 소형   (≤30cm, <1kg)     입고 150 + 출고 800
+    medium: 1400,  // 중형   (≤40cm, <3kg)     입고 200 + 출고 1200
+    large: 2100,   // 대형   (≤60cm, <6kg)     입고 300 + 출고 1800
+    xl: 3000,      // 특대형 (≤80cm, <10kg)    입고 500 + 출고 2500
+    xxl: 4300,     // 초대형 (>80cm, ≥10kg)    입고 800 + 출고 3500
   } as Record<FulfillmentSize, number>,
 } as const;
 
@@ -84,9 +94,12 @@ export const COUPANG_MODE_LABELS: Record<CoupangMode, string> = {
 
 // 쿠팡 물류 크기 라벨
 export const FULFILLMENT_SIZE_LABELS: Record<FulfillmentSize, string> = {
-  small: "소형 (60cm·2kg 이하)",
-  medium: "중형 (90cm·10kg 이하)",
-  large: "대형 (120cm·20kg 이하)",
+  xs: "초소형 (20cm·500g 이하)",
+  small: "소형 (30cm·1kg 이하)",
+  medium: "중형 (40cm·3kg 이하)",
+  large: "대형 (60cm·6kg 이하)",
+  xl: "특대형 (80cm·10kg 이하)",
+  xxl: "초대형 (80cm 초과·10kg 초과)",
 };
 
 // 11번가 수수료
@@ -106,11 +119,11 @@ export const ELEVENST = {
 // G마켓/옥션 수수료
 export const GMARKET = {
   categoryFee: {
-    clothing: 0.117,
-    food: 0.117,
-    electronics: 0.099,
-    living: 0.117,
-    beauty: 0.117,
+    clothing: 0.13,
+    food: 0.13,
+    electronics: 0.09,
+    living: 0.13,
+    beauty: 0.13,
   } as Record<CategoryKey, number>,
 
   // 배송비 수수료율 (유료배송 시)
@@ -118,4 +131,4 @@ export const GMARKET = {
 } as const;
 
 // 수수료 데이터 최종 업데이트 날짜
-export const FEE_DATA_UPDATED = "2025.06";
+export const FEE_DATA_UPDATED = "2025.10";

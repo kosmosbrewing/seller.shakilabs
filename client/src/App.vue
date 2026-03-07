@@ -5,9 +5,9 @@ import AlertHost from "@/components/ui/alert/AlertHost.vue";
 
 <template>
   <AppLayout>
-    <RouterView v-slot="{ Component }">
-      <Transition name="page-fade" mode="out-in">
-        <component :is="Component" />
+    <RouterView v-slot="{ Component, route }">
+      <Transition name="page-fade">
+        <component :is="Component" :key="route.path" />
       </Transition>
     </RouterView>
     <AlertHost />

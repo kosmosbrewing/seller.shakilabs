@@ -21,14 +21,14 @@ describe("calcSmartStore", () => {
       source: "naverShopping",
     });
 
-    // 주문관리: 30000 × 0.0198 = 594
-    expect(result.items[0].amount).toBe(594);
+    // 주문관리: 30000 × 0.01947 = 584.1 → 584
+    expect(result.items[0].amount).toBe(584);
     // 판매수수료: 30000 × 0.0273 × 1.1 = 900.9 → 900
     expect(result.items[1].amount).toBe(900);
-    // 배송비 수수료: 3000 × 0.0198 = 59.4 → 59
-    expect(result.items[2].amount).toBe(59);
+    // 배송비 수수료: 3000 × 0.01947 = 58.41 → 58
+    expect(result.items[2].amount).toBe(58);
 
-    expect(result.totalFee).toBe(594 + 900 + 59);
+    expect(result.totalFee).toBe(584 + 900 + 58);
     expect(result.netProfit).toBe(30_000 - result.totalFee);
     expect(result.marketKey).toBe("smartstore");
   });
@@ -57,32 +57,34 @@ describe("calcCoupang", () => {
   it("마켓플레이스 의류 30,000원", () => {
     const result = calcCoupang({
       price: 30_000,
+      shippingFee: 0,
       category: "clothing",
       mode: "marketplace",
       fulfillmentSize: "small",
     });
 
-    // 판매수수료: 30000 × 0.108 = 3240
-    expect(result.items[0].amount).toBe(3_240);
+    // 판매수수료: 30000 × 0.105 = 3150
+    expect(result.items[0].amount).toBe(3_150);
     // 마켓플레이스는 물류비 없음
     expect(result.items.length).toBe(1);
-    expect(result.totalFee).toBe(3_240);
-    expect(result.netProfit).toBe(30_000 - 3_240);
+    expect(result.totalFee).toBe(3_150);
+    expect(result.netProfit).toBe(30_000 - 3_150);
   });
 
   it("로켓그로스 전자기기 50,000원 (중형)", () => {
     const result = calcCoupang({
       price: 50_000,
+      shippingFee: 0,
       category: "electronics",
       mode: "rocketGrowth",
       fulfillmentSize: "medium",
     });
 
-    // 판매수수료: 50000 × 0.081 = 4050
-    expect(result.items[0].amount).toBe(4_050);
-    // 물류비: 2500 (중형)
-    expect(result.items[1].amount).toBe(2_500);
-    expect(result.totalFee).toBe(4_050 + 2_500);
+    // 판매수수료: 50000 × 0.078 = 3900
+    expect(result.items[0].amount).toBe(3_900);
+    // 물류비: 1400 (중형, 입고200+출고1200)
+    expect(result.items[1].amount).toBe(1_400);
+    expect(result.totalFee).toBe(3_900 + 1_400);
   });
 });
 
@@ -113,11 +115,11 @@ describe("calcGmarket", () => {
       category: "beauty",
     });
 
-    // 판매수수료: 30000 × 0.117 = 3510
-    expect(result.items[0].amount).toBe(3_510);
+    // 판매수수료: 30000 × 0.13 = 3900
+    expect(result.items[0].amount).toBe(3_900);
     // 배송비 수수료: 3000 × 0.033 = 99
     expect(result.items[1].amount).toBe(99);
-    expect(result.totalFee).toBe(3_510 + 99);
+    expect(result.totalFee).toBe(3_900 + 99);
     expect(result.marketKey).toBe("gmarket");
   });
 });

@@ -1,7 +1,7 @@
 // 마켓별 수수료 비교 계산 composable
 // URL 파라미터와 양방향 동기화
 
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   type CategoryKey,
@@ -130,6 +130,11 @@ export function useMarketFeeCalc() {
       syncTimer = setTimeout(syncToQuery, 300);
     }
   );
+
+  // 컴포넌트 파괴 시 타이머 정리
+  onUnmounted(() => {
+    if (syncTimer) clearTimeout(syncTimer);
+  });
 
   return {
     // 입력

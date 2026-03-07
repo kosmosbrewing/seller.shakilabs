@@ -119,7 +119,7 @@ const bestVsRunnerUp = computed(() => {
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
               월 매출 추정
             </p>
-            <p class="mt-1.5 text-heading font-black tabular-nums text-foreground">
+            <p class="mt-1.5 text-heading font-bold tabular-nums text-foreground">
               {{ formatWon(monthlyRevenue) }}
             </p>
             <p class="mt-1 text-caption text-muted-foreground">
@@ -133,7 +133,7 @@ const bestVsRunnerUp = computed(() => {
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-profit/80">
               최적 마켓
             </p>
-            <p class="mt-1.5 text-body font-black text-foreground">
+            <p class="mt-1.5 text-body font-bold text-foreground">
               {{ bestSim ? MARKET_META[bestSim.marketKey].name : "-" }}
             </p>
             <p class="mt-1 text-caption text-muted-foreground">
@@ -145,7 +145,7 @@ const bestVsRunnerUp = computed(() => {
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">
               1위 vs 2위
             </p>
-            <p class="mt-1.5 text-body font-black tabular-nums text-foreground">
+            <p class="mt-1.5 text-body font-bold tabular-nums text-foreground">
               {{ formatWon(bestVsRunnerUp) }}
             </p>
             <p class="mt-1 text-caption text-muted-foreground">
@@ -157,7 +157,7 @@ const bestVsRunnerUp = computed(() => {
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-fee/80">
               최대 편차
             </p>
-            <p class="mt-1.5 text-body font-black tabular-nums text-foreground">
+            <p class="mt-1.5 text-body font-bold tabular-nums text-foreground">
               {{ formatWon(annualSpread) }}
             </p>
             <p class="mt-1 text-caption text-muted-foreground">
@@ -184,7 +184,7 @@ const bestVsRunnerUp = computed(() => {
                   class="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl px-2"
                   :style="{ backgroundColor: `${MARKET_META[sim.marketKey].color}18` }"
                 >
-                  <span class="text-caption font-black" :style="{ color: MARKET_META[sim.marketKey].color }">
+                  <span class="text-caption font-bold" :style="{ color: MARKET_META[sim.marketKey].color }">
                     {{ MARKET_META[sim.marketKey].shortName }}
                   </span>
                 </div>
@@ -216,7 +216,7 @@ const bestVsRunnerUp = computed(() => {
               <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                 연 수수료
               </p>
-              <p class="mt-2 font-black leading-none tabular-nums text-[26px] sm:text-[28px]" :class="index === 0 ? 'text-profit' : 'text-foreground'">
+              <p class="mt-2 font-bold leading-none tabular-nums text-[26px] sm:text-[28px]" :class="index === 0 ? 'text-profit' : 'text-foreground'">
                 <span class="hidden sm:inline">{{ formatWon(sim.annualFee) }}</span>
                 <span class="sm:hidden">{{ formatWonShort(sim.annualFee) }}</span>
               </p>

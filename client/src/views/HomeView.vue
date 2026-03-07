@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { ChevronDown } from "lucide-vue-next";
+import { ChevronDown, CreditCard, PackageCheck, Store } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SummaryBanner from "@/components/common/SummaryBanner.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
@@ -117,6 +117,10 @@ function openShareFromSummary(): void {
 function moveToFeeTableFromSummary(): void {
   trackUxEvent("ux_summary_cta_click", { cta: "detail_table" });
   moveToSection("fee-table", "summary_banner");
+}
+
+function trackCostAxisClick(target: "market" | "payment" | "shipping"): void {
+  trackUxEvent("ux_cost_axis_click", { target });
 }
 
 watch(
@@ -242,8 +246,8 @@ const jsonLd = computed(() => ({
 
     <section class="retro-panel-muted px-3 py-2.5 space-y-2">
       <div class="flex items-center justify-between gap-2">
-        <p class="text-caption font-bold text-foreground">결과 빠른 이동</p>
-        <span class="text-tiny text-muted-foreground">원하는 블록으로 즉시 이동</span>
+        <p class="text-caption font-bold text-foreground">빠른 이동</p>
+        <span class="text-tiny text-muted-foreground">계산 결과와 비용 비교 도구로 바로 이동</span>
       </div>
       <div class="flex flex-wrap items-center justify-center gap-1.5">
         <button type="button" class="retro-button-subtle touch-target text-caption" @click="moveToSection('results', 'quick_nav')">
@@ -255,6 +259,20 @@ const jsonLd = computed(() => ({
         <button type="button" class="retro-button-subtle touch-target text-caption" @click="moveToSection('fee-table', 'quick_nav')">
           3. 상세 비교표
         </button>
+        <RouterLink
+          to="/payment-compare"
+          class="retro-button-subtle touch-target text-caption"
+          @click="trackCostAxisClick('payment')"
+        >
+          4. 결제 수수료
+        </RouterLink>
+        <RouterLink
+          to="/shipping-compare"
+          class="retro-button-subtle touch-target text-caption"
+          @click="trackCostAxisClick('shipping')"
+        >
+          5. 택배비 비교
+        </RouterLink>
       </div>
     </section>
 
@@ -295,6 +313,9 @@ const jsonLd = computed(() => ({
         :results="calc.results.value"
         :best-market-key="calc.bestMarket.value?.marketKey ?? null"
       />
+      <p class="text-tiny text-muted-foreground mt-2">
+        * 대표 카테고리 수수료율 기준이며, 세부 카테고리에 따라 실제 수수료율이 다를 수 있습니다.
+      </p>
     </section>
 
     <!-- 광고 -->
@@ -340,6 +361,69 @@ const jsonLd = computed(() => ({
           <FeeCompareTable :results="calc.results.value" />
         </div>
       </details>
+    </section>
+
+    <section class="space-y-3">
+      <div class="section-heading-block">
+        <span class="section-eyebrow">Section 3-A</span>
+        <h2 class="section-title">셀러 비용 3축</h2>
+        <p class="section-description">
+          수익성 판단은 마켓 수수료만으로 끝나지 않습니다. 결제 수수료와 택배비까지 같은 흐름에서 바로 비교해보세요.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <button
+          type="button"
+          class="group rounded-[1.6rem] border border-primary/20 bg-primary/10 p-4 text-left transition-colors hover:border-primary/35 hover:bg-primary/12"
+          @click="
+            trackCostAxisClick('market');
+            moveToSection('input', 'cost_axis');
+          "
+        >
+          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Store class="h-5 w-5" />
+          </span>
+          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">Axis 1</p>
+          <h3 class="mt-1.5 text-body font-bold text-foreground">마켓 수수료</h3>
+          <p class="mt-2 text-caption text-muted-foreground">
+            지금 이 페이지에서 판매가, 배송비, 카테고리 기준으로 오픈마켓 순이익을 바로 계산합니다.
+          </p>
+          <p class="mt-3 text-caption font-semibold text-primary">현재 계산기로 이동</p>
+        </button>
+
+        <RouterLink
+          to="/payment-compare"
+          class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
+          @click="trackCostAxisClick('payment')"
+        >
+          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#03C75A]/12 text-[#03C75A]">
+            <CreditCard class="h-5 w-5" />
+          </span>
+          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#03C75A]">Axis 2</p>
+          <h3 class="mt-1.5 text-body font-bold text-foreground">결제 수수료</h3>
+          <p class="mt-2 text-caption text-muted-foreground">
+            토스페이먼츠, 네이버페이, 카카오페이, PAYCO의 가입비·연회비·카드 수수료를 한눈에 비교합니다.
+          </p>
+          <p class="mt-3 text-caption font-semibold text-foreground">결제 서비스 비교 보기</p>
+        </RouterLink>
+
+        <RouterLink
+          to="/shipping-compare"
+          class="group rounded-[1.6rem] border border-border/70 bg-card p-4 transition-colors hover:border-primary/25 hover:bg-muted/15"
+          @click="trackCostAxisClick('shipping')"
+        >
+          <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1D4ED8]/12 text-[#1D4ED8]">
+            <PackageCheck class="h-5 w-5" />
+          </span>
+          <p class="mt-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#1D4ED8]">Axis 3</p>
+          <h3 class="mt-1.5 text-body font-bold text-foreground">택배비 비교</h3>
+          <p class="mt-2 text-caption text-muted-foreground">
+            일반 택배 6사와 편의점 택배 2개의 예상 운임을 무게와 크기 조건에 따라 바로 계산합니다.
+          </p>
+          <p class="mt-3 text-caption font-semibold text-foreground">택배비 계산기로 이동</p>
+        </RouterLink>
+      </div>
     </section>
 
     <!-- 내부 링크: 카테고리별 + 마켓별 통합 -->

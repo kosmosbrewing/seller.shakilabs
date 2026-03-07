@@ -12,8 +12,25 @@
 
 @font-face {
   font-family: "Pretendard";
+  src: url("/fonts/Pretendard-SemiBold-subset.woff2") format("woff2"),
+       url("/fonts/Pretendard-SemiBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
   src: url("/fonts/Pretendard-Bold-subset.woff2") format("woff2"),
        url("/fonts/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  src: url("/fonts/GmarketSansBold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -101,7 +118,7 @@
   }
 
   .retro-title {
-    @apply text-heading font-semibold tracking-normal font-title;
+    @apply text-heading font-semibold tracking-normal font-brand;
   }
 
   .retro-kbd {
