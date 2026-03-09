@@ -30,21 +30,20 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "스마트스토어",
     shortName: "네쇼",
     color: "#03C75A",
-    microBusinessRate: 1.95,
+    microBusinessRate: 2.95,
     setupFee: {
       core: "무료",
     },
     salesFeeRange: {
-      core: "영세 1.95%~",
-      tooltip: "주문관리 1.95~3.63% + 판매 0.91~2.73% (유입/등급별).",
-      condition: "스타트 제로수수료(신규 12개월) 별도 적용.",
+      core: "영세 2.95%~",
+      tooltip: "주문관리 1.95~3.63%(VAT 포함) + 판매 1.00~3.00%(VAT 포함) 합산. 유입경로·등급별 차등. 스타트 제로수수료(신규 12개월) 별도 적용.",
     },
     shippingFeeRate: {
-      core: "유료배송 주문관리만 과금",
-      tooltip: "배송비에는 판매 수수료가 적용되지 않습니다.",
+      core: "주문관리만 과금",
+      tooltip: "유료배송에만 주문관리 수수료가 부과됩니다. 판매 수수료는 미적용.",
     },
     settlementCycle: {
-      core: "구매확정 후 1~2영업일",
+      core: "확정 후 1~2영업일",
     },
     note: {
       core: "등급+유입경로 분리형",
@@ -71,6 +70,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "D+1~D+2 영업일",
       tooltip: "요일/정산 캘린더에 따라 실제 입금일이 달라질 수 있습니다.",
     },
+
     note: {
       core: "로켓그로스 물류비 별도",
       condition: "건당 700~4,300원 추가 발생 가능.",
@@ -93,7 +93,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "유료배송 3.3%",
     },
     settlementCycle: {
-      core: "구매확정 후 익영업일",
+      core: "확정 후 익영업일",
     },
     note: {
       core: "카테고리 단일형 구조",
@@ -117,7 +117,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "유료배송 3.3%",
     },
     settlementCycle: {
-      core: "구매확정 후 익영업일",
+      core: "확정 후 익영업일",
     },
     note: {
       core: "대표값 기준 표기",

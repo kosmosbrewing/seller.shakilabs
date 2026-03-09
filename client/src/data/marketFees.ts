@@ -130,5 +130,13 @@ export const GMARKET = {
   shippingFeeRate: 0.033,
 } as const;
 
-// 수수료 데이터 최종 업데이트 날짜
+// 마켓별 월정액(서버 이용료) — FAQ·비교표에서 참조
+export const MONTHLY_FEES: Partial<Record<MarketKey, { amount: number; threshold: string }>> = {
+  coupang: { amount: 55_000, threshold: "월 판매 100만원 초과" },
+  elevenst: { amount: 77_000, threshold: "월 구매확정 500만원 초과" },
+  gmarket: { amount: 55_000, threshold: "월 판매 500만원 초과" },
+};
+
+// 수수료 데이터 최종 업데이트 날짜 (2025.10 인하 반영, 2026.03 재검증 — 변동 없음)
 export const FEE_DATA_UPDATED = "2025.10";
+export const FEE_DATA_VERIFIED = "2026.03";

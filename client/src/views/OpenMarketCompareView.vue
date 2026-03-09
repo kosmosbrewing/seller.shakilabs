@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
-import { BadgeCheck, CircleHelp } from "lucide-vue-next";
+import { BadgeAlert, BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
+import CompareHint from "@/components/common/CompareHint.vue";
+import { buttonVariants } from "@/components/ui/button";
 import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   MARKET_COMPARE_UPDATED,
@@ -13,11 +15,12 @@ import {
   type OpenMarketKey,
 } from "@/data/openMarketCompare";
 
-type CompareColumnKey = "setupFee" | "salesFeeRange" | "shippingFeeRate" | "settlementCycle" | "note";
+type CompareColumnKey = "salesFeeRange" | "shippingFeeRate" | "settlementCycle" | "note";
 
 interface CompareColumn {
   key: CompareColumnKey;
   label: string;
+  nowrap?: boolean;
 }
 
 const seoTitle = "스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 오픈마켓 비교";
@@ -26,16 +29,11 @@ const seoDescription =
 const pageUrl = `${DEFAULT_SITE_URL}/market-compare`;
 
 const compareColumns: CompareColumn[] = [
-  { key: "setupFee", label: "입점비" },
-  { key: "salesFeeRange", label: "판매 수수료" },
-  { key: "shippingFeeRate", label: "배송비 수수료" },
-  { key: "settlementCycle", label: "정산주기" },
+  { key: "salesFeeRange", label: "판매 수수료", nowrap: true },
+  { key: "shippingFeeRate", label: "배송비 수수료", nowrap: true },
+  { key: "settlementCycle", label: "정산주기", nowrap: true },
   { key: "note", label: "비고" },
 ];
-
-const freeEntryCount = computed(
-  () => OPEN_MARKETS.filter((m) => m.setupFee.core === "무료").length
-);
 
 const lowestFeeMarket = computed<OpenMarketKey | null>(() => {
   let lowest: { key: OpenMarketKey; rate: number } | null = null;
@@ -94,14 +92,11 @@ function formatRate(rate: number): string {
   return rate.toFixed(2).replace(/\.?0+$/, "");
 }
 
-function isFreeValue(value: string): boolean {
-  return value.includes("무료") || value.includes("없음");
+function getReadableBadgeTextClass(marketKey: OpenMarketKey): string {
+  return "text-white";
 }
 
 function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: OpenMarketKey): string {
-  if (columnKey === "setupFee" && isFreeValue(cell.core)) {
-    return "compare-cell-highlight";
-  }
   if (columnKey === "salesFeeRange" && marketKey === lowestFeeMarket.value) {
     return "compare-cell-highlight";
   }
@@ -120,42 +115,38 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
-      <div class="retro-titlebar rounded-t-2xl">
+      <div class="retro-titlebar flex-col items-start gap-2 rounded-t-2xl sm:flex-row sm:items-center sm:gap-3">
         <h1 class="retro-title">오픈마켓 비교</h1>
-        <div class="flex flex-col items-end gap-1.5">
-          <FreshBadge :message="`${MARKET_COMPARE_UPDATED} 수수료 데이터 반영`" />
+        <div class="flex w-full flex-col items-start gap-1.5 sm:w-auto sm:items-end">
+          <FreshBadge :message="`${MARKET_COMPARE_UPDATED} 반영`" />
         </div>
       </div>
 
       <div class="retro-panel-content space-y-4">
-        <p class="text-body text-muted-foreground">
-          스마트스토어, 쿠팡, 11번가, G마켓의 입점 조건과 수수료 구조를 같은 기준으로 비교했습니다.
-          실시간 계산이 필요하면 수수료 계산기에서 바로 확인할 수 있습니다.
-        </p>
-
-        <div class="flex flex-wrap gap-1.5 text-caption">
-          <span class="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 font-semibold text-foreground">
-            무료 입점 {{ freeEntryCount }} / {{ OPEN_MARKETS.length }}
-          </span>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-body text-muted-foreground">
+            {{ OPEN_MARKETS.length }}개 오픈마켓의 판매 수수료·배송비 수수료·정산주기를 비교합니다.
+          </p>
           <span
             v-if="lowestFeeLabel"
-            class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20"
+            class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
           >
             <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-            영세 기준 최저 시작 수수료 {{ lowestFeeLabel }}
+            영세 기준 최저 수수료 {{ lowestFeeLabel }}
           </span>
         </div>
 
-        <p class="scroll-hint">표가 잘리지 않도록 좌우 스크롤을 지원합니다.</p>
+        <p class="scroll-hint">표를 좌우로 밀면 다른 비교 항목을 계속 확인할 수 있습니다.</p>
+
         <div class="overflow-x-auto">
-          <table class="min-w-[860px] w-full text-body">
+          <table class="w-full text-body">
             <thead>
               <tr class="border-b border-border/80 bg-card/95">
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">오픈마켓</th>
+                <th class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">오픈마켓</th>
                 <th
                   v-for="col in compareColumns"
                   :key="col.key"
-                  class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground"
+                  class="whitespace-nowrap px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4"
                 >
                   {{ col.label }}
                 </th>
@@ -166,19 +157,26 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                 v-for="market in OPEN_MARKETS"
                 :key="market.key"
                 class="border-b border-border/40 transition-colors hover:bg-accent/15"
-                :class="market.key === lowestFeeMarket ? 'bg-profit/5' : ''"
+                :class="market.key === lowestFeeMarket ? 'bg-profit/5 dark:bg-profit/12' : ''"
               >
-                <td class="px-4 py-3">
+                <td
+                  class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
+                  :class="'bg-card'"
+                >
                   <div class="flex items-center gap-2.5">
                     <span
-                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold text-white"
+                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                      :class="getReadableBadgeTextClass(market.key)"
                       :style="{ backgroundColor: market.color }"
                     >
                       {{ market.shortName }}
                     </span>
                     <div class="min-w-0">
                       <div class="flex items-center gap-1.5">
-                        <span class="text-body font-semibold">{{ market.name }}</span>
+                        <span class="text-body font-semibold">
+                          <span class="hidden sm:inline">{{ market.name }}</span>
+                          <span class="sm:hidden">{{ market.shortName }}</span>
+                        </span>
                         <span
                           v-if="market.key === lowestFeeMarket"
                           class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -193,36 +191,15 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                 <td
                   v-for="col in compareColumns"
                   :key="`${market.key}-${col.key}`"
-                  class="px-4 py-3 align-top"
+                  class="px-3 py-3 align-top sm:px-4"
                 >
                   <div class="compare-cell" :class="getCellBg(col.key, market[col.key], market.key)">
-                    <div class="flex items-start gap-1.5">
-                      <p class="compare-cell-value">
-                        {{ market[col.key].core }}
-                      </p>
-                      <div
-                        v-if="market[col.key].tooltip || market[col.key].condition"
-                        class="relative group shrink-0"
-                      >
-                        <button
-                          type="button"
-                          class="compare-tooltip-trigger"
-                          aria-label="상세 설명 보기"
-                        >
-                          <CircleHelp class="h-3.5 w-3.5" />
-                        </button>
-                        <div class="compare-tooltip-panel">
-                          <p class="compare-tooltip-title">상세 설명</p>
-                          <p v-if="market[col.key].tooltip" class="mt-1.5">{{ market[col.key].tooltip }}</p>
-                          <p
-                            v-if="market[col.key].condition"
-                            class="compare-tooltip-condition"
-                          >
-                            조건: {{ market[col.key].condition }}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    <span class="compare-cell-value" :class="col.nowrap ? 'whitespace-nowrap' : ''">{{ market[col.key].core }}</span>
+                    <CompareHint
+                      v-if="market[col.key].tooltip || market[col.key].condition"
+                      :tooltip="market[col.key].tooltip"
+                      :condition="market[col.key].condition"
+                    />
                   </div>
                 </td>
               </tr>
@@ -230,18 +207,25 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
           </table>
         </div>
 
-        <div class="rounded-[1.2rem] border border-border/70 bg-muted/20 px-3.5 py-3 text-[11px] leading-5 text-muted-foreground sm:text-caption">
-          수수료율은 카테고리, 매출 등급, 계약 조건에 따라 달라질 수 있습니다. 실제 입점 전에는 각 마켓의 최신 수수료 정책을 반드시 다시 확인하세요.
+        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-[11px] leading-5 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
+          <BadgeAlert class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
+          <div class="space-y-1">
+            <p>수수료율은 카테고리, 매출 등급, 계약 조건에 따라 달라질 수 있습니다.</p>
+            <p>실제 입점 전에는 각 마켓의 최신 수수료 정책을 반드시 다시 확인하세요.</p>
+          </div>
         </div>
       </div>
     </div>
 
     <AdSlot slot="market-compare" label="오픈마켓 비교 페이지 광고" />
 
-    <div class="text-center">
-      <RouterLink to="/" class="retro-button">
-        홈으로 돌아가 계산기 사용하기
-      </RouterLink>
-    </div>
+    <section class="retro-panel overflow-hidden">
+      <div class="retro-panel-content text-center space-y-2">
+        <p class="text-caption text-muted-foreground">내 상품의 수수료를 직접 계산해보세요.</p>
+        <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+          수수료 계산기 사용하기
+        </RouterLink>
+      </div>
+    </section>
   </div>
 </template>

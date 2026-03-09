@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, watch } from "vue";
-import { Link, X } from "lucide-vue-next";
+import { Link } from "lucide-vue-next";
 
 const props = defineProps<{
   show: boolean;
@@ -38,9 +38,9 @@ onBeforeUnmount(() => {
 });
 
 function handleAction(action: "kakao" | "link"): void {
+  emit("close");
   if (action === "kakao") emit("shareKakao");
   else emit("copyLink");
-  emit("close");
 }
 </script>
 
@@ -49,33 +49,30 @@ function handleAction(action: "kakao" | "link"): void {
     <Transition name="modal-fade">
       <div
         v-if="props.show"
-        class="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+        class="fixed inset-0 z-50 flex items-center justify-center"
         role="dialog"
         aria-modal="true"
         aria-labelledby="share-modal-title"
       >
         <div class="absolute inset-0 bg-black/60" @click="emit('close')" />
-        <div class="relative z-10 w-full max-w-sm mx-4 retro-panel border border-border">
-          <div class="retro-titlebar flex items-center justify-between">
+        <div class="relative z-10 mx-4 w-full max-w-sm max-h-[85vh] overflow-y-auto translate-y-[5vh] retro-panel border border-border sm:translate-y-0">
+          <div class="retro-titlebar">
             <h3 id="share-modal-title" class="retro-title text-[1rem]!">공유하기</h3>
-            <button
-              class="inline-flex items-center justify-center rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-              aria-label="공유 모달 닫기"
-              @click="emit('close')"
-            >
-              <X class="h-4 w-4" />
-            </button>
+            <button class="retro-kbd text-xs" aria-label="공유 모달 닫기" @click="emit('close')">ESC</button>
           </div>
 
-          <div class="p-4 space-y-3">
-            <div class="retro-panel-muted border border-border/40 px-3 py-2">
+          <div class="space-y-3 p-4">
+            <div
+              v-if="props.summaryText"
+              class="retro-panel-muted border border-border/40 px-3 py-2"
+            >
               <p class="text-caption text-muted-foreground">현재 계산 조건</p>
-              <p class="text-caption font-semibold mt-1 break-words">{{ props.summaryText }}</p>
+              <p class="mt-1 break-words text-caption font-semibold">{{ props.summaryText }}</p>
             </div>
+
             <div class="grid grid-cols-2 gap-3">
-              <!-- 카카오톡 공유 -->
               <button
-                class="flex flex-col items-center gap-2 retro-panel-muted border border-border/40 p-3 hover:border-yellow-400/60 transition-colors disabled:opacity-50"
+                class="flex flex-col items-center gap-2 retro-panel-muted border border-border/40 p-3 transition-colors hover:border-yellow-400/60 disabled:opacity-50"
                 :disabled="props.kakaoBusy"
                 aria-label="카카오톡 공유"
                 @click="handleAction('kakao')"
@@ -86,17 +83,16 @@ function handleAction(action: "kakao" | "link"): void {
                   aria-hidden="true"
                   class="h-6 w-6 object-contain"
                 />
-                <span class="text-[0.72rem] font-bold text-center leading-tight whitespace-nowrap">카카오톡 공유</span>
+                <span class="text-center text-[0.72rem] font-bold leading-tight whitespace-nowrap">카카오톡 공유</span>
               </button>
 
-              <!-- 링크 복사 -->
               <button
-                class="flex flex-col items-center gap-2 retro-panel-muted border border-border/40 p-3 hover:border-border/80 transition-colors"
+                class="flex flex-col items-center gap-2 retro-panel-muted border border-border/40 p-3 transition-colors hover:border-border/80"
                 aria-label="공유 링크 복사"
                 @click="handleAction('link')"
               >
                 <Link class="h-6 w-6 text-muted-foreground" />
-                <span class="text-[0.72rem] font-bold text-center leading-tight whitespace-nowrap">링크 복사</span>
+                <span class="text-center text-[0.72rem] font-bold leading-tight whitespace-nowrap">링크 복사</span>
               </button>
             </div>
           </div>
@@ -107,10 +103,6 @@ function handleAction(action: "kakao" | "link"): void {
 </template>
 
 <style scoped>
-.retro-title {
-  font-size: 1rem !important;
-}
-
 .modal-fade-enter-active,
 .modal-fade-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;

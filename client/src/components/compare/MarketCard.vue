@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { BadgeCheck, ChevronDown, Medal } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import { formatWon, formatWonShort, formatPercent } from "@/lib/utils";
 import { MARKET_META } from "@/data/marketFees";
 import type { FeeBreakdown } from "@/utils/calculator";
@@ -26,6 +27,13 @@ const gapLabel = computed(() => {
   return `1위보다 ${formatWonShort(props.netGap)} 덜 남음`;
 });
 
+function toBrandTint(color: string, alpha = 0.12): string {
+  const normalized = color.replace("#", "");
+  if (normalized.length !== 6) return `rgba(0, 0, 0, ${alpha})`;
+  const channels = [0, 2, 4].map((index) => Number.parseInt(normalized.slice(index, index + 2), 16));
+  return `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${alpha})`;
+}
+
 // 결과 변경 시 짧은 하이라이트 애니메이션
 const highlight = ref(false);
 watch(() => props.result.totalFee, () => {
@@ -37,7 +45,7 @@ watch(() => props.result.totalFee, () => {
 <template>
   <div
     :class="[
-      'retro-panel relative overflow-hidden rounded-3xl transition-all duration-200',
+      'retro-panel relative overflow-hidden rounded-2xl transition-all duration-200',
       isBest ? 'ring-2 ring-profit shadow-[0_12px_30px_rgba(20,130,90,0.16)]' : 'hover:-translate-y-0.5',
       highlight ? 'card-highlight' : '',
     ]"
@@ -55,7 +63,7 @@ watch(() => props.result.totalFee, () => {
         <div class="flex items-center gap-3 min-w-0">
           <div
             class="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl px-2"
-            :style="{ backgroundColor: meta.color + '18' }"
+            :style="{ backgroundColor: toBrandTint(meta.color) }"
           >
             <span class="text-caption font-bold" :style="{ color: meta.color }">
               {{ meta.shortName }}
@@ -80,7 +88,7 @@ watch(() => props.result.totalFee, () => {
     <div class="px-4 pb-4">
       <div
         class="rounded-[1.35rem] px-3.5 py-3.5"
-        :class="isBest ? 'bg-profit/8' : 'bg-muted/25'"
+        :class="isBest ? 'bg-profit/8' : 'bg-white'"
       >
         <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           건당 순이익
@@ -115,18 +123,20 @@ watch(() => props.result.totalFee, () => {
     </div>
 
     <!-- 상세 토글 -->
-    <button
+    <Button
       type="button"
-      class="touch-target flex w-full items-center justify-center gap-1 border-t border-border/50 px-3 py-2.5 text-caption font-semibold text-muted-foreground transition-colors hover:bg-muted/20 hover:text-foreground"
+      variant="ghost"
+      size="sm"
+      class="w-full justify-center gap-1 rounded-none border-t border-border/50 px-3 text-muted-foreground hover:bg-muted/20 hover:text-foreground"
       @click="showDetail = !showDetail"
     >
       <span>{{ showDetail ? "상세 닫기" : "수수료 상세 보기" }}</span>
       <ChevronDown class="h-3.5 w-3.5 transition-transform duration-200" :class="{ 'rotate-180': showDetail }" />
-    </button>
+    </Button>
 
     <!-- 상세 내역 -->
     <Transition name="slide-fade">
-      <div v-if="showDetail" class="border-t border-border/50 bg-muted/10 px-4 py-3 space-y-1.5">
+      <div v-if="showDetail" class="border-t border-border/50 bg-white px-4 py-3 space-y-1.5">
         <div
           v-for="(item, idx) in result.items"
           :key="idx"

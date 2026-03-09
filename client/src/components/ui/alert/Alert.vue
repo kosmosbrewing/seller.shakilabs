@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { Check, X, CheckCircle2, AlertTriangle, Info } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type AlertType = "success" | "error" | "warning" | "info";
@@ -121,18 +122,20 @@ onUnmounted(() => {
               </p>
             </div>
             <div class="flex border-t border-border">
-              <button
+              <Button
                 @click="handleCancel"
-                class="flex-1 py-3 sm:py-3.5 text-caption sm:text-body font-medium text-muted-foreground hover:bg-muted/50 transition-colors border-r border-border"
+                variant="ghost"
+                class="flex-1 rounded-none border-r border-border py-3 text-muted-foreground hover:bg-muted/50 sm:py-3.5"
               >
                 {{ cancelText }}
-              </button>
-              <button
+              </Button>
+              <Button
                 @click="handleConfirm"
-                class="flex-1 py-3 sm:py-3.5 text-caption sm:text-body font-semibold transition-colors text-primary hover:bg-primary/5"
+                variant="ghost"
+                class="flex-1 rounded-none py-3 text-primary hover:bg-primary/5 hover:text-primary sm:py-3.5"
               >
                 {{ confirmText }}
-              </button>
+              </Button>
             </div>
           </template>
 

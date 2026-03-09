@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { Primitive } from "radix-vue";
-import { buttonVariants, type ButtonVariants } from ".";
+import { actionCardVariants, type ActionCardVariants } from ".";
 import { cn } from "@/lib/utils";
 
-type ButtonClassValue = string | string[] | Record<string, boolean>;
+type ActionCardClassValue = string | string[] | Record<string, boolean>;
 
 const props = withDefaults(
   defineProps<{
-    variant?: ButtonVariants["variant"];
-    size?: ButtonVariants["size"];
-    as?: string;
+    variant?: ActionCardVariants["variant"];
+    as?: string | object;
     asChild?: boolean;
-    class?: ButtonClassValue;
+    class?: ActionCardClassValue;
   }>(),
   {
     variant: "default",
-    size: "default",
     as: "button",
     asChild: false,
     class: "",
@@ -27,7 +25,7 @@ const props = withDefaults(
   <Primitive
     :as="props.as"
     :as-child="props.asChild"
-    :class="cn(buttonVariants({ variant: props.variant, size: props.size }), props.class)"
+    :class="cn(actionCardVariants({ variant: props.variant }), props.class)"
   >
     <slot />
   </Primitive>

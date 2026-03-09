@@ -5,9 +5,9 @@ import { useRoute, RouterLink } from "vue-router";
 const route = useRoute();
 
 const tabs = [
-  { key: "home", label: "수수료 계산기", to: "/" },
+  { key: "home", label: "수수료 계산", to: "/" },
   { key: "market", label: "오픈마켓 비교", to: "/market-compare" },
-  { key: "payment", label: "결제 수수료", to: "/payment-compare" },
+  { key: "payment", label: "결제 비교", to: "/payment-compare" },
   { key: "shipping", label: "택배비 비교", to: "/shipping-compare" },
 ] as const;
 

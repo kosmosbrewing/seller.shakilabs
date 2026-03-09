@@ -2,10 +2,12 @@
 import { ref, watch } from "vue";
 import { ChevronDown } from "lucide-vue-next";
 import FreshBadge from "@/components/common/FreshBadge.vue";
+import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/data/categories";
 const PRICE_QUICK = [
   { value: 10_000, label: "1만" },
   { value: 30_000, label: "3만" },
+  { value: 50_000, label: "5만" },
   { value: 100_000, label: "10만" },
 ] as const;
 import {
@@ -48,6 +50,7 @@ const SHIPPING_PRESETS = [
   { value: 3000, label: "3,000원" },
   { value: 5000, label: "5,000원" },
 ] as const;
+const SHIPPING_STEP_UNIT = 1_000;
 
 // 가격 입력 처리 (콤마 포맷)
 const priceDisplay = ref(props.price.toLocaleString("ko-KR"));
@@ -69,12 +72,7 @@ function handlePriceBlur(): void {
   priceDisplay.value = props.price.toLocaleString("ko-KR");
 }
 
-const PRICE_STEPS = [
-  { delta: -10_000, label: "-1만" },
-  { delta: -1_000, label: "-1천" },
-  { delta: 1_000, label: "+1천" },
-  { delta: 10_000, label: "+1만" },
-] as const;
+const PRICE_STEP_UNIT = 10_000;
 
 function adjustPrice(delta: number): void {
   const next = Math.max(PRICE_MIN, Math.min(PRICE_MAX, props.price + delta));
@@ -101,129 +99,165 @@ function handleShippingBlur(): void {
   shippingDisplay.value = props.shippingFee.toLocaleString("ko-KR");
 }
 
+function adjustShipping(delta: number): void {
+  const next = Math.max(0, props.shippingFee + delta);
+  emit("update:shippingFee", next);
+}
+
 </script>
 
 <template>
   <div class="retro-panel">
-    <div class="retro-titlebar rounded-t-2xl">
-      <h2 class="retro-title">내 상품 수수료 한눈에 비교하기</h2>
+    <div class="retro-titlebar flex-col items-start gap-2 rounded-t-2xl sm:flex-row sm:items-center sm:gap-3">
+      <h2 class="retro-title">상품 정보 입력</h2>
       <FreshBadge />
     </div>
 
     <div class="retro-panel-content space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <!-- 판매가 카드 -->
-        <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
-            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
-            <span class="text-caption font-bold text-foreground">판매가</span>
+        <div class="rounded-xl border border-border/60 p-3">
+          <div class="space-y-1.5">
+            <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+              <label for="price-input">판매가</label>
+            </p>
           </div>
-          <div class="p-3 space-y-2">
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">₩</span>
-              <input
-                id="price-input"
-                type="text"
-                inputmode="numeric"
-                class="retro-input pl-7 tabular-nums text-right"
-                :value="priceDisplay"
-                @input="handlePriceInput"
-                @blur="handlePriceBlur"
-              />
+          <div class="mt-3 space-y-2">
+            <div class="flex items-stretch gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="chip"
+                class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                @click="adjustPrice(-PRICE_STEP_UNIT)"
+              >
+                -
+              </Button>
+              <div class="relative min-w-0 flex-1">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">₩</span>
+                <input
+                  id="price-input"
+                  type="text"
+                  inputmode="numeric"
+                  class="retro-input pl-7 tabular-nums text-right"
+                  :value="priceDisplay"
+                  @input="handlePriceInput"
+                  @blur="handlePriceBlur"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="chip"
+                class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                @click="adjustPrice(PRICE_STEP_UNIT)"
+              >
+                +
+              </Button>
             </div>
-            <div class="flex flex-wrap gap-1.5">
-              <button
+            <div class="grid grid-cols-4 gap-1.5">
+              <Button
                 v-for="preset in PRICE_QUICK"
                 :key="preset.value"
                 type="button"
+                :variant="price === preset.value ? 'default' : 'outline'"
+                size="chip"
                 :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
-                  price === preset.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  'w-full justify-center px-0',
+                  price === preset.value ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
                 ]"
                 @click="emit('update:price', preset.value)"
               >
                 {{ preset.label }}
-              </button>
-            </div>
-            <div class="flex gap-1">
-              <button
-                v-for="step in PRICE_STEPS"
-                :key="step.delta"
-                type="button"
-                :class="[
-                  'flex-1 rounded-lg border px-1 py-1.5 text-tiny font-semibold tabular-nums transition-colors',
-                  step.delta < 0
-                    ? 'border-border bg-background text-muted-foreground hover:border-fee/40 hover:text-fee'
-                    : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
-                ]"
-                @click="adjustPrice(step.delta)"
-              >
-                {{ step.label }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
         <!-- 카테고리 카드 -->
-        <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
-            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
-            <span class="text-caption font-bold text-foreground">카테고리</span>
+        <div class="rounded-xl border border-border/60 p-3">
+          <div class="space-y-1.5">
+            <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+              <span>카테고리</span>
+            </p>
           </div>
-          <div class="p-3 grid grid-cols-2 gap-1.5">
-            <button
+          <div class="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+            <Button
               v-for="cat in CATEGORIES"
               :key="cat.key"
               type="button"
+              :variant="category === cat.key ? 'default' : 'outline'"
+              size="chip"
               :class="[
-                'touch-target rounded-lg border px-2.5 py-2 text-left text-caption font-semibold transition-colors',
-                category === cat.key
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                'h-full justify-center gap-1 whitespace-nowrap px-1.5 text-center text-[11px] leading-tight',
+                category === cat.key ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
               ]"
               @click="emit('update:category', cat.key)"
             >
-              {{ cat.emoji }} {{ cat.label }}
-            </button>
+              <span class="leading-none">{{ cat.emoji }}</span>
+              <span>{{ cat.label }}</span>
+            </Button>
           </div>
         </div>
 
         <!-- 배송비 카드 -->
-        <div class="rounded-xl border border-border/60 overflow-hidden">
-          <div class="bg-muted/40 px-3 py-2 flex items-center gap-2">
-            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
-            <span class="text-caption font-bold text-foreground">배송비</span>
+        <div class="rounded-xl border border-border/60 p-3">
+          <div class="space-y-1.5">
+            <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
+              <label for="shipping-input">배송비</label>
+            </p>
           </div>
-          <div class="p-3 space-y-2">
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">₩</span>
-              <input
-                id="shipping-input"
-                type="text"
-                inputmode="numeric"
-                class="retro-input pl-7 tabular-nums text-right"
-                :value="shippingDisplay"
-                @input="handleShippingInput"
-                @blur="handleShippingBlur"
-              />
+          <div class="mt-3 space-y-2">
+            <div class="flex items-stretch gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="chip"
+                class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                @click="adjustShipping(-SHIPPING_STEP_UNIT)"
+              >
+                -
+              </Button>
+              <div class="relative min-w-0 flex-1">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">₩</span>
+                <input
+                  id="shipping-input"
+                  type="text"
+                  inputmode="numeric"
+                  class="retro-input pl-7 tabular-nums text-right"
+                  :value="shippingDisplay"
+                  @input="handleShippingInput"
+                  @blur="handleShippingBlur"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="chip"
+                class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                @click="adjustShipping(SHIPPING_STEP_UNIT)"
+              >
+                +
+              </Button>
             </div>
             <div class="flex flex-wrap gap-1.5">
-              <button
+              <Button
                 v-for="sp in SHIPPING_PRESETS"
                 :key="sp.value"
                 type="button"
+                :variant="shippingFee === sp.value ? 'default' : 'outline'"
+                size="chip"
                 :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
-                  shippingFee === sp.value
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  'min-w-[4.5rem] flex-1 justify-center',
+                  shippingFee === sp.value ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
                 ]"
                 @click="emit('update:shippingFee', sp.value)"
               >
                 {{ sp.label }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -247,20 +281,21 @@ function handleShippingBlur(): void {
               스마트스토어 매출 등급
             </label>
             <div class="flex flex-wrap gap-1.5">
-              <button
+              <Button
                 v-for="(label, key) in SMARTSTORE_TIER_LABELS"
                 :key="key"
                 type="button"
-                :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
+                variant="outline"
+                size="chip"
+                :class="
                   smartstoreTier === key
-                    ? 'border-market-smartstore bg-market-smartstore text-white'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                ]"
+                    ? 'border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white'
+                    : ''
+                "
                 @click="emit('update:smartstoreTier', key as SmartStoreTier)"
               >
                 {{ label }}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -270,20 +305,21 @@ function handleShippingBlur(): void {
               스마트스토어 유입 경로
             </label>
             <div class="flex flex-wrap gap-1.5">
-              <button
+              <Button
                 v-for="(label, key) in SMARTSTORE_SOURCE_LABELS"
                 :key="key"
                 type="button"
-                :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
+                variant="outline"
+                size="chip"
+                :class="
                   smartstoreSource === key
-                    ? 'border-market-smartstore bg-market-smartstore text-white'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                ]"
+                    ? 'border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white'
+                    : ''
+                "
                 @click="emit('update:smartstoreSource', key as SmartStoreSource)"
               >
                 {{ label }}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -293,20 +329,21 @@ function handleShippingBlur(): void {
               쿠팡 판매 방식
             </label>
             <div class="flex flex-wrap gap-1.5">
-              <button
+              <Button
                 v-for="(label, key) in COUPANG_MODE_LABELS"
                 :key="key"
                 type="button"
-                :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
+                variant="outline"
+                size="chip"
+                :class="
                   coupangMode === key
-                    ? 'border-market-coupang bg-market-coupang text-white'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                ]"
+                    ? 'border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white'
+                    : ''
+                "
                 @click="emit('update:coupangMode', key as CoupangMode)"
               >
                 {{ label }}
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -316,20 +353,21 @@ function handleShippingBlur(): void {
               로켓그로스 물류 크기
             </label>
             <div class="flex flex-wrap gap-1.5">
-              <button
+              <Button
                 v-for="(label, key) in FULFILLMENT_SIZE_LABELS"
                 :key="key"
                 type="button"
-                :class="[
-                  'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
+                variant="outline"
+                size="chip"
+                :class="
                   fulfillmentSize === key
-                    ? 'border-market-coupang bg-market-coupang text-white'
-                    : 'border-border text-muted-foreground hover:text-foreground'
-                ]"
+                    ? 'border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white'
+                    : ''
+                "
                 @click="emit('update:fulfillmentSize', key as FulfillmentSize)"
               >
                 {{ label }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

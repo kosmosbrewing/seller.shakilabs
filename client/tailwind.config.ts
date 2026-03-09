@@ -100,7 +100,7 @@ const config: Config = {
         market: {
           smartstore: "#03C75A",
           coupang: "#E31937",
-          elevenst: "#FF0B0B",
+          elevenst: "#FF6B00",
           gmarket: "#00B050",
         },
       },

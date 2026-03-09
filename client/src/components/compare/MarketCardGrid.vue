@@ -37,8 +37,8 @@ const totalFeeSpread = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-3">
-    <div class="retro-panel-muted px-3.5 py-3 sm:px-4">
+  <div class="space-y-3 px-3 py-3 sm:px-4 sm:py-4">
+    <div class="rounded-2xl bg-white px-3.5 py-3 sm:px-4">
       <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div class="flex flex-wrap items-center gap-2 text-caption">
           <span class="inline-flex items-center rounded-full bg-primary px-2.5 py-1 font-bold text-primary-foreground">

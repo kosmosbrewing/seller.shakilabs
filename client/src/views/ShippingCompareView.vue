@@ -5,6 +5,8 @@ import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
+import CompareHint from "@/components/common/CompareHint.vue";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   REMOTE_AREA_POSTAL_CODE_SUMMARY,
@@ -17,18 +19,35 @@ import {
   parseShippingSumCm,
   parseShippingWeight,
   resolveShippingSize,
+  type ShippingEstimateResult,
   type ShippingSizeKey,
 } from "@/data/shippingRates";
 import { formatNumber, formatWon } from "@/lib/utils";
 
-const seoTitle = "8개 택배사 예상 운임 택배비 비교 계산기";
+type ShippingCompareColumnKey = "baseFare" | "weightSurcharge" | "totalFare" | "limit";
+
+interface ShippingCompareColumn {
+  key: ShippingCompareColumnKey;
+  label: string;
+  nowrap?: boolean;
+}
+
+const seoTitle = "일반 택배 6사 · 편의점 택배 2사 택배비 비교";
 const seoDescription =
   "CJ대한통운, 한진, 로젠, 우체국, 경동, 롯데, CU, GS25의 예상 택배비를 무게와 크기 기준으로 비교합니다.";
 const pageUrl = `${DEFAULT_SITE_URL}/shipping-compare`;
 
+const shippingCompareColumns: ShippingCompareColumn[] = [
+  { key: "baseFare", label: "기본운임", nowrap: true },
+  { key: "weightSurcharge", label: "무게추가", nowrap: true },
+  { key: "totalFare", label: "예상 총 운임", nowrap: true },
+  { key: "limit", label: "접수 제한", nowrap: true },
+];
+
 const weightKg = ref(3);
 const selectedSize = ref<ShippingSizeKey>("medium");
 const sumCm = ref<number | null>(100);
+const showRemoteAreaReference = ref(false);
 
 const weightDisplay = ref(String(weightKg.value));
 const sumDisplay = ref(sumCm.value != null ? String(sumCm.value) : "");
@@ -57,15 +76,10 @@ const convenienceResults = computed(() => allResults.value.filter((item) => item
 const cheapestOverall = computed(() => allResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestGeneral = computed(() => generalResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestConvenience = computed(() => convenienceResults.value.find((item) => item.isAvailable) ?? null);
-const remoteAreaGroupCount = computed(() => REMOTE_AREA_POSTAL_CODE_SUMMARY.length);
+const cheapestGeneralLabel = computed(() => formatCheapestShippingLabel(cheapestGeneral.value));
+const cheapestConvenienceLabel = computed(() => formatCheapestShippingLabel(cheapestConvenience.value));
 const remoteAreaClusterCount = computed(() =>
   REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce((sum, group) => sum + group.clusters.length, 0)
-);
-const remoteAreaRangeCount = computed(() =>
-  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
-    (sum, group) => sum + group.clusters.reduce((clusterSum, cluster) => clusterSum + cluster.postalRanges.length, 0),
-    0
-  )
 );
 const remoteAreaPostalCodeCount = computed(() =>
   REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
@@ -75,18 +89,6 @@ const remoteAreaPostalCodeCount = computed(() =>
           groupSum + cluster.postalRanges.reduce((rangeSum, postalRange) => rangeSum + getPostalCodeCount(postalRange), 0),
         0
       ),
-    0
-  )
-);
-const remoteAreaExceptionCount = computed(() =>
-  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
-    (sum, group) => sum + group.clusters.filter((cluster) => cluster.variant === "exception").length,
-    0
-  )
-);
-const remoteAreaConflictCount = computed(() =>
-  REMOTE_AREA_POSTAL_CODE_SUMMARY.reduce(
-    (sum, group) => sum + group.clusters.filter((cluster) => cluster.variant === "conflict").length,
     0
   )
 );
@@ -126,7 +128,7 @@ const jsonLd = computed(() => [
     "@context": "https://schema.org",
     "@type": "Dataset",
     "name": "제주·도서산간 우편번호 내부 정리표",
-    "description": `제주 및 도서산간 우편번호 묶음 ${remoteAreaClusterCount.value}건, 총 ${remoteAreaPostalCodeCount.value}개 우편번호 참고 데이터`,
+    "description": `제주 및 도서산간 ${remoteAreaClusterCount.value}개 지역, 총 ${remoteAreaPostalCodeCount.value}개 우편번호 참고 데이터`,
     "url": pageUrl,
     "inLanguage": "ko-KR",
     "dateModified": "2026-03-07",
@@ -148,6 +150,16 @@ function handleWeightInput(event: Event): void {
 
 function handleWeightBlur(): void {
   weightDisplay.value = String(weightKg.value);
+}
+
+const WEIGHT_STEP_UNIT = 1;
+
+function adjustWeight(delta: number): void {
+  const next = Math.max(0.5, weightKg.value + delta);
+  const validated = parseShippingWeight(next);
+  if (validated != null) {
+    weightKg.value = validated;
+  }
 }
 
 function handleSumInput(event: Event): void {
@@ -173,6 +185,70 @@ function selectSize(size: ShippingSizeKey): void {
   sumCm.value = null;
 }
 
+function formatCheapestShippingLabel(result: ShippingEstimateResult | null): string | null {
+  if (!result || !result.isAvailable) return null;
+  return `${result.carrier.shortName} ${formatWon(result.totalFare)}`;
+}
+
+function formatCarrierLimit(result: ShippingEstimateResult): string {
+  return `${formatNumber(result.carrier.maxWeightKg)}kg · ${result.carrier.maxSumCm}cm`;
+}
+
+function formatWeightSurcharge(result: ShippingEstimateResult): string {
+  if (!result.isAvailable) return "-";
+  if (result.weightSurcharge <= 0) return "없음";
+  return `+${formatWon(result.weightSurcharge)}`;
+}
+
+function getReadableBadgeTextClass(): string {
+  return "text-white";
+}
+
+function getShippingCellBg(
+  columnKey: ShippingCompareColumnKey,
+  result: ShippingEstimateResult,
+  cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
+): string {
+  if (columnKey === "totalFare" && result.isAvailable && result.carrier.key === cheapestKey) {
+    return "compare-cell-highlight";
+  }
+  if (columnKey === "limit" && result.unavailableReason) {
+    return "compare-cell-caution";
+  }
+  return "";
+}
+
+function getShippingRowTone(
+  result: ShippingEstimateResult,
+  cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
+): string {
+  if (!result.isAvailable) return "bg-muted/25";
+  if (result.carrier.key === cheapestKey) return "bg-profit/8 dark:bg-profit/12";
+  return "";
+}
+
+function getShippingStickyCellTone(
+  result: ShippingEstimateResult,
+  cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
+): string {
+  if (!result.isAvailable) return "bg-muted";
+  if (result.carrier.key === cheapestKey) return "bg-card";
+  return "bg-card";
+}
+
+function getShippingCellValue(columnKey: ShippingCompareColumnKey, result: ShippingEstimateResult): string {
+  if (columnKey === "baseFare") {
+    return result.isAvailable ? formatWon(result.baseFare) : "-";
+  }
+  if (columnKey === "weightSurcharge") {
+    return formatWeightSurcharge(result);
+  }
+  if (columnKey === "totalFare") {
+    return result.isAvailable ? formatWon(result.totalFare) : "접수 불가";
+  }
+  return formatCarrierLimit(result);
+}
+
 function getPostalCodeCount(range: string): number {
   if (!range.includes("-")) return 1;
 
@@ -181,38 +257,10 @@ function getPostalCodeCount(range: string): number {
   return end - start + 1;
 }
 
-function getPostalRangeKind(range: string): string {
-  return range.includes("-") ? "연속 구간" : "단일 번호";
-}
-
-function getPostalRangesCount(ranges: string[]): number {
-  return ranges.reduce((sum, range) => sum + getPostalCodeCount(range), 0);
-}
-
-function getPostalRangeKinds(ranges: string[]): string {
-  if (ranges.length === 1) return getPostalRangeKind(ranges[0]);
-  return "복합 구간";
-}
-
 function formatPostalRanges(ranges: string[]): string {
   return ranges.join(", ");
 }
 
-function getClusterVariantLabel(variant?: "main" | "exception" | "conflict"): string {
-  if (variant === "exception") return "예외 구간";
-  if (variant === "conflict") return "교차검증 상충";
-  return "대표 묶음";
-}
-
-function getClusterVariantClass(variant?: "main" | "exception" | "conflict"): string {
-  if (variant === "exception") {
-    return "border-sky-300/70 bg-sky-50 text-sky-700 dark:border-sky-400/35 dark:bg-sky-950/20 dark:text-sky-200";
-  }
-  if (variant === "conflict") {
-    return "border-amber-300/70 bg-amber-50 text-amber-700 dark:border-amber-400/35 dark:bg-amber-950/20 dark:text-amber-200";
-  }
-  return "border-emerald-300/70 bg-emerald-50 text-emerald-700 dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-200";
-}
 </script>
 
 <template>
@@ -220,400 +268,446 @@ function getClusterVariantClass(variant?: "main" | "exception" | "conflict"): st
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
-      <div class="retro-titlebar rounded-t-2xl">
+      <div class="retro-titlebar flex-col items-start gap-2 rounded-t-2xl sm:flex-row sm:items-center sm:gap-3">
         <h1 class="retro-title">택배비 비교</h1>
-        <FreshBadge :message="`${SHIPPING_DATA_UPDATED} 공개 운임 기준 추정`" />
+        <FreshBadge :message="`${SHIPPING_DATA_UPDATED} 반영`" />
       </div>
 
-      <div class="retro-panel-content space-y-5">
-        <div class="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-start">
-          <div class="space-y-3">
-            <p class="text-body text-muted-foreground">
-              상품 무게와 크기에 따라 일반 택배 6사와 편의점 택배 2개의 예상 운임을 비교합니다.
-              실제 계약 단가와 지역 할증은 제외한 공개 운임 기준 추정이므로, 최종 발송 전에는 계약 요율을 다시 확인해야 합니다.
-            </p>
-            <div class="rounded-[1.5rem] border border-primary/20 bg-primary/10 px-4 py-3.5">
-              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary/80">현재 조건 기준</p>
-              <p class="mt-1.5 text-body font-bold text-foreground">
-                {{ formatNumber(weightKg) }}kg · {{ resolvedSizeLabel }}
-                <span v-if="sumCm != null" class="text-muted-foreground">(3변 합 {{ sumCm }}cm)</span>
-              </p>
-              <p class="mt-1 text-caption text-muted-foreground">
-                가장 저렴한 옵션은
-                <span class="font-bold text-foreground">{{ cheapestOverall?.carrier.name ?? "계산 불가" }}</span>
-                입니다.
-              </p>
-              <p class="mt-1 text-caption text-muted-foreground">
-                일반 비교는 별도 입력이 없으므로 <span class="font-bold text-foreground">동일권 기준 최소 공개 운임</span>을 우선 사용합니다.
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-2">
-            <div class="rounded-[1.35rem] bg-muted/25 px-3.5 py-3">
-              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">비교 대상</p>
-              <p class="mt-1.5 text-body font-bold text-foreground">8개 택배사</p>
-            </div>
-            <div class="rounded-[1.35rem] bg-muted/25 px-3.5 py-3">
-              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">입력값</p>
-              <p class="mt-1.5 text-body font-bold text-foreground">무게 + 크기</p>
-            </div>
-            <div class="rounded-[1.35rem] bg-muted/25 px-3.5 py-3">
-              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">출력값</p>
-              <p class="mt-1.5 text-body font-bold text-foreground">기본운임 + 추가요금</p>
-            </div>
-            <div class="rounded-[1.35rem] bg-muted/25 px-3.5 py-3">
-              <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">주의</p>
-              <p class="mt-1.5 text-body font-bold text-foreground">지역·계약단가 제외</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <div class="rounded-2xl border border-border/60 overflow-hidden">
-            <div class="bg-muted/40 px-4 py-3">
-              <span class="text-caption font-bold text-foreground">무게 입력</span>
-            </div>
-            <div class="space-y-3 p-4">
-              <div class="relative max-w-[11rem]">
-                <input
-                  type="text"
-                  inputmode="decimal"
-                  class="retro-input pr-10 text-right tabular-nums"
-                  :value="weightDisplay"
-                  @input="handleWeightInput"
-                  @blur="handleWeightBlur"
-                />
-                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">kg</span>
-              </div>
-              <div class="flex flex-wrap gap-1.5">
-                <button
-                  v-for="preset in SHIPPING_WEIGHT_PRESETS"
-                  :key="preset"
-                  type="button"
-                  :class="[
-                    'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
-                    weightKg === preset
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                  ]"
-                  @click="weightKg = preset"
-                >
-                  {{ preset }}kg
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="rounded-2xl border border-border/60 overflow-hidden">
-            <div class="bg-muted/40 px-4 py-3">
-              <span class="text-caption font-bold text-foreground">크기 입력</span>
-            </div>
-            <div class="space-y-3 p-4">
-              <div class="flex flex-wrap gap-1.5">
-                <button
-                  v-for="sizeKey in SHIPPING_SIZE_ORDER"
-                  :key="sizeKey"
-                  type="button"
-                  :class="[
-                    'touch-target rounded-xl border px-3 py-1.5 text-caption font-semibold transition-colors',
-                    sumCm == null && selectedSize === sizeKey
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                  ]"
-                  @click="selectSize(sizeKey)"
-                >
-                  {{ SHIPPING_SIZE_LABELS[sizeKey] }}
-                </button>
-              </div>
-              <div class="space-y-2">
-                <label class="block text-caption font-semibold text-foreground">또는 3변 합 입력</label>
-                <div class="relative max-w-[11rem]">
-                  <input
-                    type="text"
-                    inputmode="numeric"
-                    class="retro-input pr-12 text-right tabular-nums"
-                    :value="sumDisplay"
-                    placeholder="예: 100"
-                    @input="handleSumInput"
-                    @blur="handleSumBlur"
-                  />
-                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-muted-foreground">cm</span>
-                </div>
-                <p class="text-caption text-muted-foreground">
-                  입력 시 자동으로 <span class="font-bold text-foreground">{{ resolvedSizeLabel }}</span> 구간을 적용합니다.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="retro-panel-content space-y-1.5">
+        <p class="text-body text-muted-foreground">
+          상품 무게와 크기에 따라 일반 택배 6사와 편의점 택배 2개의 예상 운임을 비교합니다.
+        </p>
+        <p class="text-caption text-muted-foreground">
+          동일권 공개 운임 기준 추정이며, 계약 단가·타권·제주/도서산간·냉장냉동 할증은 제외됩니다.
+        </p>
       </div>
     </div>
 
     <section>
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
-          <div>
-            <div class="flex items-center gap-2">
-              <Truck class="h-4.5 w-4.5" />
-              <span class="retro-title">일반 택배 6사 비교</span>
-            </div>
-            <p class="mt-1 text-tiny text-muted-foreground">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
-          </div>
-          <span v-if="cheapestGeneral" class="inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-caption font-semibold text-white">
-            <BadgeCheck class="h-3.5 w-3.5" />
-            최저가 {{ cheapestGeneral.carrier.shortName }}
-          </span>
+          <h2 class="retro-title">운임 조건 입력</h2>
         </div>
-        <div class="overflow-x-auto px-4 pb-4 pt-4">
-          <table class="min-w-[920px] w-full text-body">
-            <thead>
-              <tr class="border-b border-border/80 bg-card/95">
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">택배사</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">기본운임</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">무게추가 요금</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">예상 총 운임</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">제한사항</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="result in generalResults"
-                :key="result.carrier.key"
-                class="border-b border-border/40"
-                :class="cheapestGeneral?.carrier.key === result.carrier.key ? 'bg-profit/5' : ''"
-              >
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2.5">
-                    <span
-                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold text-white"
-                      :style="{ backgroundColor: result.carrier.color }"
+        <div class="retro-panel-content">
+          <div class="space-y-3">
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="rounded-xl border border-border/60 p-3">
+                <div class="space-y-1.5">
+                  <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+                    <label for="shipping-weight-input">무게</label>
+                  </p>
+                </div>
+                <div class="mt-3 max-w-[18rem] space-y-2">
+                  <div class="flex items-stretch gap-1.5">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="chip"
+                      class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                      @click="adjustWeight(-WEIGHT_STEP_UNIT)"
                     >
-                      {{ result.carrier.shortName }}
-                    </span>
-                    <div>
-                      <p class="font-semibold text-foreground">{{ result.carrier.name }}</p>
-                      <p class="text-tiny text-muted-foreground">
-                        {{ result.carrier.estimateNote }} · {{ result.effectiveSizeLabel }} 구간
-                      </p>
+                      -
+                    </Button>
+                    <div class="relative min-w-0 flex-1">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">kg</span>
+                      <input
+                        id="shipping-weight-input"
+                        type="text"
+                        inputmode="decimal"
+                        class="retro-input pl-10 tabular-nums text-right"
+                        :value="weightDisplay"
+                        @input="handleWeightInput"
+                        @blur="handleWeightBlur"
+                      />
                     </div>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                  {{ result.isAvailable ? formatWon(result.baseFare) : '-' }}
-                </td>
-                <td class="px-4 py-3 text-right tabular-nums text-fee">
-                  {{ result.isAvailable ? formatWon(result.weightSurcharge) : '-' }}
-                </td>
-                <td class="px-4 py-3 text-right font-bold tabular-nums" :class="cheapestGeneral?.carrier.key === result.carrier.key ? 'text-profit' : 'text-foreground'">
-                  {{ result.isAvailable ? formatWon(result.totalFare) : '접수 불가' }}
-                </td>
-                <td class="px-4 py-3 text-caption text-muted-foreground">
-                  <p>{{ result.restrictionText }}</p>
-                  <p v-if="result.unavailableReason" class="mt-1 font-semibold text-fee">{{ result.unavailableReason }}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="retro-panel overflow-hidden">
-        <div class="retro-titlebar rounded-t-2xl">
-          <div>
-            <div class="flex items-center gap-2">
-              <Package2 class="h-4.5 w-4.5" />
-              <span class="retro-title">편의점 택배 2종 비교</span>
-            </div>
-            <p class="mt-1 text-tiny text-muted-foreground">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
-          </div>
-          <span v-if="cheapestConvenience" class="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-caption font-semibold text-primary-foreground">
-            <BadgeCheck class="h-3.5 w-3.5" />
-            최저가 {{ cheapestConvenience.carrier.shortName }}
-          </span>
-        </div>
-        <div class="overflow-x-auto px-4 pb-4 pt-4">
-          <table class="min-w-[920px] w-full text-body">
-            <thead>
-              <tr class="border-b border-border/80 bg-card/95">
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">택배사</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">기본운임</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">무게추가 요금</th>
-                <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">예상 총 운임</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">제한사항</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="result in convenienceResults"
-                :key="result.carrier.key"
-                class="border-b border-border/40"
-                :class="cheapestConvenience?.carrier.key === result.carrier.key ? 'bg-primary/5' : ''"
-              >
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2.5">
-                    <span
-                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold text-white"
-                      :style="{ backgroundColor: result.carrier.color }"
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="chip"
+                      class="w-11 shrink-0 px-0 tabular-nums active:text-foreground"
+                      @click="adjustWeight(WEIGHT_STEP_UNIT)"
                     >
-                      {{ result.carrier.shortName }}
-                    </span>
-                    <div>
-                      <p class="font-semibold text-foreground">{{ result.carrier.name }}</p>
-                      <p class="text-tiny text-muted-foreground">
-                        {{ result.carrier.estimateNote }} · {{ result.effectiveSizeLabel }} 구간
-                      </p>
-                    </div>
+                      +
+                    </Button>
                   </div>
-                </td>
-                <td class="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                  {{ result.isAvailable ? formatWon(result.baseFare) : '-' }}
-                </td>
-                <td class="px-4 py-3 text-right tabular-nums text-fee">
-                  {{ result.isAvailable ? formatWon(result.weightSurcharge) : '-' }}
-                </td>
-                <td class="px-4 py-3 text-right font-bold tabular-nums" :class="cheapestConvenience?.carrier.key === result.carrier.key ? 'text-primary' : 'text-foreground'">
-                  {{ result.isAvailable ? formatWon(result.totalFare) : '접수 불가' }}
-                </td>
-                <td class="px-4 py-3 text-caption text-muted-foreground">
-                  <p>{{ result.restrictionText }}</p>
-                  <p v-if="result.unavailableReason" class="mt-1 font-semibold text-fee">{{ result.unavailableReason }}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="retro-panel overflow-hidden">
-        <div class="retro-titlebar rounded-t-2xl">
-          <div class="flex flex-col gap-1">
-            <span class="retro-title">제주·도서산간 우편번호 정리표</span>
-            <p class="text-tiny text-muted-foreground">여수시 공개 목록을 우선 기준으로 삼고, 상업몰 공개 공지를 보조 기준으로 교차 정리한 탐색용 참고표입니다.</p>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap gap-1.5 border-b border-border/60 px-4 py-3 text-tiny text-muted-foreground">
-          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaGroupCount }}개 권역</span>
-          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaClusterCount }}개 섬권역 묶음</span>
-          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">{{ remoteAreaRangeCount }}개 원시 구간</span>
-          <span class="rounded-full border border-sky-300/70 bg-sky-50 px-2.5 py-1 text-sky-700 dark:border-sky-400/35 dark:bg-sky-950/20 dark:text-sky-200">{{ remoteAreaExceptionCount }}개 예외 구간</span>
-          <span class="rounded-full border border-amber-300/70 bg-amber-50 px-2.5 py-1 text-amber-700 dark:border-amber-400/35 dark:bg-amber-950/20 dark:text-amber-200">{{ remoteAreaConflictCount }}개 상충 구간</span>
-          <span class="rounded-full border border-border/70 bg-background px-2.5 py-1">총 {{ remoteAreaPostalCodeCount.toLocaleString('ko-KR') }}개 우편번호</span>
-        </div>
-
-        <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
-          <article
-            v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY"
-            :key="group.group"
-            class="rounded-2xl border border-border/70 bg-background px-3.5 py-3"
-          >
-            <p class="text-body font-bold text-foreground">{{ group.group }}</p>
-            <div class="mt-3 space-y-2">
-              <div
-                v-for="cluster in group.clusters"
-                :key="`${group.group}-${cluster.zone}`"
-                class="rounded-xl border border-border/60 bg-muted/10 px-3 py-2.5"
-              >
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <p class="text-caption font-bold text-foreground">{{ cluster.zone }}</p>
-                    <p class="mt-0.5 text-[11px] text-muted-foreground">{{ cluster.areas }}</p>
-                  </div>
-                  <div class="flex flex-wrap justify-end gap-1">
-                    <span
-                      class="rounded-full border px-2 py-0.5 text-[10px] font-semibold"
-                      :class="getClusterVariantClass(cluster.variant)"
+                  <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+                    <Button
+                      v-for="preset in SHIPPING_WEIGHT_PRESETS"
+                      :key="preset"
+                      type="button"
+                      :variant="weightKg === preset ? 'default' : 'outline'"
+                      size="chip"
+                      class="justify-center px-0"
+                      :class="weightKg === preset ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'"
+                      @click="weightKg = preset"
                     >
-                      {{ getClusterVariantLabel(cluster.variant) }}
-                    </span>
-                    <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                      {{ getPostalRangeKinds(cluster.postalRanges) }}
-                    </span>
-                    <span class="rounded-full border border-border/70 bg-background px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                      {{ getPostalRangesCount(cluster.postalRanges) }}개
-                    </span>
+                      {{ preset }}kg
+                    </Button>
                   </div>
                 </div>
-                <p class="mt-1 text-[12px] font-semibold tracking-[-0.01em] text-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</p>
-                <p v-if="cluster.note" class="mt-1 text-[11px] text-muted-foreground">{{ cluster.note }}</p>
+              </div>
+
+              <div class="rounded-xl border border-border/60 p-3">
+                <div class="space-y-1.5">
+                  <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+                    <span>크기</span>
+                  </p>
+                </div>
+                <div class="mt-3 max-w-[18rem] space-y-2">
+                  <div class="grid grid-cols-4 gap-1.5">
+                    <Button
+                      v-for="sizeKey in SHIPPING_SIZE_ORDER"
+                      :key="sizeKey"
+                      type="button"
+                      :variant="resolvedSize === sizeKey ? 'default' : 'outline'"
+                      size="chip"
+                      class="justify-center px-0"
+                      :class="resolvedSize === sizeKey ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'"
+                      @click="selectSize(sizeKey)"
+                    >
+                      {{ SHIPPING_SIZE_LABELS[sizeKey] }}
+                    </Button>
+                  </div>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">cm</span>
+                    <input
+                      id="shipping-sum-input"
+                      type="text"
+                      inputmode="numeric"
+                      class="retro-input pl-10 tabular-nums text-right"
+                      :value="sumDisplay"
+                      placeholder="3변 합"
+                      @input="handleSumInput"
+                      @blur="handleSumBlur"
+                    />
+                  </div>
+                  <p class="text-caption text-muted-foreground">
+                    입력 시 자동으로 <span class="font-bold text-foreground">{{ resolvedSizeLabel }}</span> 구간을 적용합니다.
+                  </p>
+                </div>
               </div>
             </div>
-          </article>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="hidden overflow-x-auto px-4 pb-4 pt-4 md:block">
-          <table class="min-w-[880px] w-full text-body">
-            <thead>
-              <tr class="border-b border-border/80 bg-card/95">
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">권역</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">섬권역 묶음</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">포함 지역</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">우편번호 묶음</th>
-                <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">묶음 정보</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY" :key="group.group">
-                <tr class="border-b border-border/40 bg-muted/10">
-                  <td colspan="5" class="px-4 py-2.5 text-body font-bold text-foreground">
-                    {{ group.group }}
+    <section id="shipping-general-results">
+      <div class="retro-panel overflow-hidden">
+        <div class="retro-titlebar rounded-t-2xl">
+          <div class="flex items-center gap-2">
+            <Truck class="h-4.5 w-4.5" />
+            <h2 class="retro-title">일반 택배 6사 비교</h2>
+          </div>
+        </div>
+        <div class="retro-panel-content space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-body text-muted-foreground">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
+            <span
+              v-if="cheapestGeneralLabel"
+              class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
+            >
+              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              현재 최저 예상 운임 {{ cheapestGeneralLabel }}
+            </span>
+          </div>
+
+          <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-body">
+              <thead>
+                <tr class="border-b border-border/80 bg-card/95">
+                  <th class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">택배사</th>
+                  <th
+                    v-for="col in shippingCompareColumns"
+                    :key="`general-${col.key}`"
+                    class="whitespace-nowrap px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4"
+                  >
+                    {{ col.label }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="result in generalResults"
+                  :key="result.carrier.key"
+                  class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                  :class="getShippingRowTone(result, cheapestGeneral?.carrier.key)"
+                >
+                  <td
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
+                    :class="getShippingStickyCellTone(result, cheapestGeneral?.carrier.key)"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <span
+                        class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
+                        :style="{ backgroundColor: result.carrier.color }"
+                      >
+                        {{ result.carrier.shortName }}
+                      </span>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <p class="text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
+                            {{ result.carrier.name }}
+                          </p>
+                          <span
+                            v-if="cheapestGeneral?.carrier.key === result.carrier.key"
+                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                          >
+                            <BadgeCheck class="h-3.5 w-3.5" />
+                            최저
+                          </span>
+                          <span
+                            v-else-if="!result.isAvailable"
+                            class="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-700 dark:border-orange-400/35 dark:bg-orange-950/20 dark:text-orange-200"
+                          >
+                            접수 불가
+                          </span>
+                        </div>
+                        <p class="text-tiny text-muted-foreground whitespace-normal">
+                          <span class="hidden sm:inline">{{ result.carrier.estimateNote }} · </span>{{ result.effectiveSizeLabel }} 구간
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    v-for="col in shippingCompareColumns"
+                    :key="`${result.carrier.key}-${col.key}`"
+                    class="px-3 py-3 align-top sm:px-4"
+                  >
+                    <div class="compare-cell" :class="getShippingCellBg(col.key, result, cheapestGeneral?.carrier.key)">
+                      <span
+                        class="compare-cell-value"
+                        :class="[
+                          result.isAvailable ? '' : 'text-muted-foreground',
+                          col.nowrap ? 'whitespace-nowrap' : '',
+                          col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? 'text-profit' : '',
+                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-fee' : '',
+                        ]"
+                      >
+                        {{ getShippingCellValue(col.key, result) }}
+                      </span>
+                      <CompareHint
+                        v-if="col.key === 'limit'"
+                        :tooltip="result.restrictionText"
+                        :condition="result.unavailableReason"
+                      />
+                    </div>
                   </td>
                 </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="retro-panel overflow-hidden">
+        <div class="retro-titlebar rounded-t-2xl">
+          <div class="flex items-center gap-2">
+            <Package2 class="h-4.5 w-4.5" />
+            <h2 class="retro-title">편의점 택배 2종 비교</h2>
+          </div>
+        </div>
+        <div class="retro-panel-content space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-body text-muted-foreground">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
+            <span
+              v-if="cheapestConvenienceLabel"
+              class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
+            >
+              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
+            </span>
+          </div>
+
+          <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-body">
+              <thead>
+                <tr class="border-b border-border/80 bg-card/95">
+                  <th class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">택배사</th>
+                  <th
+                    v-for="col in shippingCompareColumns"
+                    :key="`convenience-${col.key}`"
+                    class="whitespace-nowrap px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4"
+                  >
+                    {{ col.label }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
                 <tr
+                  v-for="result in convenienceResults"
+                  :key="result.carrier.key"
+                  class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                  :class="getShippingRowTone(result, cheapestConvenience?.carrier.key)"
+                >
+                  <td
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
+                    :class="getShippingStickyCellTone(result, cheapestConvenience?.carrier.key)"
+                  >
+                    <div class="flex items-center gap-2.5">
+                      <span
+                        class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
+                        :style="{ backgroundColor: result.carrier.color }"
+                      >
+                        {{ result.carrier.shortName }}
+                      </span>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <p class="text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
+                            {{ result.carrier.name }}
+                          </p>
+                          <span
+                            v-if="cheapestConvenience?.carrier.key === result.carrier.key"
+                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                          >
+                            <BadgeCheck class="h-3.5 w-3.5" />
+                            최저
+                          </span>
+                          <span
+                            v-else-if="!result.isAvailable"
+                            class="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-700 dark:border-orange-400/35 dark:bg-orange-950/20 dark:text-orange-200"
+                          >
+                            접수 불가
+                          </span>
+                        </div>
+                        <p class="text-tiny text-muted-foreground whitespace-normal">
+                          <span class="hidden sm:inline">{{ result.carrier.estimateNote }} · </span>{{ result.effectiveSizeLabel }} 구간
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    v-for="col in shippingCompareColumns"
+                    :key="`${result.carrier.key}-${col.key}`"
+                    class="px-3 py-3 align-top sm:px-4"
+                  >
+                    <div class="compare-cell" :class="getShippingCellBg(col.key, result, cheapestConvenience?.carrier.key)">
+                      <span
+                        class="compare-cell-value"
+                        :class="[
+                          result.isAvailable ? '' : 'text-muted-foreground',
+                          col.nowrap ? 'whitespace-nowrap' : '',
+                          col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? 'text-profit' : '',
+                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-fee' : '',
+                        ]"
+                      >
+                        {{ getShippingCellValue(col.key, result) }}
+                      </span>
+                      <CompareHint
+                        v-if="col.key === 'limit'"
+                        :tooltip="result.restrictionText"
+                        :condition="result.unavailableReason"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <details class="retro-panel overflow-hidden" :open="showRemoteAreaReference || undefined">
+        <summary class="retro-titlebar rounded-t-2xl list-none cursor-pointer" @click.prevent="showRemoteAreaReference = !showRemoteAreaReference">
+          <h2 class="retro-title">제주·도서산간 우편번호 정리표</h2>
+          <span class="retro-kbd">{{ showRemoteAreaReference ? "접기" : "열기" }}</span>
+        </summary>
+
+        <div v-if="showRemoteAreaReference">
+          <div class="space-y-3 px-4 pb-4 pt-4 md:hidden">
+            <details
+              v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY"
+              :key="group.group"
+              class="overflow-hidden rounded-2xl border border-border/70 bg-background"
+            >
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3">
+                <p class="text-body font-bold text-foreground">{{ group.group }}</p>
+                <span class="rounded-full border border-border/70 bg-muted/15 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                  {{ group.clusters.length }}개 지역
+                </span>
+              </summary>
+              <div class="space-y-2 border-t border-border/60 px-3.5 py-3">
+                <div
                   v-for="cluster in group.clusters"
                   :key="`${group.group}-${cluster.zone}`"
-                  class="border-b border-border/40"
+                  class="rounded-xl border border-border/60 bg-white px-3 py-2.5"
                 >
-                  <td class="px-4 py-3 text-caption text-muted-foreground">{{ group.group }}</td>
-                  <td class="px-4 py-3 text-body font-semibold text-foreground">{{ cluster.zone }}</td>
-                  <td class="px-4 py-3 text-caption text-muted-foreground">{{ cluster.areas }}</td>
-                  <td class="px-4 py-3 text-body font-semibold tracking-[-0.01em] text-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</td>
-                  <td class="px-4 py-3">
-                    <div class="flex flex-wrap gap-1.5">
-                      <span
-                        class="rounded-full border px-2.5 py-1 text-[11px] font-semibold"
-                        :class="getClusterVariantClass(cluster.variant)"
-                      >
-                        {{ getClusterVariantLabel(cluster.variant) }}
-                      </span>
-                      <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                        {{ getPostalRangeKinds(cluster.postalRanges) }}
-                      </span>
-                      <span class="rounded-full border border-border/70 bg-muted/20 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                        {{ getPostalRangesCount(cluster.postalRanges) }}개
-                      </span>
-                      <span
-                        v-if="cluster.note"
-                        class="rounded-full border border-orange-300/70 bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-foreground dark:border-orange-400/35 dark:bg-orange-950/20"
-                      >
-                        {{ cluster.note }}
-                      </span>
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-caption font-bold text-foreground">{{ cluster.zone }}</p>
+                      <p v-if="cluster.areas" class="mt-0.5 text-[11px] text-muted-foreground">{{ cluster.areas }}</p>
                     </div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+                    <CompareHint v-if="cluster.note" :tooltip="cluster.note" />
+                  </div>
+                  <p class="mt-2 text-caption tabular-nums tracking-[-0.01em] text-muted-foreground">{{ formatPostalRanges(cluster.postalRanges) }}</p>
+                </div>
+              </div>
+            </details>
+          </div>
 
-    <div class="rounded-[1.4rem] border border-border/70 bg-muted/20 px-4 py-3.5 text-caption text-muted-foreground">
-      동일권 기준 공개 운임을 우선 사용했고, 타권/제주/도서산간/계약 단가/냉장·냉동/방문 수거 할인 등은 반영하지 않았습니다.
-      공개 운임표가 직접 노출되지 않는 일부 택배사는 보수적 추정 모델을 유지했습니다.
-    </div>
+          <div class="hidden overflow-x-auto px-4 pb-4 pt-4 md:block">
+            <table class="w-full text-body leading-6">
+              <thead>
+                <tr class="border-b border-border/80 bg-card/95">
+                  <th class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">지역</th>
+                  <th class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">우편번호</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-for="group in REMOTE_AREA_POSTAL_CODE_SUMMARY" :key="group.group">
+                  <tr class="border-b border-border/60 bg-muted/20">
+                    <td colspan="2" class="px-3 py-1.5 sm:px-4">
+                      <span class="text-caption font-bold text-foreground">{{ group.group }}</span>
+                      <span class="ml-1.5 text-tiny text-muted-foreground">{{ group.clusters.length }}개 지역</span>
+                    </td>
+                  </tr>
+                  <tr
+                    v-for="cluster in group.clusters"
+                    :key="`${group.group}-${cluster.zone}`"
+                    class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                  >
+                    <td class="whitespace-nowrap px-3 py-1.5 pl-6 sm:px-4 sm:pl-8">
+                      <span class="flex h-6 items-center gap-1.5">
+                        <span class="text-body font-semibold text-foreground">{{ cluster.zone }}</span>
+                        <span v-if="cluster.areas" class="text-caption text-muted-foreground">{{ cluster.areas }}</span>
+                      </span>
+                    </td>
+                    <td class="px-3 py-1.5 sm:px-4">
+                      <span class="flex h-6 items-center gap-1">
+                        <span class="compare-cell-value tracking-[-0.01em]">{{ formatPostalRanges(cluster.postalRanges) }}</span>
+                        <CompareHint v-if="cluster.note" :tooltip="cluster.note" />
+                      </span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </section>
 
     <AdSlot slot="shipping-compare" label="택배비 비교 페이지 광고" />
 
-    <div class="text-center">
-      <RouterLink to="/" class="retro-button">
-        홈으로 돌아가 마켓 수수료도 함께 보기
-      </RouterLink>
-    </div>
+    <section class="retro-panel overflow-hidden">
+      <div class="retro-panel-content text-center space-y-2">
+        <p class="text-caption text-muted-foreground">내 상품의 수수료를 직접 계산해보세요.</p>
+        <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+          수수료 계산기 사용하기
+        </RouterLink>
+      </div>
+    </section>
   </div>
 </template>

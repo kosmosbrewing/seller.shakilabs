@@ -65,9 +65,8 @@ export interface ShippingEstimateResult {
 
 export interface RemoteAreaPostalCodeSummaryCluster {
   zone: string;
-  areas: string;
+  areas?: string;
   postalRanges: string[];
-  variant?: "main" | "exception" | "conflict";
   note?: string;
 }
 
@@ -100,155 +99,76 @@ export const REMOTE_AREA_POSTAL_CODE_SUMMARY: RemoteAreaPostalCodeSummaryGroup[]
   {
     group: "제주",
     clusters: [
-      {
-        zone: "제주 본섬",
-        areas: "제주시·서귀포시",
-        postalRanges: ["63002-63644"],
-        variant: "main",
-      },
-      {
-        zone: "추자면 예외",
-        areas: "제주 섬지역",
-        postalRanges: ["63000-63001"],
-        variant: "exception",
-        note: "여수시 공개 목록은 제주 섬지역으로 별도 분리",
-      },
-      {
-        zone: "우도 예외",
-        areas: "우도면",
-        postalRanges: ["63365"],
-        variant: "exception",
-        note: "일부 상업몰 공지에서만 별도 표기",
-      },
+      { zone: "제주 본섬", areas: "제주시·서귀포시", postalRanges: ["63002-63644"] },
+      { zone: "추자면", areas: "추자도 일대", postalRanges: ["63000-63001"], note: "제주 본섬과 별도로 도서산간 할증이 적용될 수 있습니다" },
+      { zone: "우도면", postalRanges: ["63365"], note: "일부 택배사에서 별도 도서산간으로 분류합니다" },
     ],
   },
   {
     group: "경기",
     clusters: [
-      {
-        zone: "풍도 예외",
-        areas: "안산시 단원구 풍도동",
-        postalRanges: ["15654"],
-        variant: "exception",
-        note: "여수시 공개 목록 포함",
-      },
+      { zone: "풍도", areas: "안산시 단원구", postalRanges: ["15654"], note: "경기도이나 도서산간 추가운임이 적용됩니다" },
     ],
   },
   {
     group: "인천",
     clusters: [
-      {
-        zone: "중구 섬권역",
-        areas: "중구 섬지역",
-        postalRanges: ["22386-22388"],
-        variant: "main",
-        note: "상업몰 공지 다수 일치, 여수시 목록 일부 미노출",
-      },
-      {
-        zone: "강화 섬권역",
-        areas: "강화 섬지역",
-        postalRanges: ["23008-23010"],
-        variant: "conflict",
-        note: "여수시 23008-23010 / 상업몰 공지 다수 23004-23010",
-      },
-      {
-        zone: "옹진 섬권역",
-        areas: "옹진 섬지역",
-        postalRanges: ["23100-23116", "23124-23136"],
-        variant: "main",
-      },
+      { zone: "중구", postalRanges: ["22386-22388"] },
+      { zone: "강화", postalRanges: ["23008-23010"], note: "택배사에 따라 23004부터 적용하는 경우도 있습니다" },
+      { zone: "옹진", postalRanges: ["23100-23116", "23124-23136"] },
     ],
   },
   {
     group: "충남",
     clusters: [
-      {
-        zone: "충남 서해안 섬권역",
-        areas: "당진·태안·보령",
-        postalRanges: ["31708", "32133", "33411"],
-        variant: "main",
-      },
+      { zone: "서해안", areas: "당진·태안·보령", postalRanges: ["31708", "32133", "33411"] },
     ],
   },
   {
     group: "경북",
     clusters: [
-      { zone: "울릉도 전역", areas: "울릉군", postalRanges: ["40200-40240"], variant: "main" },
+      { zone: "울릉도", postalRanges: ["40200-40240"] },
     ],
   },
   {
     group: "부산",
     clusters: [
-      { zone: "강서구 섬권역", areas: "강서구 섬지역", postalRanges: ["46768-46771"], variant: "main" },
+      { zone: "강서구", postalRanges: ["46768-46771"] },
     ],
   },
   {
     group: "경남",
     clusters: [
-      { zone: "사천 섬권역", areas: "사천 섬지역", postalRanges: ["52570-52571"], variant: "main" },
-      {
-        zone: "통영 섬권역",
-        areas: "통영 섬지역",
-        postalRanges: ["53031-53033", "53088-53104"],
-        variant: "conflict",
-        note: "여수시 53088-53104 / 상업몰 공지 다수 53089-53104",
-      },
+      { zone: "사천", postalRanges: ["52570-52571"] },
+      { zone: "통영", postalRanges: ["53031-53033", "53088-53104"], note: "택배사에 따라 53089부터 적용하는 경우도 있습니다" },
     ],
   },
   {
     group: "전북",
     clusters: [
-      {
-        zone: "군산 옥도면 예외",
-        areas: "군산시 옥도면",
-        postalRanges: ["54000"],
-        variant: "exception",
-        note: "여수시 공개 목록 기준, 기존 통영 분류와 상충",
-      },
-      { zone: "부안 섬권역", areas: "부안 섬지역", postalRanges: ["56347-56349"], variant: "main" },
+      { zone: "옥도면", areas: "군산시", postalRanges: ["54000"], note: "도서산간 추가운임이 적용됩니다" },
+      { zone: "부안", postalRanges: ["56347-56349"] },
     ],
   },
   {
     group: "전남",
     clusters: [
-      { zone: "영광 섬권역", areas: "영광 섬지역", postalRanges: ["57068-57069"], variant: "main" },
+      { zone: "영광", postalRanges: ["57068-57069"] },
+      { zone: "목포", postalRanges: ["58760-58761"], note: "택배사에 따라 58762까지 포함하는 경우도 있습니다" },
       {
-        zone: "목포 섬권역",
-        areas: "목포 섬지역",
-        postalRanges: ["58760-58761"],
-        variant: "conflict",
-        note: "여수시 58760-58761 / 상업몰 공지 일부 58762 포함",
-      },
-      {
-        zone: "신안 섬권역",
-        areas: "신안 섬지역",
+        zone: "신안",
         postalRanges: ["58800-58804", "58809-58810", "58816-58818", "58826", "58832", "58839-58841", "58843-58866"],
-        variant: "conflict",
-        note: "여수시는 세부 분리, 상업몰 공지 다수는 더 넓은 묶음 사용",
+        note: "택배사에 따라 적용 범위가 다를 수 있습니다",
       },
-      { zone: "진도 섬권역", areas: "진도 섬지역", postalRanges: ["58953-58958"], variant: "main" },
+      { zone: "진도", postalRanges: ["58953-58958"] },
       {
-        zone: "완도 섬권역",
-        areas: "완도 섬지역",
+        zone: "완도",
         postalRanges: ["59102-59103", "59127", "59137-59145", "59149-59170"],
-        variant: "conflict",
-        note: "여수시는 세부 분리, 상업몰 공지 일부는 59106·59129·59137-59166으로 단순화",
+        note: "택배사에 따라 적용 범위가 다를 수 있습니다",
       },
-      {
-        zone: "보성 예외",
-        areas: "보성군 벌교읍 섬지역",
-        postalRanges: ["59421"],
-        variant: "exception",
-        note: "여수시 공개 목록 포함",
-      },
-      {
-        zone: "고흥 예외",
-        areas: "고흥군 섬지역",
-        postalRanges: ["59531", "59551", "59563", "59568"],
-        variant: "exception",
-        note: "여수시 공개 목록 포함",
-      },
-      { zone: "여수 섬권역", areas: "여수시 섬지역", postalRanges: ["59650", "59766", "59781-59790"], variant: "main" },
+      { zone: "보성 벌교읍", postalRanges: ["59421"], note: "도서산간 추가운임이 적용됩니다" },
+      { zone: "고흥", postalRanges: ["59531", "59551", "59563", "59568"], note: "도서산간 추가운임이 적용됩니다" },
+      { zone: "여수", postalRanges: ["59650", "59766", "59781-59790"] },
     ],
   },
 ];
@@ -300,7 +220,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "CJ",
     category: "general",
     pricingMode: "profile",
-    color: "#1F4ACC",
+    color: "#F58220",
     maxWeightKg: 20,
     maxSumCm: 160,
     extraWeightFeePerKg: 250,
@@ -314,20 +234,19 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     name: "한진택배",
     shortName: "한진",
     category: "general",
-    pricingMode: "profile",
-    color: "#005BAC",
+    pricingMode: "band",
+    color: "#004B8D",
     maxWeightKg: 20,
     maxSumCm: 160,
-    extraWeightFeePerKg: 0,
-    restrictionNote: "공식 요금안내 기준 동일권 최저 운임 사용 · 타권/제주 추가",
+    restrictionNote: "20kg 이하 · 3변 합 160cm 이하 · 타권/제주 추가",
     estimateNote: "한진 요금안내 기반 동일권 기준",
     rateBasis: "한진 공식 요금안내(동일권 기준)",
-    sizeProfiles: buildProfiles({
-      small: { baseFare: 5000, includedWeightKg: 3, maxSumCm: 80 },
-      medium: { baseFare: 6000, includedWeightKg: 5, maxSumCm: 100 },
-      large: { baseFare: 7000, includedWeightKg: 15, maxSumCm: 120 },
-      xlarge: { baseFare: 8000, includedWeightKg: 20, maxSumCm: 160 },
-    }),
+    rateBands: [
+      buildBand("small", 3, 80, 5000),
+      buildBand("medium", 5, 100, 6000),
+      buildBand("large", 15, 120, 7000),
+      buildBand("xlarge", 20, 160, 8000),
+    ],
   },
   {
     key: "logen",
@@ -335,7 +254,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "로젠",
     category: "general",
     pricingMode: "band",
-    color: "#D93C2F",
+    color: "#D9392E",
     maxWeightKg: 25,
     maxSumCm: 160,
     restrictionNote: "타권 +1,000원 · 제주 추가운임 · 25kg 이하",
@@ -354,10 +273,10 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "우체국",
     category: "general",
     pricingMode: "band",
-    color: "#E74B2C",
+    color: "#E85C2A",
     maxWeightKg: 30,
     maxSumCm: 160,
-    restrictionNote: "창구 일반소포 D+3 기준 · 방문접수/익일배달은 별도",
+    restrictionNote: "30kg 이하 · 3변 합 160cm 이하 · 방문접수/익일배달은 별도",
     estimateNote: "우체국 창구 일반소포(D+3) 기준",
     rateBasis: "인터넷우체국 창구 일반소포 요금안내",
     rateBands: [
@@ -365,6 +284,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
       buildBand("medium", 5, 100, 3200),
       buildBand("large", 10, 120, 4700),
       buildBand("xlarge", 20, 160, 6700),
+      buildBand("xlarge", 30, 160, 8200),
     ],
   },
   {
@@ -373,11 +293,11 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "경동",
     category: "general",
     pricingMode: "band",
-    color: "#1E8F4D",
+    color: "#009B4E",
     maxWeightKg: 30,
     maxSumCm: 200,
-    restrictionNote: "부피 운임과 무게 운임 중 높은 운임 적용 · 지역별 편차 큼",
-    estimateNote: "경동 표준운임 무게 기준 적용",
+    restrictionNote: "30kg 이하 · 3변 합 200cm 이하 · 지역별 편차 큼",
+    estimateNote: "경동 표준운임 무게 기준 적용 · 부피·무게 중 높은 운임 적용",
     rateBasis: "경동 표준운임(무게 기준)",
     rateBands: [
       buildBand("small", 6, 100, 3000),
@@ -413,7 +333,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "롯데",
     category: "general",
     pricingMode: "band",
-    color: "#E4002B",
+    color: "#E0002A",
     maxWeightKg: 20,
     maxSumCm: 160,
     restrictionNote: "동일구역 기준 · 타권/제주/고가품 할증 별도",
@@ -431,7 +351,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "CU",
     category: "convenience",
     pricingMode: "band",
-    color: "#6A3DE8",
+    color: "#7A38D8",
     maxWeightKg: 30,
     maxSumCm: 160,
     restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 0~2kg +300원",
@@ -463,10 +383,10 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     shortName: "GS25",
     category: "convenience",
     pricingMode: "band",
-    color: "#1D4ED8",
+    color: "#0085CA",
     maxWeightKg: 20,
     maxSumCm: 160,
-    restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 +300원",
+    restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 0~2kg +300원",
     estimateNote: "GS Postbox 국내택배 운임표 동일권 기준",
     rateBasis: "GS Postbox 국내택배 이용운임 안내",
     rateBands: [

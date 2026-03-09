@@ -36,10 +36,10 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     color: "#0064FF",
     microBusinessRate: 3.4,
     setupFee: {
-      core: "약 22만원(1회)",
+      core: "22만원(1회)",
     },
     annualFee: {
-      core: "약 11만원/년",
+      core: "11만원/년",
     },
     cardFee: {
       core: "영세 3.4%~",
@@ -56,22 +56,23 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
   {
     key: "naverOrder",
     name: "네이버페이 주문형",
-    shortName: "주문형",
+    shortName: "N주문",
     badge: "네이버쇼핑 연동",
     color: "#03C75A",
-    microBusinessRate: 1.98,
+    microBusinessRate: 1.95,
     setupFee: {
       core: "무료",
     },
     annualFee: {
-      core: "없음",
+      core: "무료",
     },
     cardFee: {
-      core: "영세 1.98%~",
-      tooltip: "일반 구간은 최대 3.63% 수준으로 안내됩니다.",
+      core: "영세 1.95%~",
+      tooltip: "스마트스토어 주문관리 수수료와 동일. 일반 구간은 최대 3.63% 수준.",
     },
     settlementCycle: {
-      core: "서비스 정책 확인 필요",
+      core: "주문형 정책 확인",
+      tooltip: "정산 시점은 네이버페이 주문형 가맹 정책을 따릅니다.",
     },
     note: {
       core: "주문~배송 통합 관리",
@@ -81,22 +82,23 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
   {
     key: "naverPayment",
     name: "네이버페이 결제형",
-    shortName: "결제형",
+    shortName: "N결제",
     badge: "자사몰 결제 연동",
-    color: "#00A862",
+    color: "#0099B8",
     microBusinessRate: 2.2,
     setupFee: {
       core: "무료",
     },
     annualFee: {
-      core: "없음",
+      core: "무료",
     },
     cardFee: {
-      core: "영세 2%대 초중반~",
-      tooltip: "구체 수수료는 업종/계약별로 개별 안내됩니다.",
+      core: "영세 2.2%~",
+      tooltip: "업종/계약별로 수수료가 달라질 수 있습니다.",
     },
     settlementCycle: {
-      core: "서비스 정책 확인 필요",
+      core: "결제형 정책 확인",
+      tooltip: "정산 시점은 네이버페이 결제형 연동 정책을 따릅니다.",
     },
     note: {
       core: "자사몰 결제 전용",
@@ -122,10 +124,11 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
       tooltip: "일반 구간은 최대 1.72% 수준으로 안내됩니다.",
     },
     settlementCycle: {
-      core: "연동 PG 정책 따름",
+      core: "연동 PG 정책",
+      tooltip: "정산 시점은 함께 연동한 PG의 정산 구조에 따라 달라집니다.",
     },
     note: {
-      core: "간편결제 중심",
+      core: "PG 연동 비용 확인",
       tooltip: "PG 연동 구조에 따라 부가 비용/정산 정책이 달라질 수 있습니다.",
     },
   },
@@ -140,17 +143,18 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
       core: "무료",
     },
     annualFee: {
-      core: "없음",
+      core: "무료",
     },
     cardFee: {
       core: "영세 1.5%~",
       tooltip: "일반 구간은 최대 3.0% 수준으로 안내됩니다.",
     },
     settlementCycle: {
-      core: "서비스 정책 확인 필요",
+      core: "제휴 정책 확인",
+      tooltip: "PAYCO 가맹·제휴 구조에 따라 정산 주기가 달라질 수 있습니다.",
     },
     note: {
-      core: "포인트 결제 특화",
+      core: "제휴·포인트 결제 강점",
     },
   },
 ];

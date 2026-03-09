@@ -60,9 +60,11 @@ function isBrowser(): boolean {
 }
 
 export function createScrollBehavior(): Router["options"]["scrollBehavior"] {
-  return (to, _from, savedPosition) => {
+  return (to, from, savedPosition) => {
     if (savedPosition) return savedPosition;
     if (to.hash) return { el: to.hash, behavior: "smooth", top: 80 };
+    // query parameter만 변경된 경우 스크롤 유지
+    if (to.path === from.path) return false;
     return { top: 0 };
   };
 }

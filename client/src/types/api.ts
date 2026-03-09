@@ -13,6 +13,7 @@ export interface LoginPayload {
 export interface PublicConstants {
   siteUrl: string;
   feeDataUpdated: string;
+  feeDataVerified: string;
   supportEmail: string;
 }
 

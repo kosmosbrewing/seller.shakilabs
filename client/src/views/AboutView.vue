@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SEOHead from "@/components/common/SEOHead.vue";
 import { RouterLink } from "vue-router";
+import { buttonVariants } from "@/components/ui/button";
 import { FEE_DATA_UPDATED } from "@/data/marketFees";
 import { PAYMENT_DATA_UPDATED } from "@/data/paymentGateways";
 import { SHIPPING_DATA_UPDATED } from "@/data/shippingRates";
@@ -55,7 +56,7 @@ import { SHIPPING_DATA_UPDATED } from "@/data/shippingRates";
     </div>
 
     <div class="text-center">
-      <RouterLink to="/" class="retro-button">
+      <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
         수수료 비교하기
       </RouterLink>
     </div>
