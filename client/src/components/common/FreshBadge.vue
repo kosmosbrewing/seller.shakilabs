@@ -20,7 +20,7 @@ const defaultMessage = computed(() => {
 
 <template>
   <span
-    class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-primary/35 bg-primary/10 px-2.5 py-1 text-[11px] font-bold leading-none text-primary"
+    class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-primary/35 bg-primary/10 px-2 py-1 text-[10px] font-bold leading-none text-primary sm:gap-1.5 sm:px-2.5 sm:text-[11px]"
   >
     <CheckCircle2 class="h-3.5 w-3.5" />
     {{ props.message ?? defaultMessage }}

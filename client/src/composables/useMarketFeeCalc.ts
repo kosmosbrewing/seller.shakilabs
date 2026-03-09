@@ -48,6 +48,7 @@ export function useMarketFeeCalc() {
   const smartstoreSource = ref<SmartStoreSource>("naverShopping");
   const coupangMode = ref<CoupangMode>("marketplace");
   const fulfillmentSize = ref<FulfillmentSize>("small");
+  const includeOwnStore = ref(false);
   const monthlyQty = ref(DEFAULT_MONTHLY_QTY);
 
   // URL → 상태 복원
@@ -75,6 +76,8 @@ export function useMarketFeeCalc() {
     const qSize = parseFulfillmentSize(queryFirst(q.size));
     if (qSize != null) fulfillmentSize.value = qSize;
 
+    includeOwnStore.value = parseQueryInt(q.own) === 1;
+
     const qQty = parseMonthlyQty(parseQueryInt(q.qty));
     if (qQty != null) monthlyQty.value = qQty;
   }
@@ -89,6 +92,7 @@ export function useMarketFeeCalc() {
       source: smartstoreSource.value !== "naverShopping" ? smartstoreSource.value : null,
       mode: coupangMode.value !== "marketplace" ? coupangMode.value : null,
       size: fulfillmentSize.value !== "small" ? fulfillmentSize.value : null,
+      own: includeOwnStore.value ? 1 : null,
       qty: monthlyQty.value !== DEFAULT_MONTHLY_QTY ? monthlyQty.value : null,
     });
 
@@ -108,7 +112,7 @@ export function useMarketFeeCalc() {
       coupangMode: coupangMode.value,
       fulfillmentSize: fulfillmentSize.value,
     });
-    return calcAllMarkets(validatedInput);
+    return calcAllMarkets(validatedInput, { includeOwnStore: includeOwnStore.value });
   });
 
   const bestMarket = computed(() => findBestMarket(results.value));
@@ -124,7 +128,7 @@ export function useMarketFeeCalc() {
   // 입력 변경 → URL 동기화 (디바운스 300ms)
   let syncTimer: ReturnType<typeof setTimeout> | null = null;
   watch(
-    [price, shippingFee, category, smartstoreTier, smartstoreSource, coupangMode, fulfillmentSize, monthlyQty],
+    [price, shippingFee, category, smartstoreTier, smartstoreSource, coupangMode, fulfillmentSize, includeOwnStore, monthlyQty],
     () => {
       if (syncTimer) clearTimeout(syncTimer);
       syncTimer = setTimeout(syncToQuery, 300);
@@ -145,6 +149,7 @@ export function useMarketFeeCalc() {
     smartstoreSource,
     coupangMode,
     fulfillmentSize,
+    includeOwnStore,
     monthlyQty,
 
     // 결과

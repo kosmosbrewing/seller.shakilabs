@@ -2,12 +2,12 @@
 import { computed } from "vue";
 import MarketCard from "./MarketCard.vue";
 import type { FeeBreakdown } from "@/utils/calculator";
-import { MARKET_META, type MarketKey } from "@/data/marketFees";
+import { ALL_CHANNEL_META, type CompareKey } from "@/data/marketFees";
 import { formatWon } from "@/lib/utils";
 
 const props = defineProps<{
   results: FeeBreakdown[];
-  bestMarketKey: MarketKey | null;
+  bestMarketKey: CompareKey | null;
 }>();
 
 const sortedByNetProfit = computed(() =>
@@ -15,7 +15,7 @@ const sortedByNetProfit = computed(() =>
 );
 
 const rankMap = computed(() => {
-  const map = new Map<MarketKey, number>();
+  const map = new Map<CompareKey, number>();
   sortedByNetProfit.value.forEach((item, index) => {
     map.set(item.marketKey, index + 1);
   });
@@ -55,9 +55,9 @@ const totalFeeSpread = computed(() => {
               1위 vs 2위
             </p>
             <p class="mt-1 text-caption font-semibold text-foreground">
-              {{ bestMarket ? MARKET_META[bestMarket.marketKey].name : "-" }}
+              {{ bestMarket ? ALL_CHANNEL_META[bestMarket.marketKey].name : "-" }}
               <span class="text-muted-foreground">vs</span>
-              {{ runnerUpMarket ? MARKET_META[runnerUpMarket.marketKey].name : "-" }}
+              {{ runnerUpMarket ? ALL_CHANNEL_META[runnerUpMarket.marketKey].name : "-" }}
             </p>
             <p class="mt-1 text-body font-bold tabular-nums text-profit">
               {{ formatWon(bestGap) }}

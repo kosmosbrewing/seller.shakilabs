@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
 import { formatWon, formatWonShort } from "@/lib/utils";
-import { MARKET_META } from "@/data/marketFees";
+import { ALL_CHANNEL_META } from "@/data/marketFees";
 import { QTY_PRESETS } from "@/data/pricePresets";
 import { Button } from "@/components/ui/button";
 import { parseMonthlyQty } from "@/lib/validators";
@@ -81,13 +81,69 @@ const annualSpread = computed(() => {
       </div>
     </div>
 
+    <!-- 모바일: 카드 레이아웃 -->
+    <div class="space-y-3 px-3.5 py-3 md:hidden">
+      <div
+        v-for="(sim, idx) in sortedSims"
+        :key="`m-${sim.marketKey}`"
+        class="overflow-hidden rounded-2xl border bg-white"
+        :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
+      >
+        <div class="flex items-center gap-2.5 px-3.5 py-3">
+          <span
+            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+            :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
+          >
+            <Medal class="h-3.5 w-3.5" />
+            {{ idx + 1 }}위
+          </span>
+          <span
+            class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+            :class="sim.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
+            :style="{ backgroundColor: ALL_CHANNEL_META[sim.marketKey].color }"
+          >
+            {{ ALL_CHANNEL_META[sim.marketKey].shortName }}
+          </span>
+          <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[sim.marketKey].name }}</span>
+          <span
+            v-if="idx === 0"
+            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+          >
+            <BadgeCheck class="h-3.5 w-3.5" />
+            추천
+          </span>
+        </div>
+        <div class="space-y-0 border-t border-border/60">
+          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
+            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">월 수수료</span>
+            <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(sim.monthlyFee) }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
+            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">월 순이익</span>
+            <span class="text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(sim.monthlyProfit) }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
+            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">연 수수료</span>
+            <span class="text-[11px] font-semibold tabular-nums text-foreground sm:text-caption">{{ formatWon(sim.annualFee) }}</span>
+          </div>
+          <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
+            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">1위 대비</span>
+            <span v-if="idx === 0" class="text-[11px] font-semibold text-profit sm:text-caption">최저</span>
+            <span v-else class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">+{{ formatWon(sim.annualDiff) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 데스크톱: 테이블 레이아웃 -->
+    <div class="hidden md:block">
     <p class="scroll-hint">표를 좌우로 밀어 확인하세요.</p>
 
     <div class="overflow-x-auto">
       <table class="w-full text-body">
         <thead>
           <tr class="border-b border-border/80 bg-card/95">
-            <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
+            <th class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
             <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
             <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">월 수수료</th>
             <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">월 순이익</th>
@@ -99,10 +155,10 @@ const annualSpread = computed(() => {
           <tr
             v-for="(sim, idx) in sortedSims"
             :key="sim.marketKey"
-            class="border-b border-border/40 transition-colors hover:bg-accent/15"
-            :class="idx === 0 ? 'bg-profit/5 dark:bg-profit/12' : ''"
+            class="border-b border-border/40 transition-colors"
+            :class="idx === 0 ? 'bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-emerald-950/15 dark:hover:bg-emerald-950/25' : 'hover:bg-accent/30'"
           >
-            <td class="px-4 py-3">
+            <td class="whitespace-nowrap px-4 py-3">
               <span
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
                 :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
@@ -114,13 +170,14 @@ const annualSpread = computed(() => {
             <td class="px-4 py-3">
               <div class="flex items-center gap-2.5">
                 <span
-                  class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                  :style="{ backgroundColor: `${MARKET_META[sim.marketKey].color}18`, color: MARKET_META[sim.marketKey].color }"
+                  class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                  :class="sim.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
+                  :style="{ backgroundColor: ALL_CHANNEL_META[sim.marketKey].color }"
                 >
-                  {{ MARKET_META[sim.marketKey].shortName }}
+                  {{ ALL_CHANNEL_META[sim.marketKey].shortName }}
                 </span>
                 <div class="flex items-center gap-1.5">
-                  <span class="whitespace-nowrap text-body font-semibold">{{ MARKET_META[sim.marketKey].name }}</span>
+                  <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[sim.marketKey].name }}</span>
                   <span
                     v-if="idx === 0"
                     class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -153,12 +210,13 @@ const annualSpread = computed(() => {
         </tbody>
       </table>
     </div>
+    </div>
 
     <div v-if="bestSim && worstSim" class="border-t border-border/40 px-4 py-3">
       <p class="text-caption text-muted-foreground">
         월 매출 <span class="font-semibold text-foreground">{{ formatWonShort(monthlyRevenue) }}</span> 기준,
-        <span class="font-semibold text-profit">{{ MARKET_META[bestSim.marketKey].name }}</span>이
-        {{ MARKET_META[worstSim.marketKey].name }}보다 연
+        <span class="font-semibold text-profit">{{ ALL_CHANNEL_META[bestSim.marketKey].name }}</span>이
+        {{ ALL_CHANNEL_META[worstSim.marketKey].name }}보다 연
         <span class="font-semibold text-profit">{{ formatWonShort(annualSpread) }}</span> 절감됩니다.
       </p>
     </div>

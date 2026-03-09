@@ -6,12 +6,15 @@ import {
   COUPANG,
   ELEVENST,
   GMARKET,
+  OWN_STORE_ORDER,
+  OWN_STORE_RATES,
   type CategoryKey,
   type SmartStoreTier,
   type SmartStoreSource,
   type CoupangMode,
   type FulfillmentSize,
-  type MarketKey,
+  type CompareKey,
+  type OwnStoreKey,
 } from "@/data/marketFees";
 import {
   sanitizeSmartStoreInput,
@@ -23,7 +26,7 @@ import {
 
 // 마켓별 수수료 계산 결과 (개별 항목 분리)
 export interface FeeBreakdown {
-  marketKey: MarketKey;
+  marketKey: CompareKey;
   totalFee: number;      // 총 수수료 (원)
   totalFeeRate: number;  // 총 수수료율 (0~1)
   netProfit: number;     // 순이익 (판매가 - 수수료)
@@ -69,6 +72,10 @@ export interface CompareInput {
   smartstoreSource: SmartStoreSource;
   coupangMode: CoupangMode;
   fulfillmentSize: FulfillmentSize;
+}
+
+export interface CalcAllMarketsOptions {
+  includeOwnStore?: boolean;
 }
 
 // 스마트스토어 수수료 계산
@@ -195,8 +202,20 @@ export function calcGmarket(input: SimpleMarketInput): FeeBreakdown {
   };
 }
 
-// 4개 마켓 한번에 비교 계산
-export function calcAllMarkets(input: CompareInput): FeeBreakdown[] {
+export function calcOwnStore(price: number, gatewayKey: OwnStoreKey): FeeBreakdown {
+  const totalFee = Math.floor(price * OWN_STORE_RATES[gatewayKey]);
+
+  return {
+    marketKey: gatewayKey,
+    totalFee,
+    totalFeeRate: price > 0 ? totalFee / price : 0,
+    netProfit: price - totalFee,
+    items: [{ label: "결제 수수료", amount: totalFee, rate: OWN_STORE_RATES[gatewayKey] }],
+  };
+}
+
+// 4개 마켓 + 선택 시 자사몰 PG까지 비교 계산
+export function calcAllMarkets(input: CompareInput, options: CalcAllMarketsOptions = {}): FeeBreakdown[] {
   const {
     price,
     shippingFee,
@@ -207,11 +226,20 @@ export function calcAllMarkets(input: CompareInput): FeeBreakdown[] {
     fulfillmentSize,
   } = sanitizeCompareCalcInput(input);
 
-  return [
+  const results = [
     calcSmartStore({ price, shippingFee, tier: smartstoreTier, source: smartstoreSource }),
     calcCoupang({ price, shippingFee, category, mode: coupangMode, fulfillmentSize }),
     calcElevenSt({ price, shippingFee, category }),
     calcGmarket({ price, shippingFee, category }),
+  ];
+
+  if (!options.includeOwnStore) {
+    return results;
+  }
+
+  return [
+    ...results,
+    ...OWN_STORE_ORDER.map((gatewayKey) => calcOwnStore(price, gatewayKey)),
   ];
 }
 
@@ -225,7 +253,7 @@ export function findBestMarket(results: FeeBreakdown[]): FeeBreakdown | null {
 
 // 월간/연간 시뮬레이션
 export interface MonthlySimResult {
-  marketKey: MarketKey;
+  marketKey: CompareKey;
   monthlyFee: number;
   monthlyProfit: number;
   annualFee: number;

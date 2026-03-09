@@ -25,13 +25,13 @@ function isActiveTab(key: (typeof tabs)[number]["key"]): boolean {
 <template>
   <nav class="sticky top-0 z-50 border-b border-primary/20 bg-primary shadow-sm" aria-label="주요 메뉴">
     <div class="container">
-      <div class="flex h-12 items-center gap-2 overflow-x-auto" style="scrollbar-width: none">
+      <div class="flex h-12 items-center gap-1 overflow-x-auto sm:gap-2" style="scrollbar-width: none">
         <RouterLink
           v-for="tab in tabs"
           :key="tab.key"
           :to="tab.to"
           :class="[
-            'touch-target relative inline-flex h-12 shrink-0 items-center px-3 text-body font-semibold transition-all duration-200',
+            'touch-target relative inline-flex h-12 shrink-0 items-center whitespace-nowrap px-2.5 text-caption font-semibold transition-all duration-200 sm:px-3 sm:text-body',
             isActiveTab(tab.key)
               ? 'text-primary-foreground'
               : 'text-primary-foreground/70 hover:text-primary-foreground/90',

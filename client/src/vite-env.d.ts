@@ -1,6 +1,10 @@
 /// <reference types="vite/client" />
 import "vue-router";
 
+declare global {
+  const __BUILD_DATE__: string;
+}
+
 interface ImportMetaEnv {
   readonly VITE_API_URL?: string;
   readonly VITE_ENABLE_AUTH?: string;
@@ -35,3 +39,5 @@ declare module "*.vue" {
   const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>;
   export default component;
 }
+
+export {};

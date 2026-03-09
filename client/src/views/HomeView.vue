@@ -11,7 +11,7 @@ import CompareFAQ from "@/components/compare/CompareFAQ.vue";
 import { ActionCard } from "@/components/ui/action-card";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
-import { MARKET_META } from "@/data/marketFees";
+import { ALL_CHANNEL_META } from "@/data/marketFees";
 import { formatWon, formatPercent } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { RouterLink } from "vue-router";
@@ -66,6 +66,7 @@ watch(
       calc.smartstoreSource.value,
       calc.coupangMode.value,
       calc.fulfillmentSize.value,
+      calc.includeOwnStore.value,
       calc.monthlyQty.value,
     ] as const,
   (nextValues, prevValues) => {
@@ -133,24 +134,36 @@ const jsonLd = computed(() => ({
         <h1 class="retro-title">오픈마켓 수수료를 30초 안에 비교해보세요</h1>
       </div>
       <div class="retro-panel-content space-y-4">
-        <p class="text-body text-muted-foreground">
+        <p class="text-[11px] text-muted-foreground sm:text-body">
           판매가, 카테고리, 배송비만 입력하면 스마트스토어/쿠팡/11번가/G마켓의 건당 수수료와 순이익을 바로 보여줍니다.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="retro-panel-muted p-3">
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 1</p>
-            <p class="mt-1.5 text-body font-bold text-foreground">기본값 3개 입력</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">판매가, 카테고리, 배송비만 넣으면 바로 계산이 시작됩니다.</p>
+            <p class="mt-1.5 text-body font-bold text-foreground">핵심 정보 3개 입력</p>
+            <p class="mt-1.5 text-caption text-muted-foreground">
+              판매가, 카테고리, 배송비만 넣으면
+              <br class="hidden sm:block" />
+              어디가 유리한지 바로 계산됩니다.
+            </p>
           </div>
           <div class="retro-panel-muted p-3">
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 2</p>
             <p class="mt-1.5 text-body font-bold text-foreground">최적 마켓 확인</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">1위 마켓과 2위 대비 차이 금액을 한 번에 읽을 수 있습니다.</p>
+            <p class="mt-1.5 text-caption text-muted-foreground">
+              1위 마켓과 2위 차이 금액을
+              <br class="hidden sm:block" />
+              한 번에 확인할 수 있습니다.
+            </p>
           </div>
           <div class="retro-panel-muted p-3">
             <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 3</p>
             <p class="mt-1.5 text-body font-bold text-foreground">상세표로 검증</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">상세 비교표와 월간 시뮬레이션으로 결과 근거를 이어서 확인합니다.</p>
+            <p class="mt-1.5 text-caption text-muted-foreground">
+              상세 비교표와 월간 시뮬레이션으로
+              <br class="hidden sm:block" />
+              차이를 바로 검증할 수 있습니다.
+            </p>
           </div>
         </div>
       </div>
@@ -165,6 +178,7 @@ const jsonLd = computed(() => ({
         v-model:smartstore-source="calc.smartstoreSource.value"
         v-model:coupang-mode="calc.coupangMode.value"
         v-model:fulfillment-size="calc.fulfillmentSize.value"
+        v-model:include-own-store="calc.includeOwnStore.value"
       />
     </section>
 
@@ -174,16 +188,67 @@ const jsonLd = computed(() => ({
         <SectionShareButton @click="openShareFromSummary" />
       </div>
 
+      <!-- 모바일: 카드 레이아웃 -->
+      <div class="space-y-3 px-3.5 py-3 md:hidden">
+        <div
+          v-for="(result, idx) in sortedResults"
+          :key="`m-${result.marketKey}`"
+          class="overflow-hidden rounded-2xl border bg-white"
+          :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
+        >
+          <div class="flex items-center gap-2.5 px-3.5 py-3">
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+              :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
+            >
+              <Medal class="h-3.5 w-3.5" />
+              {{ idx + 1 }}위
+            </span>
+            <span
+              class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+              :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
+              :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
+            >
+              {{ ALL_CHANNEL_META[result.marketKey].shortName }}
+            </span>
+            <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+            <span
+              v-if="idx === 0"
+              class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+            >
+              <BadgeCheck class="h-3.5 w-3.5" />
+              추천
+            </span>
+          </div>
+          <div class="space-y-0 border-t border-border/60">
+            <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
+              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
+              <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
+              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율</span>
+              <span class="text-[11px] font-semibold tabular-nums text-muted-foreground sm:text-caption">{{ formatPercent(result.totalFeeRate) }}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
+              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
+              <span class="text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 데스크톱: 테이블 레이아웃 -->
+      <div class="hidden md:block">
       <p class="scroll-hint">표를 좌우로 밀어 확인하세요.</p>
 
       <div class="overflow-x-auto">
         <table class="w-full text-body">
           <thead>
             <tr class="border-b border-border/80 bg-card/95">
-              <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
+              <th class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
               <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
-              <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">총 수수료</th>
-              <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">수수료율</th>
+              <th class="w-28 whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground">총 수수료</th>
+              <th class="w-24 whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">수수료율</th>
               <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">건당 순이익</th>
             </tr>
           </thead>
@@ -191,10 +256,10 @@ const jsonLd = computed(() => ({
             <tr
               v-for="(result, idx) in sortedResults"
               :key="result.marketKey"
-              class="border-b border-border/40 transition-colors hover:bg-accent/15"
-              :class="idx === 0 ? 'bg-profit/5 dark:bg-profit/12' : ''"
+              class="border-b border-border/40 transition-colors"
+              :class="idx === 0 ? 'bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-emerald-950/15 dark:hover:bg-emerald-950/25' : 'hover:bg-accent/30'"
             >
-              <td class="px-4 py-3">
+              <td class="whitespace-nowrap px-4 py-3">
                 <span
                   class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
                   :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
@@ -206,13 +271,14 @@ const jsonLd = computed(() => ({
               <td class="px-4 py-3">
                 <div class="flex items-center gap-2.5">
                   <span
-                    class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                    :style="{ backgroundColor: `${MARKET_META[result.marketKey].color}18`, color: MARKET_META[result.marketKey].color }"
+                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                    :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
+                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
                   >
-                    {{ MARKET_META[result.marketKey].shortName }}
+                    {{ ALL_CHANNEL_META[result.marketKey].shortName }}
                   </span>
                   <div class="flex items-center gap-1.5">
-                    <span class="whitespace-nowrap text-body font-semibold">{{ MARKET_META[result.marketKey].name }}</span>
+                    <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
                     <span
                       v-if="idx === 0"
                       class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -223,10 +289,10 @@ const jsonLd = computed(() => ({
                   </div>
                 </div>
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-fee">
+              <td class="whitespace-nowrap px-2 py-3 text-left font-semibold tabular-nums text-fee">
                 {{ formatWon(result.totalFee) }}
               </td>
-              <td class="whitespace-nowrap px-4 py-3 text-right tabular-nums text-muted-foreground">
+              <td class="whitespace-nowrap px-3 py-3 text-right tabular-nums text-muted-foreground">
                 {{ formatPercent(result.totalFeeRate) }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
@@ -236,14 +302,20 @@ const jsonLd = computed(() => ({
           </tbody>
         </table>
       </div>
+      </div>
 
       <div v-if="bestResult && runnerUp" class="border-t border-border/40 px-4 py-3">
         <p class="text-caption text-muted-foreground">
-          <span class="font-semibold text-profit">{{ MARKET_META[bestResult.marketKey].name }}</span>이
-          {{ MARKET_META[runnerUp.marketKey].name }}보다 건당
+          <span class="font-semibold text-profit">{{ ALL_CHANNEL_META[bestResult.marketKey].name }}</span>이
+          {{ ALL_CHANNEL_META[runnerUp.marketKey].name }}보다 건당
           <span class="font-semibold text-profit">{{ formatWon(summaryDelta) }}</span> 더 남습니다.
         </p>
       </div>
+      <p v-if="calc.includeOwnStore.value" class="px-4 pb-3 text-tiny text-muted-foreground">
+        * 자사몰(PG) 비교는 카드 결제 수수료 중심입니다.
+        <br class="hidden sm:block" />
+        트래픽 확보·호스팅 비용은 제외되며, 토스페이먼츠는 설정비 22만원과 연 이용료 11만원이 추가됩니다.
+      </p>
     </section>
 
     <AdSlot slot="top" label="광고" />
@@ -262,7 +334,7 @@ const jsonLd = computed(() => ({
           <h2 class="retro-title">다른 비용도 비교하기</h2>
         </div>
         <div class="retro-panel-content space-y-3">
-          <p class="text-body text-muted-foreground">
+          <p class="text-[11px] text-muted-foreground sm:text-body">
             마켓 수수료 외에 결제 수수료와 택배비도 수익에 영향을 줍니다.
           </p>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">

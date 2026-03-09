@@ -35,10 +35,10 @@ defineEmits<{
           : ''
       ]"
     >
-      <p class="text-[13px] font-bold uppercase tracking-[0.14em] text-white/80">
+      <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80 sm:text-[13px]">
         {{ leaderLabel ?? "가장 유리한 마켓" }}
       </p>
-      <p class="text-[28px] font-bold leading-none text-white sm:text-[32px]">
+      <p class="text-[24px] font-bold leading-none text-white sm:text-[32px]">
         {{ leaderValue }}
       </p>
     </div>
@@ -51,7 +51,7 @@ defineEmits<{
               {{ deltaLabel }}
             </td>
             <td class="px-4 py-3 text-right">
-              <span class="inline-flex items-center rounded-full bg-profit/12 px-3 py-1 text-[20px] font-bold tabular-nums text-profit sm:text-[22px]">
+              <span class="inline-flex items-center rounded-full bg-profit/12 px-3 py-1 text-[17px] font-bold tabular-nums text-profit sm:text-[22px]">
                 {{ deltaValue }}
               </span>
             </td>
@@ -64,7 +64,7 @@ defineEmits<{
             <td class="whitespace-nowrap px-4 py-2.5 text-caption font-semibold text-muted-foreground">
               {{ fact.label }}
             </td>
-            <td class="px-4 py-2.5 text-right text-[15px] font-bold tabular-nums">
+            <td class="px-4 py-2.5 text-right text-[14px] font-bold tabular-nums sm:text-[15px]">
               {{ fact.value }}
             </td>
           </tr>

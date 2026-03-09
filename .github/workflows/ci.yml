@@ -32,3 +32,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Generate production SBOM
+        run: npm run sbom:prod
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-sbom
+          path: client/artifacts/sbom/*.json

@@ -6,6 +6,7 @@ import {
   calcCoupang,
   calcElevenSt,
   calcGmarket,
+  calcOwnStore,
   calcAllMarkets,
   findBestMarket,
   calcMonthlySim,
@@ -124,6 +125,20 @@ describe("calcGmarket", () => {
   });
 });
 
+describe("calcOwnStore", () => {
+  it("카카오페이 결제형 30,000원 상품", () => {
+    const result = calcOwnStore(30_000, "own_kakaopay");
+
+    expect(result.marketKey).toBe("own_kakaopay");
+    // 30000 × 0.009 = 270
+    expect(result.totalFee).toBe(270);
+    expect(result.items).toEqual([
+      { label: "결제 수수료", amount: 270, rate: 0.009 },
+    ]);
+    expect(result.netProfit).toBe(30_000 - 270);
+  });
+});
+
 // ---------- 5. calcAllMarkets 4개 마켓 동시 비교 ----------
 describe("calcAllMarkets", () => {
   it("의류 30,000원 기본 조건으로 4개 마켓 동시 비교", () => {
@@ -149,6 +164,33 @@ describe("calcAllMarkets", () => {
     for (const r of results) {
       expect(r.netProfit + r.totalFee).toBe(30_000);
     }
+  });
+
+  it("자사몰 비교를 켜면 4개 PG가 뒤에 추가된다", () => {
+    const results = calcAllMarkets({
+      price: 30_000,
+      shippingFee: 3_000,
+      category: "clothing",
+      smartstoreTier: "micro",
+      smartstoreSource: "naverShopping",
+      coupangMode: "marketplace",
+      fulfillmentSize: "small",
+    }, { includeOwnStore: true });
+
+    expect(results).toHaveLength(8);
+    expect(results.map((r) => r.marketKey)).toEqual([
+      "smartstore",
+      "coupang",
+      "elevenst",
+      "gmarket",
+      "own_tosspay",
+      "own_naverpay",
+      "own_kakaopay",
+      "own_payco",
+    ]);
+    expect(results[4]?.items).toEqual([
+      { label: "결제 수수료", amount: 1_020, rate: 0.034 },
+    ]);
   });
 });
 

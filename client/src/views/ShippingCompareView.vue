@@ -7,6 +7,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { BUILD_DATE } from "@/lib/buildMeta";
 import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   REMOTE_AREA_POSTAL_CODE_SUMMARY,
@@ -16,7 +17,6 @@ import {
   SHIPPING_WEIGHT_PRESETS,
   SHIPPING_CARRIERS,
   estimateShippingRates,
-  parseShippingSumCm,
   parseShippingWeight,
   resolveShippingSize,
   type ShippingEstimateResult,
@@ -101,7 +101,7 @@ const jsonLd = computed(() => [
     "description": seoDescription,
     "url": pageUrl,
     "inLanguage": "ko-KR",
-    "dateModified": "2026-03-07",
+    "dateModified": BUILD_DATE,
     "isPartOf": {
       "@type": "WebSite",
       "name": "오픈마켓 수수료 계산기",
@@ -131,7 +131,7 @@ const jsonLd = computed(() => [
     "description": `제주 및 도서산간 ${remoteAreaClusterCount.value}개 지역, 총 ${remoteAreaPostalCodeCount.value}개 우편번호 참고 데이터`,
     "url": pageUrl,
     "inLanguage": "ko-KR",
-    "dateModified": "2026-03-07",
+    "dateModified": BUILD_DATE,
     "creator": {
       "@type": "Organization",
       "name": "ShakiLabs",
@@ -148,8 +148,11 @@ function handleWeightInput(event: Event): void {
   }
 }
 
-function handleWeightBlur(): void {
-  weightDisplay.value = String(weightKg.value);
+function handleWeightBlur(event: Event): void {
+  const el = event.target as HTMLInputElement;
+  const display = String(weightKg.value);
+  weightDisplay.value = display;
+  el.value = display;
 }
 
 const WEIGHT_STEP_UNIT = 1;
@@ -169,15 +172,17 @@ function handleSumInput(event: Event): void {
     return;
   }
 
-  const parsed = Number.parseInt(raw, 10);
-  const validated = parseShippingSumCm(parsed);
-  if (validated != null) {
-    sumCm.value = validated;
+  const parsed = Math.min(Number.parseInt(raw, 10), 200);
+  if (parsed > 0) {
+    sumCm.value = parsed;
   }
 }
 
-function handleSumBlur(): void {
-  sumDisplay.value = sumCm.value != null ? String(sumCm.value) : "";
+function handleSumBlur(event: Event): void {
+  const el = event.target as HTMLInputElement;
+  const display = sumCm.value != null ? String(sumCm.value) : "";
+  sumDisplay.value = display;
+  el.value = display;
 }
 
 function selectSize(size: ShippingSizeKey): void {
@@ -222,8 +227,8 @@ function getShippingRowTone(
   result: ShippingEstimateResult,
   cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
 ): string {
-  if (!result.isAvailable) return "bg-muted/25";
-  if (result.carrier.key === cheapestKey) return "bg-profit/8 dark:bg-profit/12";
+  if (!result.isAvailable) return "compare-hover-row-muted bg-muted/25";
+  if (result.carrier.key === cheapestKey) return "compare-hover-row-best bg-emerald-50/70 dark:bg-emerald-950/15";
   return "";
 }
 
@@ -232,7 +237,7 @@ function getShippingStickyCellTone(
   cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
 ): string {
   if (!result.isAvailable) return "bg-muted";
-  if (result.carrier.key === cheapestKey) return "bg-card";
+  if (result.carrier.key === cheapestKey) return "bg-emerald-50/70 dark:bg-emerald-950/15";
   return "bg-card";
 }
 
@@ -274,11 +279,11 @@ function formatPostalRanges(ranges: string[]): string {
       </div>
 
       <div class="retro-panel-content space-y-1.5">
-        <p class="text-body text-muted-foreground">
-          상품 무게와 크기에 따라 일반 택배 6사와 편의점 택배 2개의 예상 운임을 비교합니다.
+        <p class="text-[11px] text-muted-foreground sm:text-body">
+          상품 무게와 크기에 따라 택배사별 예상 운임을 비교합니다.
         </p>
         <p class="text-caption text-muted-foreground">
-          동일권 공개 운임 기준 추정이며, 계약 단가·타권·제주/도서산간·냉장냉동 할증은 제외됩니다.
+          동일권 공개 운임 기준의 추정값이며, 계약 단가와 지역·특수 할증은 제외했습니다.
         </p>
       </div>
     </div>
@@ -404,16 +409,85 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <p class="text-body text-muted-foreground">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
+            <p class="text-[11px] text-muted-foreground sm:text-body">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
             <span
               v-if="cheapestGeneralLabel"
-              class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
             >
               <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
               현재 최저 예상 운임 {{ cheapestGeneralLabel }}
             </span>
           </div>
 
+          <!-- 모바일: 카드 레이아웃 -->
+          <div class="space-y-3 md:hidden">
+            <div
+              v-for="result in generalResults"
+              :key="`m-general-${result.carrier.key}`"
+              class="overflow-hidden rounded-2xl border bg-white"
+              :class="[
+                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestGeneral?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
+              ]"
+            >
+              <div class="flex items-center gap-2.5 px-3.5 py-3">
+                <span
+                  class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                  :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
+                  :style="{ backgroundColor: result.carrier.color }"
+                >
+                  {{ result.carrier.shortName }}
+                </span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="min-w-0 flex-1 truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
+                    <span
+                      v-if="cheapestGeneral?.carrier.key === result.carrier.key"
+                      class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+                    >
+                      <BadgeCheck class="h-3.5 w-3.5" />
+                      최저
+                    </span>
+                    <span
+                      v-else-if="!result.isAvailable"
+                      class="inline-flex shrink-0 items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 sm:text-[11px]"
+                    >
+                      접수 불가
+                    </span>
+                  </div>
+                  <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
+                </div>
+              </div>
+              <div class="space-y-0 border-t border-border/60">
+                <div
+                  v-for="col in shippingCompareColumns"
+                  :key="`m-general-${result.carrier.key}-${col.key}`"
+                  class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
+                >
+                  <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                  <span
+                    class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
+                    :class="[
+                      result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
+                      col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? '!text-profit' : '',
+                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-fee' : '',
+                    ]"
+                  >
+                    <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
+                      {{ getShippingCellValue(col.key, result) }}
+                      <CompareHint
+                        v-if="col.key === 'limit'"
+                        :tooltip="result.restrictionText"
+                        :condition="result.unavailableReason"
+                      />
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 데스크톱: 테이블 레이아웃 -->
+          <div class="hidden md:block">
           <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
 
           <div class="overflow-x-auto">
@@ -434,16 +508,16 @@ function formatPostalRanges(ranges: string[]): string {
                 <tr
                   v-for="result in generalResults"
                   :key="result.carrier.key"
-                  class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                  class="compare-hover-row border-b border-border/40 transition-colors"
                   :class="getShippingRowTone(result, cheapestGeneral?.carrier.key)"
                 >
                   <td
-                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-4"
                     :class="getShippingStickyCellTone(result, cheapestGeneral?.carrier.key)"
                   >
                     <div class="flex items-center gap-2.5">
                       <span
-                        class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
                         :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                         :style="{ backgroundColor: result.carrier.color }"
                       >
@@ -477,9 +551,10 @@ function formatPostalRanges(ranges: string[]): string {
                   <td
                     v-for="col in shippingCompareColumns"
                     :key="`${result.carrier.key}-${col.key}`"
-                    class="px-3 py-3 align-top sm:px-4"
+                    class="px-3 py-3 align-middle transition-colors sm:px-4"
+                    :class="getShippingCellBg(col.key, result, cheapestGeneral?.carrier.key)"
                   >
-                    <div class="compare-cell" :class="getShippingCellBg(col.key, result, cheapestGeneral?.carrier.key)">
+                    <span class="inline-flex items-center gap-0.5">
                       <span
                         class="compare-cell-value"
                         :class="[
@@ -496,11 +571,12 @@ function formatPostalRanges(ranges: string[]): string {
                         :tooltip="result.restrictionText"
                         :condition="result.unavailableReason"
                       />
-                    </div>
+                    </span>
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </div>
@@ -516,16 +592,85 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <p class="text-body text-muted-foreground">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
+            <p class="text-[11px] text-muted-foreground sm:text-body">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
             <span
               v-if="cheapestConvenienceLabel"
-              class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
             >
               <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
               현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
             </span>
           </div>
 
+          <!-- 모바일: 카드 레이아웃 -->
+          <div class="space-y-3 md:hidden">
+            <div
+              v-for="result in convenienceResults"
+              :key="`m-conv-${result.carrier.key}`"
+              class="overflow-hidden rounded-2xl border bg-white"
+              :class="[
+                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestConvenience?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
+              ]"
+            >
+              <div class="flex items-center gap-2.5 px-3.5 py-3">
+                <span
+                  class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                  :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
+                  :style="{ backgroundColor: result.carrier.color }"
+                >
+                  {{ result.carrier.shortName }}
+                </span>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="min-w-0 flex-1 truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
+                    <span
+                      v-if="cheapestConvenience?.carrier.key === result.carrier.key"
+                      class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+                    >
+                      <BadgeCheck class="h-3.5 w-3.5" />
+                      최저
+                    </span>
+                    <span
+                      v-else-if="!result.isAvailable"
+                      class="inline-flex shrink-0 items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 sm:text-[11px]"
+                    >
+                      접수 불가
+                    </span>
+                  </div>
+                  <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
+                </div>
+              </div>
+              <div class="space-y-0 border-t border-border/60">
+                <div
+                  v-for="col in shippingCompareColumns"
+                  :key="`m-conv-${result.carrier.key}-${col.key}`"
+                  class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
+                >
+                  <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                  <span
+                    class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
+                    :class="[
+                      result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
+                      col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? '!text-profit' : '',
+                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-fee' : '',
+                    ]"
+                  >
+                    <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
+                      {{ getShippingCellValue(col.key, result) }}
+                      <CompareHint
+                        v-if="col.key === 'limit'"
+                        :tooltip="result.restrictionText"
+                        :condition="result.unavailableReason"
+                      />
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 데스크톱: 테이블 레이아웃 -->
+          <div class="hidden md:block">
           <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
 
           <div class="overflow-x-auto">
@@ -546,16 +691,16 @@ function formatPostalRanges(ranges: string[]): string {
                 <tr
                   v-for="result in convenienceResults"
                   :key="result.carrier.key"
-                  class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                  class="compare-hover-row border-b border-border/40 transition-colors"
                   :class="getShippingRowTone(result, cheapestConvenience?.carrier.key)"
                 >
                   <td
-                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-4"
                     :class="getShippingStickyCellTone(result, cheapestConvenience?.carrier.key)"
                   >
                     <div class="flex items-center gap-2.5">
                       <span
-                        class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
                         :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                         :style="{ backgroundColor: result.carrier.color }"
                       >
@@ -589,9 +734,10 @@ function formatPostalRanges(ranges: string[]): string {
                   <td
                     v-for="col in shippingCompareColumns"
                     :key="`${result.carrier.key}-${col.key}`"
-                    class="px-3 py-3 align-top sm:px-4"
+                    class="px-3 py-3 align-middle transition-colors sm:px-4"
+                    :class="getShippingCellBg(col.key, result, cheapestConvenience?.carrier.key)"
                   >
-                    <div class="compare-cell" :class="getShippingCellBg(col.key, result, cheapestConvenience?.carrier.key)">
+                    <span class="inline-flex items-center gap-0.5">
                       <span
                         class="compare-cell-value"
                         :class="[
@@ -608,11 +754,12 @@ function formatPostalRanges(ranges: string[]): string {
                         :tooltip="result.restrictionText"
                         :condition="result.unavailableReason"
                       />
-                    </div>
+                    </span>
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </div>
@@ -676,7 +823,7 @@ function formatPostalRanges(ranges: string[]): string {
                   <tr
                     v-for="cluster in group.clusters"
                     :key="`${group.group}-${cluster.zone}`"
-                    class="border-b border-border/40 transition-colors hover:bg-accent/15"
+                    class="border-b border-border/40 transition-colors hover:bg-accent/30"
                   >
                     <td class="whitespace-nowrap px-3 py-1.5 pl-6 sm:px-4 sm:pl-8">
                       <span class="flex h-6 items-center gap-1.5">
@@ -703,7 +850,11 @@ function formatPostalRanges(ranges: string[]): string {
 
     <section class="retro-panel overflow-hidden">
       <div class="retro-panel-content text-center space-y-2">
-        <p class="text-caption text-muted-foreground">내 상품의 수수료를 직접 계산해보세요.</p>
+        <p class="text-caption text-muted-foreground">
+          택배비까지 포함했을 때
+          <br class="hidden sm:block" />
+          어디서 더 남는지 직접 계산해보세요.
+        </p>
         <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
           수수료 계산기 사용하기
         </RouterLink>

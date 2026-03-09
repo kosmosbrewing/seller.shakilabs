@@ -8,16 +8,18 @@ export type CoupangMode = "marketplace" | "rocketGrowth";
 export type FulfillmentSize = "xs" | "small" | "medium" | "large" | "xl" | "xxl";
 
 export type MarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
+export type OwnStoreKey = "own_tosspay" | "own_naverpay" | "own_kakaopay" | "own_payco";
+export type CompareKey = MarketKey | OwnStoreKey;
 
-export interface MarketMeta {
-  key: MarketKey;
+export interface ChannelMeta {
+  key: CompareKey;
   name: string;
   shortName: string;
   color: string;
 }
 
 // 마켓 메타 정보
-export const MARKET_META: Record<MarketKey, MarketMeta> = {
+export const MARKET_META: Record<MarketKey, ChannelMeta> = {
   smartstore: { key: "smartstore", name: "스마트스토어", shortName: "네쇼", color: "#03C75A" },
   coupang: { key: "coupang", name: "쿠팡", shortName: "쿠팡", color: "#E31937" },
   elevenst: { key: "elevenst", name: "11번가", shortName: "11번", color: "#FF6B00" },
@@ -25,6 +27,27 @@ export const MARKET_META: Record<MarketKey, MarketMeta> = {
 };
 
 export const MARKET_ORDER: MarketKey[] = ["smartstore", "coupang", "elevenst", "gmarket"];
+
+export const OWN_STORE_RATES: Record<OwnStoreKey, number> = {
+  own_tosspay: 0.034,
+  own_naverpay: 0.022,
+  own_kakaopay: 0.009,   // 파트너센터 공시 영세 0.9% (VAT 별도)
+  own_payco: 0.018,      // NHN커머스 기준 영세 1.8% (VAT 별도)
+};
+
+export const OWN_STORE_META: Record<OwnStoreKey, ChannelMeta> = {
+  own_tosspay: { key: "own_tosspay", name: "자사몰 · 토스페이먼츠", shortName: "토스PG", color: "#0064FF" },
+  own_naverpay: { key: "own_naverpay", name: "자사몰 · 네이버페이", shortName: "N결제", color: "#0099B8" },
+  own_kakaopay: { key: "own_kakaopay", name: "자사몰 · 카카오페이", shortName: "카카오", color: "#FFCD00" },
+  own_payco: { key: "own_payco", name: "자사몰 · 페이코", shortName: "PAYCO", color: "#FA2828" },
+};
+
+export const OWN_STORE_ORDER: OwnStoreKey[] = ["own_tosspay", "own_naverpay", "own_kakaopay", "own_payco"];
+
+export const ALL_CHANNEL_META: Record<CompareKey, ChannelMeta> = {
+  ...MARKET_META,
+  ...OWN_STORE_META,
+};
 
 // 스마트스토어 수수료 (2025.06 개편 반영)
 export const SMARTSTORE = {

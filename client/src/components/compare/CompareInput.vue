@@ -15,6 +15,8 @@ import {
   SMARTSTORE_SOURCE_LABELS,
   COUPANG_MODE_LABELS,
   FULFILLMENT_SIZE_LABELS,
+  OWN_STORE_META,
+  OWN_STORE_ORDER,
   type SmartStoreTier,
   type SmartStoreSource,
   type CoupangMode,
@@ -31,6 +33,7 @@ const props = defineProps<{
   smartstoreSource: SmartStoreSource;
   coupangMode: CoupangMode;
   fulfillmentSize: FulfillmentSize;
+  includeOwnStore: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -41,9 +44,14 @@ const emit = defineEmits<{
   "update:smartstoreSource": [value: SmartStoreSource];
   "update:coupangMode": [value: CoupangMode];
   "update:fulfillmentSize": [value: FulfillmentSize];
+  "update:includeOwnStore": [value: boolean];
 }>();
 
 const showAdvanced = ref(false);
+
+// 마켓별 브랜드 칩 활성 스타일
+const smartstoreChipActive = "border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white";
+const coupangChipActive = "border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white";
 
 const SHIPPING_PRESETS = [
   { value: 0, label: "무료배송" },
@@ -102,6 +110,10 @@ function handleShippingBlur(): void {
 function adjustShipping(delta: number): void {
   const next = Math.max(0, props.shippingFee + delta);
   emit("update:shippingFee", next);
+}
+
+function handleOwnStoreChange(e: Event): void {
+  emit("update:includeOwnStore", (e.target as HTMLInputElement).checked);
 }
 
 </script>
@@ -287,11 +299,7 @@ function adjustShipping(delta: number): void {
                 type="button"
                 variant="outline"
                 size="chip"
-                :class="
-                  smartstoreTier === key
-                    ? 'border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white'
-                    : ''
-                "
+                :class="smartstoreTier === key ? smartstoreChipActive : ''"
                 @click="emit('update:smartstoreTier', key as SmartStoreTier)"
               >
                 {{ label }}
@@ -311,11 +319,7 @@ function adjustShipping(delta: number): void {
                 type="button"
                 variant="outline"
                 size="chip"
-                :class="
-                  smartstoreSource === key
-                    ? 'border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white'
-                    : ''
-                "
+                :class="smartstoreSource === key ? smartstoreChipActive : ''"
                 @click="emit('update:smartstoreSource', key as SmartStoreSource)"
               >
                 {{ label }}
@@ -335,11 +339,7 @@ function adjustShipping(delta: number): void {
                 type="button"
                 variant="outline"
                 size="chip"
-                :class="
-                  coupangMode === key
-                    ? 'border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white'
-                    : ''
-                "
+                :class="coupangMode === key ? coupangChipActive : ''"
                 @click="emit('update:coupangMode', key as CoupangMode)"
               >
                 {{ label }}
@@ -359,17 +359,50 @@ function adjustShipping(delta: number): void {
                 type="button"
                 variant="outline"
                 size="chip"
-                :class="
-                  fulfillmentSize === key
-                    ? 'border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white'
-                    : ''
-                "
+                :class="fulfillmentSize === key ? coupangChipActive : ''"
                 @click="emit('update:fulfillmentSize', key as FulfillmentSize)"
               >
                 {{ label }}
               </Button>
             </div>
           </div>
+
+          <label
+            class="group flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-all"
+            :class="includeOwnStore
+              ? 'border-primary/40 bg-primary/5'
+              : 'border-border/60 bg-background/70 hover:border-border'"
+          >
+            <input
+              type="checkbox"
+              class="sr-only"
+              :checked="includeOwnStore"
+              @change="handleOwnStoreChange"
+            />
+            <span
+              class="relative mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full transition-colors"
+              :class="includeOwnStore ? 'bg-primary' : 'bg-border'"
+            >
+              <span
+                class="absolute h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                :class="includeOwnStore ? 'translate-x-[18px]' : 'translate-x-[3px]'"
+              />
+            </span>
+            <div class="min-w-0 flex-1">
+              <span class="text-body font-semibold text-foreground">자사몰(PG) 수수료 함께 비교</span>
+              <div class="mt-1.5 flex flex-wrap gap-1">
+                <span
+                  v-for="key in OWN_STORE_ORDER"
+                  :key="key"
+                  class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
+                  :class="key === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
+                  :style="{ backgroundColor: OWN_STORE_META[key].color }"
+                >
+                  {{ OWN_STORE_META[key].shortName }}
+                </span>
+              </div>
+            </div>
+          </label>
         </div>
       </details>
 

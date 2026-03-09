@@ -431,8 +431,8 @@ export function resolveShippingSize(sumCm: number | null | undefined): ShippingS
   if (sumCm <= SIZE_SUM_THRESHOLDS.small) return "small";
   if (sumCm <= SIZE_SUM_THRESHOLDS.medium) return "medium";
   if (sumCm <= SIZE_SUM_THRESHOLDS.large) return "large";
-  if (sumCm <= SIZE_SUM_THRESHOLDS.xlarge) return "xlarge";
-  return null;
+  // 160cm 초과도 특대로 분류 (경동 등 200cm까지 접수 가능한 택배사 존재)
+  return "xlarge";
 }
 
 function estimateFromBands(

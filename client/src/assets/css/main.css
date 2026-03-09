@@ -250,8 +250,20 @@
     @apply inline-flex items-center text-caption font-medium text-muted-foreground;
   }
 
-  .compare-cell {
-    @apply rounded-lg px-1 py-0.5;
+  .compare-hover-row > td {
+    @apply transition-colors;
+  }
+
+  .compare-hover-row:hover > td {
+    @apply bg-accent/30;
+  }
+
+  .compare-hover-row-best:hover > td {
+    @apply bg-emerald-100/70 dark:bg-emerald-950/25;
+  }
+
+  .compare-hover-row-muted:hover > td {
+    @apply bg-muted/80;
   }
 
   .compare-cell-highlight {
@@ -319,4 +331,49 @@
 .slide-fade-leave-to {
   opacity: 0;
   transform: translateY(6px);
+}
+
+@media (max-width: 639px) {
+  .text-display {
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .text-heading,
+  .retro-title {
+    font-size: 0.9375rem;
+    line-height: 1.3;
+  }
+
+  .text-body {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  .text-caption {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .text-tiny {
+    font-size: 0.65625rem;
+    line-height: 1.3;
+  }
+
+  .retro-titlebar {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    gap: 0.625rem;
+  }
+
+  .retro-panel-content {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  .retro-board-item {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    gap: 0.625rem;
+  }
 }

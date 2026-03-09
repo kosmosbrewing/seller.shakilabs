@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue";
 import { BadgeCheck, ChevronDown, Medal } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { formatWon, formatWonShort, formatPercent } from "@/lib/utils";
-import { MARKET_META } from "@/data/marketFees";
+import { ALL_CHANNEL_META } from "@/data/marketFees";
 import type { FeeBreakdown } from "@/utils/calculator";
 
 const props = defineProps<{
@@ -13,7 +13,7 @@ const props = defineProps<{
   netGap: number;
 }>();
 
-const meta = computed(() => MARKET_META[props.result.marketKey]);
+const meta = computed(() => ALL_CHANNEL_META[props.result.marketKey]);
 const showDetail = ref(false);
 const rankLabel = computed(() => {
   if (props.rank === 1) return "1위";

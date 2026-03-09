@@ -39,7 +39,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
       core: "22만원(1회)",
     },
     annualFee: {
-      core: "11만원/년",
+      core: "11만원(매년)",
     },
     cardFee: {
       core: "영세 3.4%~",
@@ -111,7 +111,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "카카오",
     badge: "간편결제 중심",
     color: "#FFCD00",
-    microBusinessRate: 0.89,
+    microBusinessRate: 0.9,
     setupFee: {
       core: "무료",
     },
@@ -120,8 +120,8 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
       condition: "이벤트/정책 기간에 따라 변동 가능.",
     },
     cardFee: {
-      core: "영세 0.89%~",
-      tooltip: "일반 구간은 최대 1.72% 수준으로 안내됩니다.",
+      core: "영세 0.9%~",
+      tooltip: "영세 0.9%, 일반 최대 3.2% (카드 기준, VAT 별도). 카카오페이머니 영세 0.5%.",
     },
     settlementCycle: {
       core: "연동 PG 정책",
@@ -138,7 +138,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "PAYCO",
     badge: "포인트 결제 특화",
     color: "#FA2828",
-    microBusinessRate: 1.5,
+    microBusinessRate: 1.8,
     setupFee: {
       core: "무료",
     },
@@ -146,8 +146,8 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
       core: "무료",
     },
     cardFee: {
-      core: "영세 1.5%~",
-      tooltip: "일반 구간은 최대 3.0% 수준으로 안내됩니다.",
+      core: "영세 1.8%~",
+      tooltip: "일반 구간 최대 3.4%까지 (카드 기준, VAT 별도).",
     },
     settlementCycle: {
       core: "제휴 정책 확인",

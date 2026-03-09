@@ -95,7 +95,7 @@ export function useSEO({
       script: resolvedJsonLdArray.map((entry, index) => ({
         key: `json-ld-${index}`,
         type: "application/ld+json",
-        children: JSON.stringify(entry),
+        textContent: JSON.stringify(entry),
       })),
     };
   });

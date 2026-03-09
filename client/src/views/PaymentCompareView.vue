@@ -7,6 +7,7 @@ import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
 import { buttonVariants } from "@/components/ui/button";
+import { BUILD_DATE } from "@/lib/buildMeta";
 import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   PAYMENT_DATA_UPDATED,
@@ -72,7 +73,7 @@ const jsonLd = computed(() => [
     "description": seoDescription,
     "url": pageUrl,
     "inLanguage": "ko-KR",
-    "dateModified": "2026-03-07",
+    "dateModified": BUILD_DATE,
     "isPartOf": {
       "@type": "WebSite",
       "name": "오픈마켓 수수료 계산기",
@@ -112,7 +113,7 @@ function getCell(gateway: PaymentGatewayMeta, key: CompareColumnKey): CompareCel
     if (isFreeValue(setup) && isFreeValue(annual)) {
       return { core: "무료" };
     }
-    return { core: `가입 ${setup} · 연 ${annual}` };
+    return { core: `${setup} · ${annual}` };
   }
   return gateway[key as keyof Pick<PaymentGatewayMeta, "cardFee" | "settlementCycle" | "note">];
 }
@@ -125,9 +126,6 @@ function getGatewayBadgeTextClass(gatewayKey: PaymentGatewayKey): string {
 }
 
 function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: PaymentGatewayKey): string {
-  if (columnKey === "fixedCost" && isFreeValue(cell.core)) {
-    return "compare-cell-highlight";
-  }
   if (columnKey === "cardFee" && gatewayKey === lowestCardFeeGateway.value) {
     return "compare-cell-highlight";
   }
@@ -150,12 +148,12 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
 
       <div class="retro-panel-content space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <p class="text-body text-muted-foreground">
+          <p class="text-[11px] text-muted-foreground sm:text-body">
             {{ PAYMENT_GATEWAYS.length }}개 결제 서비스의 가입비·연회비·카드 수수료·정산 조건을 비교합니다.
           </p>
           <span
             v-if="lowestCardFeeLabel"
-            class="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-caption font-semibold text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300"
+            class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
           >
             <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             영세 기준 최저 수수료 {{ lowestCardFeeLabel }}
@@ -169,6 +167,55 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
           </span>
         </div>
 
+        <!-- 모바일: 카드 레이아웃 -->
+        <div class="space-y-3 md:hidden">
+          <div
+            v-for="gateway in PAYMENT_GATEWAYS"
+            :key="`m-${gateway.key}`"
+            class="overflow-hidden rounded-2xl border bg-white"
+            :class="gateway.key === lowestCardFeeGateway ? 'border-profit/40' : 'border-border/70'"
+          >
+            <div class="flex items-center gap-2.5 px-3.5 py-3">
+              <span
+                class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                :class="getGatewayBadgeTextClass(gateway.key)"
+                :style="{ backgroundColor: gateway.color }"
+              >
+                {{ gateway.shortName }}
+              </span>
+              <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ gateway.name }}</span>
+              <span
+                v-if="gateway.key === lowestCardFeeGateway"
+                class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+              >
+                <BadgeCheck class="h-3.5 w-3.5" />
+                최저
+              </span>
+            </div>
+            <div class="space-y-0 border-t border-border/60">
+              <div
+                v-for="col in compareColumns"
+                :key="`m-${gateway.key}-${col.key}`"
+                class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
+              >
+                <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                <span class="min-w-0 text-right text-[11px] font-semibold text-foreground sm:text-caption">
+                  <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
+                    {{ getCell(gateway, col.key).core }}
+                    <CompareHint
+                      v-if="getCell(gateway, col.key).tooltip || getCell(gateway, col.key).condition"
+                      :tooltip="getCell(gateway, col.key).tooltip"
+                      :condition="getCell(gateway, col.key).condition"
+                    />
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 데스크톱: 테이블 레이아웃 -->
+        <div class="hidden md:block">
         <p class="scroll-hint">표를 좌우로 밀면 다른 비교 항목을 계속 확인할 수 있습니다.</p>
 
         <div class="overflow-x-auto">
@@ -189,16 +236,16 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
               <tr
                 v-for="gateway in PAYMENT_GATEWAYS"
                 :key="gateway.key"
-                class="border-b border-border/40 transition-colors hover:bg-accent/15"
-                :class="gateway.key === lowestCardFeeGateway ? 'bg-profit/5 dark:bg-profit/12' : ''"
+                class="compare-hover-row border-b border-border/40 transition-colors"
+                :class="gateway.key === lowestCardFeeGateway ? 'compare-hover-row-best bg-emerald-50/70 dark:bg-emerald-950/15' : ''"
               >
                 <td
-                  class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 sm:px-4"
-                  :class="'bg-card'"
+                  class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 transition-colors sm:px-4"
+                  :class="gateway.key === lowestCardFeeGateway ? 'bg-emerald-50/70 dark:bg-emerald-950/15' : 'bg-card'"
                 >
                   <div class="flex items-center gap-2.5">
                     <span
-                      class="inline-flex h-8 min-w-8 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                      class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
                       :class="getGatewayBadgeTextClass(gateway.key)"
                       :style="{ backgroundColor: gateway.color }"
                     >
@@ -206,10 +253,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                     </span>
                     <div class="min-w-0">
                       <div class="flex items-center gap-1.5">
-                        <span class="text-body font-semibold">
-                          <span class="hidden sm:inline">{{ gateway.name }}</span>
-                          <span class="sm:hidden">{{ gateway.shortName }}</span>
-                        </span>
+                        <span class="text-body font-semibold">{{ gateway.name }}</span>
                         <span
                           v-if="gateway.key === lowestCardFeeGateway"
                           class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -224,25 +268,25 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                 <td
                   v-for="col in compareColumns"
                   :key="`${gateway.key}-${col.key}`"
-                  class="px-3 py-3 align-top sm:px-4"
+                  class="px-3 py-3 align-top transition-colors sm:px-4"
+                  :class="getCellBg(col.key, getCell(gateway, col.key), gateway.key)"
                 >
-                  <div class="compare-cell" :class="getCellBg(col.key, getCell(gateway, col.key), gateway.key)">
-                    <span class="inline-flex max-w-full items-center gap-0.5 align-middle">
-                      <span class="compare-cell-value" :class="col.nowrap ? 'whitespace-nowrap' : ''">{{ getCell(gateway, col.key).core }}</span>
-                      <CompareHint
-                        v-if="getCell(gateway, col.key).tooltip || getCell(gateway, col.key).condition"
-                        :tooltip="getCell(gateway, col.key).tooltip"
-                        :condition="getCell(gateway, col.key).condition"
-                      />
-                    </span>
-                  </div>
+                  <span class="inline-flex max-w-full items-center gap-0.5 align-middle">
+                    <span class="compare-cell-value" :class="col.nowrap ? 'whitespace-nowrap' : ''">{{ getCell(gateway, col.key).core }}</span>
+                    <CompareHint
+                      v-if="getCell(gateway, col.key).tooltip || getCell(gateway, col.key).condition"
+                      :tooltip="getCell(gateway, col.key).tooltip"
+                      :condition="getCell(gateway, col.key).condition"
+                    />
+                  </span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        </div>
 
-        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-[11px] leading-5 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
+        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-[10px] leading-4 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
           <BadgeAlert class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
           <div class="space-y-1">
             <p>정산주기는 계약 조건, 매출 규모, PG 연동 구조에 따라 달라질 수 있습니다.</p>
@@ -256,7 +300,11 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
 
     <section class="retro-panel overflow-hidden">
       <div class="retro-panel-content text-center space-y-2">
-        <p class="text-caption text-muted-foreground">내 상품의 수수료를 직접 계산해보세요.</p>
+        <p class="text-caption text-muted-foreground">
+          마켓 수수료에
+          <br class="hidden sm:block" />
+          PG 비용까지 합쳐서 직접 계산해보세요.
+        </p>
         <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
           수수료 계산기 사용하기
         </RouterLink>

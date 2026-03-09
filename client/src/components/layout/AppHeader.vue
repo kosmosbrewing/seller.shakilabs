@@ -32,12 +32,12 @@ onMounted(() => {
   <header class="border-b border-border bg-primary/8">
     <div class="container pt-2.5 pb-2.5">
       <div class="overflow-hidden">
-        <div class="retro-titlebar h-11 border-b-0 px-2 bg-transparent">
-          <div class="flex h-full w-full items-center gap-4">
+        <div class="retro-titlebar h-11 border-b-0 bg-transparent px-1.5 sm:px-2">
+          <div class="flex h-full w-full items-center gap-2.5 sm:gap-4">
             <RouterLink
               to="/"
               aria-label="ShakiLabs 홈"
-              class="inline-flex h-8 w-8 sm:w-auto shrink-0 items-center justify-center sm:justify-start gap-1.5 px-0.5 text-muted-foreground transition-colors hover:text-foreground"
+              class="inline-flex h-8 w-8 shrink-0 items-center justify-center gap-1 px-0.5 text-muted-foreground transition-colors hover:text-foreground sm:w-auto sm:justify-start sm:gap-1.5"
             >
               <span
                 class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-muted/60 ring-1 ring-border/60"
@@ -49,7 +49,7 @@ onMounted(() => {
                 ShakiLabs
               </span>
             </RouterLink>
-            <div class="flex h-full flex-1 items-center justify-center text-center font-brand text-caption sm:text-body overflow-hidden">
+            <div class="flex h-full flex-1 items-center justify-center overflow-hidden text-center font-brand text-tiny sm:text-body">
               <TickerBar :messages="tickerMessages" />
             </div>
             <Button

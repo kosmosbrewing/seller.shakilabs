@@ -4,7 +4,7 @@ import { formatWon, formatWonShort } from "@/lib/utils";
 import { buildAbsoluteUrl, copyToClipboard } from "@/lib/routeState";
 import { trackEvent } from "@/lib/analytics";
 import type { FeeBreakdown } from "@/utils/calculator";
-import { MARKET_META, type MarketKey } from "@/data/marketFees";
+import { ALL_CHANNEL_META } from "@/data/marketFees";
 import type { CategoryKey } from "@/data/marketFees";
 import { CATEGORY_MAP } from "@/data/categories";
 
@@ -26,6 +26,7 @@ interface ShareContext {
   price: { value: number };
   category: { value: CategoryKey };
   bestMarket: { value: FeeBreakdown | null };
+  includeOwnStore?: { value: boolean };
   monthlyQty: { value: number };
 }
 
@@ -48,7 +49,7 @@ export function useShare(ctx: ShareContext) {
     const cat = CATEGORY_MAP[ctx.category.value]?.label ?? "";
     const best = ctx.bestMarket.value;
     if (!best) return "";
-    const marketName = MARKET_META[best.marketKey].name;
+    const marketName = ALL_CHANNEL_META[best.marketKey].name;
     return `판매가 ${formatWon(ctx.price.value)} ${cat} → ${marketName} 수수료 ${formatWon(best.totalFee)} (${(best.totalFeeRate * 100).toFixed(1)}%)`;
   });
 
@@ -66,6 +67,7 @@ export function useShare(ctx: ShareContext) {
     return buildAbsoluteUrl(path, {
       price: ctx.price.value,
       cat: ctx.category.value !== "clothing" ? ctx.category.value : null,
+      own: ctx.includeOwnStore?.value ? 1 : null,
       qty: ctx.monthlyQty.value !== 100 ? ctx.monthlyQty.value : null,
     });
   }
@@ -73,7 +75,7 @@ export function useShare(ctx: ShareContext) {
   function getShareText(): string {
     const best = ctx.bestMarket.value;
     if (!best) return "오픈마켓 수수료 비교 계산기";
-    const marketName = MARKET_META[best.marketKey].name;
+    const marketName = ALL_CHANNEL_META[best.marketKey].name;
     const cat = CATEGORY_MAP[ctx.category.value]?.label ?? "";
     return `판매가 ${formatWon(ctx.price.value)} ${cat} → ${marketName}가 가장 유리 (반영 데이터 기준)`;
   }
