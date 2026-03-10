@@ -9,18 +9,14 @@ const props = defineProps<{
 
 const constantsStore = useConstantsStore();
 const defaultMessage = computed(() => {
-  const updated = constantsStore.feeDataUpdated;
   const verified = constantsStore.feeDataVerified;
-  if (verified && verified !== updated) {
-    return `${updated} 반영 · ${verified} 확인`;
-  }
-  return `${updated} 반영`;
+  return `${verified} 기준`;
 });
 </script>
 
 <template>
   <span
-    class="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-primary/35 bg-primary/10 px-2 py-1 text-[10px] font-bold leading-none text-primary sm:gap-1.5 sm:px-2.5 sm:text-[11px]"
+    class="hidden shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-primary/35 bg-primary/10 px-2 py-1 text-[10px] font-bold leading-none text-primary md:inline-flex md:gap-1.5 md:px-2.5 md:text-[11px]"
   >
     <CheckCircle2 class="h-3.5 w-3.5" />
     {{ props.message ?? defaultMessage }}

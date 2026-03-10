@@ -127,15 +127,35 @@ describe("calcGmarket", () => {
 
 describe("calcOwnStore", () => {
   it("카카오페이 결제형 30,000원 상품", () => {
-    const result = calcOwnStore(30_000, "own_kakaopay");
+    const result = calcOwnStore(30_000, "own_kakaopay", "micro");
 
     expect(result.marketKey).toBe("own_kakaopay");
-    // 30000 × 0.009 = 270
-    expect(result.totalFee).toBe(270);
+    // 30000 × 0.009 × 1.1 = 297
+    expect(result.totalFee).toBe(297);
     expect(result.items).toEqual([
-      { label: "결제 수수료", amount: 270, rate: 0.009 },
+      { label: "결제 수수료", amount: 297, rate: 0.0099 },
     ]);
-    expect(result.netProfit).toBe(30_000 - 270);
+    expect(result.netProfit).toBe(30_000 - 297);
+  });
+
+  it("네이버페이 결제형은 5단계 요율을 그대로 적용한다", () => {
+    const micro = calcOwnStore(100_000, "own_naverpay", "micro");
+    const normal = calcOwnStore(100_000, "own_naverpay", "normal");
+
+    expect(micro.totalFee).toBe(990);
+    expect(micro.items[0]).toEqual({ label: "결제 수수료", amount: 990, rate: 0.0099 });
+    expect(normal.totalFee).toBe(2_750);
+    expect(normal.items[0]).toEqual({ label: "결제 수수료", amount: 2_750, rate: 0.0275 });
+  });
+
+  it("공개 단계가 일부만 있는 PG는 상위 공개 구간으로 fallback 한다", () => {
+    const toss = calcOwnStore(100_000, "own_tosspay", "small2");
+    const paycoMicro = calcOwnStore(100_000, "own_payco", "micro");
+    const paycoSmall = calcOwnStore(100_000, "own_payco", "small1");
+
+    expect(toss.items[0]).toEqual({ label: "결제 수수료", amount: 3_740, rate: 0.0374 });
+    expect(paycoMicro.items[0]).toEqual({ label: "결제 수수료", amount: 1_980, rate: 0.0198 });
+    expect(paycoSmall.items[0]).toEqual({ label: "결제 수수료", amount: 3_740, rate: 0.0374 });
   });
 });
 
@@ -166,7 +186,7 @@ describe("calcAllMarkets", () => {
     }
   });
 
-  it("자사몰 비교를 켜면 4개 PG가 뒤에 추가된다", () => {
+  it("자사몰 비교를 켜면 5개 PG가 뒤에 추가된다", () => {
     const results = calcAllMarkets({
       price: 30_000,
       shippingFee: 3_000,
@@ -177,19 +197,20 @@ describe("calcAllMarkets", () => {
       fulfillmentSize: "small",
     }, { includeOwnStore: true });
 
-    expect(results).toHaveLength(8);
+    expect(results).toHaveLength(9);
     expect(results.map((r) => r.marketKey)).toEqual([
       "smartstore",
       "coupang",
       "elevenst",
       "gmarket",
       "own_tosspay",
+      "own_naverorder",
       "own_naverpay",
       "own_kakaopay",
       "own_payco",
     ]);
     expect(results[4]?.items).toEqual([
-      { label: "결제 수수료", amount: 1_020, rate: 0.034 },
+      { label: "결제 수수료", amount: 1_122, rate: 0.0374 },
     ]);
   });
 });

@@ -113,10 +113,10 @@ watch(() => props.result.totalFee, () => {
         </div>
         <div class="rounded-2xl border border-border/70 bg-background px-3 py-3">
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-            수수료율
+            수수료율(VAT 포함)
           </p>
           <p class="mt-1.5 text-body font-bold tabular-nums text-foreground">
-            {{ formatPercent(result.totalFeeRate) }}
+            {{ formatPercent(result.totalFeeRate, 2) }}
           </p>
         </div>
       </div>

@@ -7,7 +7,9 @@ import {
   ELEVENST,
   GMARKET,
   OWN_STORE_ORDER,
-  OWN_STORE_RATES,
+  VAT_MULTIPLIER,
+  resolveOwnStoreEffectiveRate,
+  SMARTSTORE_TIER_THRESHOLDS,
   type CategoryKey,
   type SmartStoreTier,
   type SmartStoreSource,
@@ -90,7 +92,7 @@ export function calcSmartStore(input: SmartStoreInput): FeeBreakdown {
 
   // 2. 판매 수수료 (VAT 별도이므로 ×1.1)
   const saleFeeRate = SMARTSTORE.saleFee[source];
-  const saleFeeWithVat = saleFeeRate * 1.1;
+  const saleFeeWithVat = saleFeeRate * VAT_MULTIPLIER;
   const saleFee = Math.floor(price * saleFeeWithVat);
   items.push({ label: "판매 수수료", amount: saleFee, rate: saleFeeWithVat });
 
@@ -202,15 +204,16 @@ export function calcGmarket(input: SimpleMarketInput): FeeBreakdown {
   };
 }
 
-export function calcOwnStore(price: number, gatewayKey: OwnStoreKey): FeeBreakdown {
-  const totalFee = Math.floor(price * OWN_STORE_RATES[gatewayKey]);
+export function calcOwnStore(price: number, gatewayKey: OwnStoreKey, tier: SmartStoreTier): FeeBreakdown {
+  const rate = resolveOwnStoreEffectiveRate(gatewayKey, tier);
+  const totalFee = Math.floor(price * rate + 1e-6);
 
   return {
     marketKey: gatewayKey,
     totalFee,
     totalFeeRate: price > 0 ? totalFee / price : 0,
     netProfit: price - totalFee,
-    items: [{ label: "결제 수수료", amount: totalFee, rate: OWN_STORE_RATES[gatewayKey] }],
+    items: [{ label: "결제 수수료", amount: totalFee, rate }],
   };
 }
 
@@ -239,7 +242,7 @@ export function calcAllMarkets(input: CompareInput, options: CalcAllMarketsOptio
 
   return [
     ...results,
-    ...OWN_STORE_ORDER.map((gatewayKey) => calcOwnStore(price, gatewayKey)),
+    ...OWN_STORE_ORDER.map((gatewayKey) => calcOwnStore(price, gatewayKey, smartstoreTier)),
   ];
 }
 
@@ -249,6 +252,19 @@ export function findBestMarket(results: FeeBreakdown[]): FeeBreakdown | null {
   return results.reduce((best, current) =>
     current.netProfit > best.netProfit ? current : best
   );
+}
+
+// 판매가 × 월 판매량으로 스마트스토어 매출등급 추정
+export function estimateTier(price: number, monthlyQty: number): {
+  estimatedRevenue: number;
+  recommendedTier: SmartStoreTier;
+} {
+  const estimatedRevenue = price * monthlyQty * 12;
+  const match = SMARTSTORE_TIER_THRESHOLDS.find((t) => estimatedRevenue <= t.maxRevenue);
+  return {
+    estimatedRevenue,
+    recommendedTier: match?.tier ?? "normal",
+  };
 }
 
 // 월간/연간 시뮬레이션

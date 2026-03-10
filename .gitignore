@@ -1,5 +1,5 @@
-ISSUES.md
-client/ISSUES.md
+ISSUE*.md
+client/ISSUES*.md
 client/node_modules/
 client/dist/
 client/artifacts/

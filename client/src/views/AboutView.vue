@@ -2,9 +2,12 @@
 import SEOHead from "@/components/common/SEOHead.vue";
 import { RouterLink } from "vue-router";
 import { buttonVariants } from "@/components/ui/button";
+import { useConstantsStore } from "@/stores/constants";
 import { FEE_DATA_UPDATED } from "@/data/marketFees";
 import { PAYMENT_DATA_UPDATED } from "@/data/paymentGateways";
 import { SHIPPING_DATA_UPDATED } from "@/data/shippingRates";
+
+const constantsStore = useConstantsStore();
 </script>
 
 <template>
@@ -49,7 +52,7 @@ import { SHIPPING_DATA_UPDATED } from "@/data/shippingRates";
         <h2 class="text-heading font-bold">문의</h2>
         <p class="text-body text-muted-foreground">
           오류 제보나 기능 건의는
-          <a href="mailto:skdba1313@gmail.com" class="retro-link">skdba1313@gmail.com</a>으로
+          <a :href="`mailto:${constantsStore.supportEmail}`" class="retro-link">{{ constantsStore.supportEmail }}</a>으로
           보내주세요.
         </p>
       </div>

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
-import { formatWon, formatWonShort } from "@/lib/utils";
+import { formatWon } from "@/lib/utils";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
 import { QTY_PRESETS } from "@/data/pricePresets";
 import { Button } from "@/components/ui/button";
+
 import { parseMonthlyQty } from "@/lib/validators";
 import type { MonthlySimResult } from "@/utils/calculator";
 
@@ -35,7 +36,7 @@ function handleQtyInput(e: Event): void {
 }
 
 const sortedSims = computed(() =>
-  [...props.simResults].sort((a, b) => a.annualFee - b.annualFee)
+  [...props.simResults].sort((a, b) => a.monthlyFee - b.monthlyFee)
 );
 
 const bestSim = computed(() => sortedSims.value[0] ?? null);
@@ -43,10 +44,11 @@ const worstSim = computed(() =>
   sortedSims.value.length ? sortedSims.value[sortedSims.value.length - 1] : null
 );
 
-const annualSpread = computed(() => {
+const monthlySpread = computed(() => {
   if (!bestSim.value || !worstSim.value) return 0;
-  return Math.max(0, worstSim.value.annualFee - bestSim.value.annualFee);
+  return Math.max(0, worstSim.value.monthlyFee - bestSim.value.monthlyFee);
 });
+
 </script>
 
 <template>
@@ -83,22 +85,23 @@ const annualSpread = computed(() => {
 
     <!-- 모바일: 카드 레이아웃 -->
     <div class="space-y-3 px-3.5 py-3 md:hidden">
+      <p class="text-caption text-muted-foreground">수수료 낮은순 · 월 판매 기준 수수료와 순이익 비교</p>
       <div
         v-for="(sim, idx) in sortedSims"
         :key="`m-${sim.marketKey}`"
-        class="overflow-hidden rounded-2xl border bg-white"
+        class="overflow-hidden rounded-2xl border bg-card"
         :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
       >
         <div class="flex items-center gap-2.5 px-3.5 py-3">
           <span
-            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+            class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
             :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
           >
             <Medal class="h-3.5 w-3.5" />
             {{ idx + 1 }}위
           </span>
           <span
-            class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+            class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
             :class="sim.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
             :style="{ backgroundColor: ALL_CHANNEL_META[sim.marketKey].color }"
           >
@@ -114,22 +117,18 @@ const annualSpread = computed(() => {
           </span>
         </div>
         <div class="space-y-0 border-t border-border/60">
-          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">월 수수료</span>
-            <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(sim.monthlyFee) }}</span>
+          <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
+            <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">월 수수료</span>
+            <span class="text-right text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(sim.monthlyFee) }}</span>
           </div>
-          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">월 순이익</span>
-            <span class="text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(sim.monthlyProfit) }}</span>
+          <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
+            <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">월 순이익</span>
+            <span class="text-right text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(sim.monthlyProfit) }}</span>
           </div>
-          <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">연 수수료</span>
-            <span class="text-[11px] font-semibold tabular-nums text-foreground sm:text-caption">{{ formatWon(sim.annualFee) }}</span>
-          </div>
-          <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">1위 대비</span>
-            <span v-if="idx === 0" class="text-[11px] font-semibold text-profit sm:text-caption">최저</span>
-            <span v-else class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">+{{ formatWon(sim.annualDiff) }}</span>
+          <div class="grid grid-cols-[4.5rem_1fr] items-center px-3.5 py-2.5">
+            <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">1위 대비</span>
+            <span v-if="idx === 0" class="text-right text-[11px] font-semibold text-profit sm:text-caption">최저</span>
+            <span v-else class="text-right text-[11px] font-semibold tabular-nums text-fee sm:text-caption">+{{ formatWon(sim.monthlyFee - (bestSim?.monthlyFee ?? 0)) }}</span>
           </div>
         </div>
       </div>
@@ -137,18 +136,22 @@ const annualSpread = computed(() => {
 
     <!-- 데스크톱: 테이블 레이아웃 -->
     <div class="hidden md:block">
-    <p class="scroll-hint">표를 좌우로 밀어 확인하세요.</p>
-
     <div class="overflow-x-auto">
-      <table class="w-full text-body">
+      <table class="w-full table-fixed text-body">
+        <colgroup>
+          <col class="w-[7%]" />
+          <col />
+          <col class="w-[16%]" />
+          <col class="w-[16%]" />
+          <col class="w-[18%]" />
+        </colgroup>
         <thead>
           <tr class="border-b border-border/80 bg-card/95">
-            <th class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
-            <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
-            <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">월 수수료</th>
-            <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">월 순이익</th>
-            <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">연 수수료</th>
-            <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">1위 대비</th>
+            <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
+            <th scope="col" class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
+            <th scope="col" class="whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">월 수수료</th>
+            <th scope="col" class="whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">월 순이익</th>
+            <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">1위 대비</th>
           </tr>
         </thead>
         <tbody>
@@ -188,23 +191,15 @@ const annualSpread = computed(() => {
                 </div>
               </div>
             </td>
-            <td class="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-fee">
+            <td class="whitespace-nowrap px-3 py-3 text-right font-semibold tabular-nums text-fee">
               {{ formatWon(sim.monthlyFee) }}
             </td>
-            <td class="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
-              <span class="hidden sm:inline">{{ formatWon(sim.monthlyProfit) }}</span>
-              <span class="sm:hidden">{{ formatWonShort(sim.monthlyProfit) }}</span>
-            </td>
-            <td class="whitespace-nowrap px-4 py-3 text-right font-semibold tabular-nums text-foreground">
-              <span class="hidden sm:inline">{{ formatWon(sim.annualFee) }}</span>
-              <span class="sm:hidden">{{ formatWonShort(sim.annualFee) }}</span>
+            <td class="whitespace-nowrap px-3 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
+              {{ formatWon(sim.monthlyProfit) }}
             </td>
             <td class="whitespace-nowrap px-4 py-3 text-right tabular-nums">
               <span v-if="idx === 0" class="text-caption text-profit font-semibold">최저</span>
-              <span v-else class="text-caption text-fee font-semibold">
-                +<span class="hidden sm:inline">{{ formatWon(sim.annualDiff) }}</span>
-                <span class="sm:hidden">{{ formatWonShort(sim.annualDiff) }}</span>
-              </span>
+              <span v-else class="text-caption text-fee font-semibold">+{{ formatWon(sim.monthlyFee - (bestSim?.monthlyFee ?? 0)) }}</span>
             </td>
           </tr>
         </tbody>
@@ -214,10 +209,10 @@ const annualSpread = computed(() => {
 
     <div v-if="bestSim && worstSim" class="border-t border-border/40 px-4 py-3">
       <p class="text-caption text-muted-foreground">
-        월 매출 <span class="font-semibold text-foreground">{{ formatWonShort(monthlyRevenue) }}</span> 기준,
+        월 매출 <span class="font-semibold text-foreground">{{ formatWon(monthlyRevenue) }}</span> 기준,
         <span class="font-semibold text-profit">{{ ALL_CHANNEL_META[bestSim.marketKey].name }}</span>이
-        {{ ALL_CHANNEL_META[worstSim.marketKey].name }}보다 연
-        <span class="font-semibold text-profit">{{ formatWonShort(annualSpread) }}</span> 절감됩니다.
+        {{ ALL_CHANNEL_META[worstSim.marketKey].name }}보다 월
+        <span class="font-semibold text-profit">{{ formatWon(monthlySpread) }}</span> 절감됩니다.
       </p>
     </div>
   </div>

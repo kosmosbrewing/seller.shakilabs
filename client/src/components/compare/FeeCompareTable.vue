@@ -3,67 +3,85 @@ import { computed } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
 import { formatWon, formatPercent } from "@/lib/utils";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
+import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import type { FeeBreakdown } from "@/utils/calculator";
 
 const props = defineProps<{
   results: FeeBreakdown[];
 }>();
 
+function isOwnStore(key: string): boolean {
+  return key.startsWith("own_");
+}
+
 const sortedResults = computed(() => {
   const sorted = [...props.results];
   sorted.sort((a, b) => a.totalFee - b.totalFee);
   return sorted;
 });
+
+const copyHeaders = ["순위", "마켓", "총 수수료", "수수료율", "건당 순이익"];
+const copyRows = computed(() =>
+  sortedResults.value.map((r, idx) => [
+    `${idx + 1}위`,
+    ALL_CHANNEL_META[r.marketKey].name,
+    formatWon(r.totalFee),
+    formatPercent(r.totalFeeRate, 2),
+    formatWon(r.netProfit),
+  ])
+);
 </script>
 
 <template>
   <div class="space-y-3 px-3 py-3 sm:px-4 sm:py-4">
-      <p class="text-caption text-muted-foreground">수수료 낮은순 · 현재 입력값 기준 건당 수수료와 순이익 비교</p>
+      <div class="flex items-center justify-between gap-2">
+        <div class="space-y-1">
+          <p class="text-caption text-muted-foreground">수수료 낮은순 · 현재 입력값 기준 건당 수수료와 순이익 비교</p>
+          <p class="text-[10px] text-muted-foreground sm:text-caption">수수료율은 VAT 포함 총 수수료 기준입니다.</p>
+        </div>
+        <span class="md:hidden"><CopyTableButton :headers="copyHeaders" :rows="copyRows" /></span>
+      </div>
 
       <!-- 모바일: 카드 레이아웃 -->
       <div class="space-y-3 md:hidden">
         <div
           v-for="(result, idx) in sortedResults"
           :key="`m-${result.marketKey}`"
-          class="overflow-hidden rounded-2xl border bg-white"
+          class="overflow-hidden rounded-2xl border bg-card"
           :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
         >
           <div class="flex items-center gap-2.5 px-3.5 py-3">
             <span
-              class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+              class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
               :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
             >
               <Medal class="h-3.5 w-3.5" />
               {{ idx + 1 }}위
             </span>
             <span
-              class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+              class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
               :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
               :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
             >
               {{ ALL_CHANNEL_META[result.marketKey].shortName }}
             </span>
-            <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
-            <span
-              v-if="idx === 0"
-              class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
-            >
-              <BadgeCheck class="h-3.5 w-3.5" />
-              추천
-            </span>
+            <div class="min-w-0 flex-1">
+              <span class="block truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+              <span v-if="isOwnStore(result.marketKey)" class="text-[10px] text-muted-foreground">등급 연동</span>
+            </div>
           </div>
           <div class="space-y-0 border-t border-border/60">
-            <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
-              <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
+            <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
+              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
+              <span class="text-right text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
             </div>
-            <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율</span>
-              <span class="text-[11px] font-semibold tabular-nums text-muted-foreground sm:text-caption">{{ formatPercent(result.totalFeeRate) }}</span>
+            <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
+              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
+              <span class="text-right text-body font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatPercent(result.totalFeeRate, 2) }}</span>
             </div>
-            <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
-              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
-              <span class="text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
+            <div class="grid grid-cols-[4.5rem_1fr] items-center px-3.5 py-2.5">
+              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
+              <span class="text-right text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
             </div>
           </div>
         </div>
@@ -72,15 +90,26 @@ const sortedResults = computed(() => {
       <!-- 데스크톱: 테이블 레이아웃 -->
       <div class="hidden md:block">
       <div class="overflow-x-auto">
-        <p class="scroll-hint">표를 좌우로 밀어 확인하세요.</p>
-        <table class="w-full text-body">
+        <table class="w-full table-fixed text-body">
+          <colgroup>
+            <col class="w-[7%]" />
+            <col />
+            <col class="w-[16%]" />
+            <col class="w-[16%]" />
+            <col class="w-[18%]" />
+          </colgroup>
           <thead>
             <tr class="border-b border-border/80 bg-card/95">
-              <th class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
-              <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
-              <th class="w-28 whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground">총 수수료</th>
-              <th class="w-24 whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground" title="총 수수료 ÷ 판매가">수수료율</th>
-              <th class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">건당 순이익</th>
+              <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
+              <th scope="col" class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
+              <th scope="col" class="whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">총 수수료</th>
+              <th scope="col" class="whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground" title="총 수수료 ÷ 판매가">수수료율(VAT 포함)</th>
+              <th scope="col" class="px-4 py-3 text-right text-caption font-semibold text-muted-foreground">
+                <span class="flex w-full items-center justify-between gap-1.5">
+                  건당 순이익
+                  <CopyTableButton :headers="copyHeaders" :rows="copyRows" />
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -110,6 +139,7 @@ const sortedResults = computed(() => {
                   </span>
                   <div class="flex items-center gap-1.5">
                     <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+                    <span v-if="isOwnStore(result.marketKey)" class="text-[10px] text-muted-foreground">(등급 연동)</span>
                     <span
                       v-if="idx === 0"
                       class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -120,11 +150,11 @@ const sortedResults = computed(() => {
                   </div>
                 </div>
               </td>
-              <td class="whitespace-nowrap px-2 py-3 text-left font-semibold tabular-nums text-fee">
+              <td class="whitespace-nowrap px-3 py-3 text-right font-semibold tabular-nums text-fee">
                 {{ formatWon(result.totalFee) }}
               </td>
-              <td class="whitespace-nowrap px-3 py-3 text-right tabular-nums text-muted-foreground">
-                {{ formatPercent(result.totalFeeRate) }}
+              <td class="whitespace-nowrap px-3 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
+                {{ formatPercent(result.totalFeeRate, 2) }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
                 {{ formatWon(result.netProfit) }}

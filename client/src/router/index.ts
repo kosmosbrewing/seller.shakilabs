@@ -44,6 +44,11 @@ export const routes: RouteRecordRaw[] = [
     component: () => import("@/views/AboutView.vue"),
   },
   {
+    path: "/terms",
+    name: "Terms",
+    component: () => import("@/views/TermsView.vue"),
+  },
+  {
     path: "/privacy",
     name: "Privacy",
     component: () => import("@/views/PrivacyView.vue"),

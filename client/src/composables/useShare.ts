@@ -1,26 +1,13 @@
 import { computed, ref } from "vue";
 import { showAlert } from "./useAlert";
-import { formatWon, formatWonShort } from "@/lib/utils";
+import { formatWon } from "@/lib/utils";
 import { buildAbsoluteUrl, copyToClipboard } from "@/lib/routeState";
 import { trackEvent } from "@/lib/analytics";
+import { ensureKakaoSdk } from "@/lib/kakaoSdk";
 import type { FeeBreakdown } from "@/utils/calculator";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
 import type { CategoryKey } from "@/data/marketFees";
 import { CATEGORY_MAP } from "@/data/categories";
-
-declare global {
-  interface Window {
-    Kakao?: {
-      init: (key: string) => void;
-      isInitialized: () => boolean;
-      Share: {
-        sendDefault: (params: Record<string, unknown>) => void;
-      };
-    };
-  }
-}
-
-let kakaoSdkPromise: Promise<void> | null = null;
 
 interface ShareContext {
   price: { value: number };
@@ -93,41 +80,6 @@ export function useShare(ctx: ShareContext) {
       trackShareEvent("ux_share_link_copy_fail");
       showAlert("링크 복사에 실패했습니다", { type: "error" });
     }
-  }
-
-  async function ensureKakaoSdk(): Promise<void> {
-    if (window.Kakao) return;
-    if (kakaoSdkPromise) return kakaoSdkPromise;
-
-    const key = (import.meta.env.VITE_KAKAO_JS_KEY || "").trim();
-    if (!key) throw new Error("KAKAO_JS_KEY not configured");
-
-    kakaoSdkPromise = new Promise<void>((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>('script[data-kakao-sdk="true"]');
-      if (existing) {
-        if (window.Kakao) { resolve(); return; }
-        if (existing.dataset.loaded === "true") { reject(new Error("Kakao SDK not available")); return; }
-        existing.addEventListener("load", () => resolve(), { once: true });
-        existing.addEventListener("error", () => reject(new Error("Kakao SDK load failed")), { once: true });
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
-      script.async = true;
-      script.dataset.kakaoSdk = "true";
-      script.onload = () => { script.dataset.loaded = "true"; resolve(); };
-      script.onerror = () => reject(new Error("Kakao SDK load failed"));
-      document.head.appendChild(script);
-    }).then(() => {
-      if (window.Kakao && !window.Kakao.isInitialized()) {
-        window.Kakao.init(key);
-      }
-    }).finally(() => {
-      if (!window.Kakao) kakaoSdkPromise = null;
-    });
-
-    return kakaoSdkPromise;
   }
 
   async function shareKakao(): Promise<void> {

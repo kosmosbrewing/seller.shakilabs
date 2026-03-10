@@ -34,6 +34,7 @@ export interface ShippingCarrierMeta {
   category: ShippingCarrierCategory;
   pricingMode: ShippingPricingMode;
   color: string;
+  sourceUrl: string;
   maxWeightKg: number;
   maxSumCm: number;
   extraWeightFeePerKg?: number;
@@ -75,9 +76,10 @@ export interface RemoteAreaPostalCodeSummaryGroup {
   clusters: RemoteAreaPostalCodeSummaryCluster[];
 }
 
-export const SHIPPING_DATA_UPDATED = "2026.03";
+export const SHIPPING_DATA_UPDATED: string = "2026.03";
+export const SHIPPING_DATA_VERIFIED: string = "2026.03";
 
-export const SHIPPING_WEIGHT_PRESETS = [1, 3, 5, 10, 20] as const;
+export const SHIPPING_WEIGHT_PRESETS = [1, 2, 3, 5, 10, 20] as const;
 
 export const SHIPPING_SIZE_ORDER: ShippingSizeKey[] = ["small", "medium", "large", "xlarge"];
 
@@ -221,12 +223,13 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "profile",
     color: "#F58220",
+    sourceUrl: "https://www.cjlogistics.com/ko/main",
     maxWeightKg: 20,
     maxSumCm: 160,
     extraWeightFeePerKg: 250,
     restrictionNote: "20kg 이하 · 3변 합 160cm 이하 · 지역별 할증 별도",
     estimateNote: "공개 운임표 비노출로 예약 화면 기준 추정 모델 적용",
-    rateBasis: "오네 예약 요금 비공개 구간 추정",
+    rateBasis: "공식 공개 운임표 미확인 · 오네 예약 기준 추정",
     sizeProfiles: buildProfiles(),
   },
   {
@@ -236,6 +239,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#004B8D",
+    sourceUrl: "https://www.hanjin.com/kor/CMS/Contents/Contents.do?mCode=MN130",
     maxWeightKg: 20,
     maxSumCm: 160,
     restrictionNote: "20kg 이하 · 3변 합 160cm 이하 · 타권/제주 추가",
@@ -255,6 +259,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#D9392E",
+    sourceUrl: "https://www.ilogen.com/web/personal/chargeInfo",
     maxWeightKg: 25,
     maxSumCm: 160,
     restrictionNote: "타권 +1,000원 · 제주 추가운임 · 25kg 이하",
@@ -274,6 +279,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#E85C2A",
+    sourceUrl: "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
     maxWeightKg: 30,
     maxSumCm: 160,
     restrictionNote: "30kg 이하 · 3변 합 160cm 이하 · 방문접수/익일배달은 별도",
@@ -294,6 +300,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#009B4E",
+    sourceUrl: "https://kdexp.com/service/charge/package_standard.do",
     maxWeightKg: 30,
     maxSumCm: 200,
     restrictionNote: "30kg 이하 · 3변 합 200cm 이하 · 지역별 편차 큼",
@@ -334,6 +341,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#E0002A",
+    sourceUrl: "https://www.lotteglogis.com/home/reservation/feeinfo/write",
     maxWeightKg: 20,
     maxSumCm: 160,
     restrictionNote: "동일구역 기준 · 타권/제주/고가품 할증 별도",
@@ -352,6 +360,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "convenience",
     pricingMode: "band",
     color: "#7A38D8",
+    sourceUrl: "https://www.cupost.co.kr/postbox/today/general/guidePrice.cupost",
     maxWeightKg: 30,
     maxSumCm: 160,
     restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 0~2kg +300원",
@@ -384,6 +393,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "convenience",
     pricingMode: "band",
     color: "#0085CA",
+    sourceUrl: "https://www.cvsnet.co.kr/service/national-delivery/use/contentsid/205/index.do",
     maxWeightKg: 20,
     maxSumCm: 160,
     restrictionNote: "동일권 기준 · 도서 +4,000원 · 착불 0~2kg +300원",
@@ -411,6 +421,23 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     ],
   },
 ];
+
+const SHIPPING_SOURCE_LABELS: Record<ShippingCarrierKey, string> = {
+  cj: "CJ대한통운 공식 사이트 · 공개 운임표 미확인",
+  hanjin: "한진 요금안내",
+  logen: "로젠 요금안내",
+  epost: "우체국 창구소포 요금안내",
+  kdexp: "경동 표준운임",
+  lotte: "롯데 택배요금조회/안내",
+  cu: "CUpost 국내택배 운임안내",
+  gs25: "GS Postbox 국내택배 안내",
+};
+
+export const SHIPPING_SOURCES = SHIPPING_CARRIERS.map(({ key, name, sourceUrl }) => ({
+  name,
+  url: sourceUrl,
+  basis: SHIPPING_SOURCE_LABELS[key],
+}));
 
 export function parseShippingWeight(value: number): number | null {
   if (!Number.isFinite(value)) return null;

@@ -8,8 +8,10 @@ export type CoupangMode = "marketplace" | "rocketGrowth";
 export type FulfillmentSize = "xs" | "small" | "medium" | "large" | "xl" | "xxl";
 
 export type MarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
-export type OwnStoreKey = "own_tosspay" | "own_naverpay" | "own_kakaopay" | "own_payco";
+export type OwnStoreKey = "own_tosspay" | "own_naverorder" | "own_naverpay" | "own_kakaopay" | "own_payco";
 export type CompareKey = MarketKey | OwnStoreKey;
+export type OwnStoreRateMap = Partial<Record<SmartStoreTier, number>>;
+export const VAT_MULTIPLIER = 1.1;
 
 export interface ChannelMeta {
   key: CompareKey;
@@ -28,21 +30,79 @@ export const MARKET_META: Record<MarketKey, ChannelMeta> = {
 
 export const MARKET_ORDER: MarketKey[] = ["smartstore", "coupang", "elevenst", "gmarket"];
 
-export const OWN_STORE_RATES: Record<OwnStoreKey, number> = {
-  own_tosspay: 0.034,
-  own_naverpay: 0.022,
-  own_kakaopay: 0.009,   // 파트너센터 공시 영세 0.9% (VAT 별도)
-  own_payco: 0.018,      // NHN커머스 기준 영세 1.8% (VAT 별도)
+export const OWN_STORE_RATES: Record<OwnStoreKey, OwnStoreRateMap> = {
+  // 공개 요금표는 일반 3.4%(VAT 별도)만 제공되고, 영중소 우대는 관리자 화면에서 별도 반영됨.
+  own_tosspay: { normal: 0.034 },
+  // 네이버페이 주문형 수수료 (매출등급별, VAT 포함) — 스마트스토어 주문관리 수수료와 동일 체계
+  own_naverorder: {
+    micro: 0.01947,
+    small1: 0.02563,
+    small2: 0.02728,
+    small3: 0.03003,
+    normal: 0.0363,
+  },
+  // 네이버페이 결제형 카드 수수료 (매출액 구간별, VAT 포함)
+  own_naverpay: {
+    micro: 0.0099,
+    small1: 0.01595,
+    small2: 0.0176,
+    small3: 0.02035,
+    normal: 0.0275,
+  },
+  // 카카오페이 온라인 쇼핑몰 단독 계약 기준 (매출액 구간별, VAT 별도)
+  own_kakaopay: {
+    micro: 0.009,
+    small1: 0.0145,
+    small2: 0.0215,
+    small3: 0.0235,
+    normal: 0.032,
+  },
+  // PAYCO는 공개 범위(1.8%~3.4%, VAT 별도)만 확인돼 상세 단계는 문의가 필요하다.
+  // 계산은 공개 하한/상한만 반영하고, 중간 구간은 보수적으로 상한 fallback을 사용한다.
+  own_payco: {
+    micro: 0.018,
+    normal: 0.034,
+  },
 };
 
 export const OWN_STORE_META: Record<OwnStoreKey, ChannelMeta> = {
   own_tosspay: { key: "own_tosspay", name: "자사몰 · 토스페이먼츠", shortName: "토스PG", color: "#0064FF" },
-  own_naverpay: { key: "own_naverpay", name: "자사몰 · 네이버페이", shortName: "N결제", color: "#0099B8" },
+  own_naverorder: { key: "own_naverorder", name: "자사몰 · 네이버페이 주문형", shortName: "N주문", color: "#03C75A" },
+  own_naverpay: { key: "own_naverpay", name: "자사몰 · 네이버페이 결제형", shortName: "N결제", color: "#03C75A" },
   own_kakaopay: { key: "own_kakaopay", name: "자사몰 · 카카오페이", shortName: "카카오", color: "#FFCD00" },
   own_payco: { key: "own_payco", name: "자사몰 · 페이코", shortName: "PAYCO", color: "#FA2828" },
 };
 
-export const OWN_STORE_ORDER: OwnStoreKey[] = ["own_tosspay", "own_naverpay", "own_kakaopay", "own_payco"];
+export const OWN_STORE_ORDER: OwnStoreKey[] = ["own_tosspay", "own_naverorder", "own_naverpay", "own_kakaopay", "own_payco"];
+
+const SMARTSTORE_TIER_ORDER: SmartStoreTier[] = ["micro", "small1", "small2", "small3", "normal"];
+const OWN_STORE_VAT_EXCLUSIVE_KEYS: OwnStoreKey[] = ["own_tosspay", "own_kakaopay", "own_payco"];
+
+export function resolveOwnStoreRate(gatewayKey: OwnStoreKey, tier: SmartStoreTier): number {
+  const rates = OWN_STORE_RATES[gatewayKey];
+  const requestedIndex = SMARTSTORE_TIER_ORDER.indexOf(tier);
+
+  for (let index = requestedIndex; index < SMARTSTORE_TIER_ORDER.length; index += 1) {
+    const candidate = rates[SMARTSTORE_TIER_ORDER[index]];
+    if (candidate != null) return candidate;
+  }
+
+  for (let index = requestedIndex - 1; index >= 0; index -= 1) {
+    const candidate = rates[SMARTSTORE_TIER_ORDER[index]];
+    if (candidate != null) return candidate;
+  }
+
+  throw new Error(`Missing own store rate config for ${gatewayKey}`);
+}
+
+export function isOwnStoreVatExclusive(gatewayKey: OwnStoreKey): boolean {
+  return OWN_STORE_VAT_EXCLUSIVE_KEYS.includes(gatewayKey);
+}
+
+export function resolveOwnStoreEffectiveRate(gatewayKey: OwnStoreKey, tier: SmartStoreTier): number {
+  const rate = resolveOwnStoreRate(gatewayKey, tier);
+  return isOwnStoreVatExclusive(gatewayKey) ? rate * VAT_MULTIPLIER : rate;
+}
 
 export const ALL_CHANNEL_META: Record<CompareKey, ChannelMeta> = {
   ...MARKET_META,
@@ -69,6 +129,15 @@ export const SMARTSTORE = {
   // 배송비에 주문관리 수수료만 적용 (판매 수수료 미적용)
   shippingFeeApplied: "orderFee" as const,
 } as const;
+
+// 스마트스토어 매출등급 구간 (연매출 기준)
+export const SMARTSTORE_TIER_THRESHOLDS: { tier: SmartStoreTier; maxRevenue: number }[] = [
+  { tier: "micro",  maxRevenue: 300_000_000 },   // 3억 이하
+  { tier: "small1", maxRevenue: 500_000_000 },   // 5억 이하
+  { tier: "small2", maxRevenue: 1_000_000_000 }, // 10억 이하
+  { tier: "small3", maxRevenue: 3_000_000_000 }, // 30억 이하
+  { tier: "normal", maxRevenue: Infinity },       // 30억 초과
+];
 
 // 스마트스토어 매출등급 라벨
 export const SMARTSTORE_TIER_LABELS: Record<SmartStoreTier, string> = {

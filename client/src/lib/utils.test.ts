@@ -26,6 +26,7 @@ describe("utils formatters", () => {
   it("formatPercent는 소수점 자릿수를 반영한다", () => {
     expect(formatPercent(0.1234)).toBe("12.3%");
     expect(formatPercent(0.1234, 2)).toBe("12.34%");
+    expect(formatPercent(0.0099, 2)).toBe("0.99%");
     expect(formatPercent(null)).toBe("-");
   });
 

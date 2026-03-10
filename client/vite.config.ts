@@ -29,9 +29,10 @@ export default defineConfig({
   server: {
     port: 6203,
   },
-  esbuild: {
-    drop: ["console", "debugger"],
-  },
+  esbuild:
+    process.env.NODE_ENV === "production"
+      ? { drop: ["console", "debugger"] }
+      : {},
   build: {
     outDir: "dist",
     sourcemap: false,
@@ -58,6 +59,7 @@ export default defineConfig({
         "/payment-compare",
         "/shipping-compare",
         "/about",
+        "/terms",
         "/privacy",
       ];
     },

@@ -6,14 +6,20 @@ import SEOHead from "@/components/common/SEOHead.vue";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
+import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
+import CopyTableButton from "@/components/common/CopyTableButton.vue";
+import SectionShareButton from "@/components/common/SectionShareButton.vue";
+import ShareModal from "@/components/share/ShareModal.vue";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { usePageShare } from "@/composables/usePageShare";
 import { BUILD_DATE } from "@/lib/buildMeta";
 import { DEFAULT_SITE_URL } from "@/lib/site";
 import {
   REMOTE_AREA_POSTAL_CODE_SUMMARY,
-  SHIPPING_DATA_UPDATED,
+  SHIPPING_DATA_VERIFIED,
   SHIPPING_SIZE_LABELS,
   SHIPPING_SIZE_ORDER,
+  SHIPPING_SOURCES,
   SHIPPING_WEIGHT_PRESETS,
   SHIPPING_CARRIERS,
   estimateShippingRates,
@@ -32,10 +38,26 @@ interface ShippingCompareColumn {
   nowrap?: boolean;
 }
 
+const SHIPPING_COMPARE_CARRIER_COL_WIDTH = "24rem";
+const SHIPPING_COMPARE_COL_WIDTHS: Record<ShippingCompareColumnKey, string> = {
+  baseFare: "8rem",
+  weightSurcharge: "6.5rem",
+  totalFare: "8rem",
+  limit: "9rem",
+};
+
+
 const seoTitle = "일반 택배 6사 · 편의점 택배 2사 택배비 비교";
 const seoDescription =
   "CJ대한통운, 한진, 로젠, 우체국, 경동, 롯데, CU, GS25의 예상 택배비를 무게와 크기 기준으로 비교합니다.";
 const pageUrl = `${DEFAULT_SITE_URL}/shipping-compare`;
+
+const share = usePageShare({
+  title: seoTitle,
+  description: seoDescription,
+  summaryText: "일반 택배 6사 · 편의점 택배 2사 예상 택배비 비교",
+  buttonLabel: "비교하러 가기",
+});
 
 const shippingCompareColumns: ShippingCompareColumn[] = [
   { key: "baseFare", label: "기본운임", nowrap: true },
@@ -73,7 +95,6 @@ const allResults = computed(() =>
 
 const generalResults = computed(() => allResults.value.filter((item) => item.carrier.category === "general"));
 const convenienceResults = computed(() => allResults.value.filter((item) => item.carrier.category === "convenience"));
-const cheapestOverall = computed(() => allResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestGeneral = computed(() => generalResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestConvenience = computed(() => convenienceResults.value.find((item) => item.isAvailable) ?? null);
 const cheapestGeneralLabel = computed(() => formatCheapestShippingLabel(cheapestGeneral.value));
@@ -262,6 +283,33 @@ function getPostalCodeCount(range: string): number {
   return end - start + 1;
 }
 
+const shippingCopyHeaders = ["택배사", ...shippingCompareColumns.map((c) => c.label)];
+
+function buildShippingCopyRows(results: ShippingEstimateResult[]): string[][] {
+  return results.map((r) => [
+    r.carrier.name,
+    ...shippingCompareColumns.map((col) => getShippingCellValue(col.key, r)),
+  ]);
+}
+
+const generalCopyRows = computed(() => buildShippingCopyRows(generalResults.value));
+const convenienceCopyRows = computed(() => buildShippingCopyRows(convenienceResults.value));
+
+const remoteAreaCopyHeaders = ["지역", "세부지역", "우편번호"];
+const remoteAreaCopyRows = computed(() => {
+  const rows: string[][] = [];
+  for (const group of REMOTE_AREA_POSTAL_CODE_SUMMARY) {
+    for (const cluster of group.clusters) {
+      rows.push([
+        group.group,
+        cluster.areas ? `${cluster.zone} (${cluster.areas})` : cluster.zone,
+        cluster.postalRanges.join(", "),
+      ]);
+    }
+  }
+  return rows;
+});
+
 function formatPostalRanges(ranges: string[]): string {
   return ranges.join(", ");
 }
@@ -273,9 +321,12 @@ function formatPostalRanges(ranges: string[]): string {
 
   <div class="container space-y-5 py-5">
     <div class="retro-panel overflow-hidden">
-      <div class="retro-titlebar flex-col items-start gap-2 rounded-t-2xl sm:flex-row sm:items-center sm:gap-3">
-        <h1 class="retro-title">택배비 비교</h1>
-        <FreshBadge :message="`${SHIPPING_DATA_UPDATED} 반영`" />
+      <div class="retro-titlebar rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <h1 class="retro-title">택배비 비교</h1>
+          <FreshBadge :message="`${SHIPPING_DATA_VERIFIED} 기준`" />
+        </div>
+        <SectionShareButton @click="share.openShare" />
       </div>
 
       <div class="retro-panel-content space-y-1.5">
@@ -336,7 +387,7 @@ function formatPostalRanges(ranges: string[]): string {
                       +
                     </Button>
                   </div>
-                  <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+                  <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
                     <Button
                       v-for="preset in SHIPPING_WEIGHT_PRESETS"
                       :key="preset"
@@ -410,13 +461,16 @@ function formatPostalRanges(ranges: string[]): string {
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-[11px] text-muted-foreground sm:text-body">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
-            <span
-              v-if="cheapestGeneralLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
-            >
-              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              현재 최저 예상 운임 {{ cheapestGeneralLabel }}
-            </span>
+            <div class="ml-auto flex flex-wrap items-center gap-2">
+              <span
+                v-if="cheapestGeneralLabel"
+                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+              >
+                <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                현재 최저 예상 운임 {{ cheapestGeneralLabel }}
+              </span>
+              <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="generalCopyRows" /></span>
+            </div>
           </div>
 
           <!-- 모바일: 카드 레이아웃 -->
@@ -424,36 +478,21 @@ function formatPostalRanges(ranges: string[]): string {
             <div
               v-for="result in generalResults"
               :key="`m-general-${result.carrier.key}`"
-              class="overflow-hidden rounded-2xl border bg-white"
+              class="overflow-hidden rounded-2xl border bg-card"
               :class="[
                 !result.isAvailable ? 'border-border/50 opacity-75' : cheapestGeneral?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
               ]"
             >
               <div class="flex items-center gap-2.5 px-3.5 py-3">
                 <span
-                  class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                  class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                   :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                   :style="{ backgroundColor: result.carrier.color }"
                 >
                   {{ result.carrier.shortName }}
                 </span>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="min-w-0 flex-1 truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
-                    <span
-                      v-if="cheapestGeneral?.carrier.key === result.carrier.key"
-                      class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
-                    >
-                      <BadgeCheck class="h-3.5 w-3.5" />
-                      최저
-                    </span>
-                    <span
-                      v-else-if="!result.isAvailable"
-                      class="inline-flex shrink-0 items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 sm:text-[11px]"
-                    >
-                      접수 불가
-                    </span>
-                  </div>
+                <div class="min-w-0 flex-1">
+                  <span class="block truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
                   <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
                 </div>
               </div>
@@ -488,19 +527,29 @@ function formatPostalRanges(ranges: string[]): string {
 
           <!-- 데스크톱: 테이블 레이아웃 -->
           <div class="hidden md:block">
-          <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-body">
+            <table class="w-full table-fixed text-body">
+              <colgroup>
+                <col :style="{ width: SHIPPING_COMPARE_CARRIER_COL_WIDTH }" />
+                <col
+                  v-for="col in shippingCompareColumns"
+                  :key="`general-col-${col.key}`"
+                  :style="{ width: SHIPPING_COMPARE_COL_WIDTHS[col.key] }"
+                />
+              </colgroup>
               <thead>
                 <tr class="border-b border-border/80 bg-card/95">
-                  <th class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">택배사</th>
+                  <th scope="col" class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-3.5">택배사</th>
                   <th
-                    v-for="col in shippingCompareColumns"
+                    scope="col"
+                    v-for="(col, colIdx) in shippingCompareColumns"
                     :key="`general-${col.key}`"
-                    class="whitespace-nowrap px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4"
+                    class="whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-2.5"
                   >
-                    {{ col.label }}
+                    <span v-if="colIdx === shippingCompareColumns.length - 1" class="flex w-full items-center justify-between gap-1.5">
+                      {{ col.label }}
+                      <CopyTableButton :headers="shippingCopyHeaders" :rows="generalCopyRows" />
+                    </span>
+                    <template v-else>{{ col.label }}</template>
                   </th>
                 </tr>
               </thead>
@@ -508,16 +557,16 @@ function formatPostalRanges(ranges: string[]): string {
                 <tr
                   v-for="result in generalResults"
                   :key="result.carrier.key"
-                  class="compare-hover-row border-b border-border/40 transition-colors"
+                  class="compare-hover-row border-b border-border/40 last:border-b-0 transition-colors"
                   :class="getShippingRowTone(result, cheapestGeneral?.carrier.key)"
                 >
                   <td
-                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-4"
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-3.5"
                     :class="getShippingStickyCellTone(result, cheapestGeneral?.carrier.key)"
                   >
                     <div class="flex items-center gap-2.5">
                       <span
-                        class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                         :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                         :style="{ backgroundColor: result.carrier.color }"
                       >
@@ -525,7 +574,7 @@ function formatPostalRanges(ranges: string[]): string {
                       </span>
                       <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
-                          <p class="text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
+                          <p class="min-w-0 truncate whitespace-nowrap text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
                             {{ result.carrier.name }}
                           </p>
                           <span
@@ -551,7 +600,7 @@ function formatPostalRanges(ranges: string[]): string {
                   <td
                     v-for="col in shippingCompareColumns"
                     :key="`${result.carrier.key}-${col.key}`"
-                    class="px-3 py-3 align-middle transition-colors sm:px-4"
+                    class="px-2 py-3 align-middle transition-colors sm:px-2.5"
                     :class="getShippingCellBg(col.key, result, cheapestGeneral?.carrier.key)"
                   >
                     <span class="inline-flex items-center gap-0.5">
@@ -577,7 +626,6 @@ function formatPostalRanges(ranges: string[]): string {
               </tbody>
             </table>
           </div>
-          </div>
         </div>
       </div>
     </section>
@@ -593,13 +641,16 @@ function formatPostalRanges(ranges: string[]): string {
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-[11px] text-muted-foreground sm:text-body">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
-            <span
-              v-if="cheapestConvenienceLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
-            >
-              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
-            </span>
+            <div class="ml-auto flex flex-wrap items-center gap-2">
+              <span
+                v-if="cheapestConvenienceLabel"
+                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+              >
+                <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
+              </span>
+              <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="convenienceCopyRows" /></span>
+            </div>
           </div>
 
           <!-- 모바일: 카드 레이아웃 -->
@@ -607,36 +658,21 @@ function formatPostalRanges(ranges: string[]): string {
             <div
               v-for="result in convenienceResults"
               :key="`m-conv-${result.carrier.key}`"
-              class="overflow-hidden rounded-2xl border bg-white"
+              class="overflow-hidden rounded-2xl border bg-card"
               :class="[
                 !result.isAvailable ? 'border-border/50 opacity-75' : cheapestConvenience?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
               ]"
             >
               <div class="flex items-center gap-2.5 px-3.5 py-3">
                 <span
-                  class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                  class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                   :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                   :style="{ backgroundColor: result.carrier.color }"
                 >
                   {{ result.carrier.shortName }}
                 </span>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-1.5">
-                    <span class="min-w-0 flex-1 truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
-                    <span
-                      v-if="cheapestConvenience?.carrier.key === result.carrier.key"
-                      class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
-                    >
-                      <BadgeCheck class="h-3.5 w-3.5" />
-                      최저
-                    </span>
-                    <span
-                      v-else-if="!result.isAvailable"
-                      class="inline-flex shrink-0 items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700 sm:text-[11px]"
-                    >
-                      접수 불가
-                    </span>
-                  </div>
+                <div class="min-w-0 flex-1">
+                  <span class="block truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
                   <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
                 </div>
               </div>
@@ -671,19 +707,29 @@ function formatPostalRanges(ranges: string[]): string {
 
           <!-- 데스크톱: 테이블 레이아웃 -->
           <div class="hidden md:block">
-          <p class="scroll-hint">표를 좌우로 밀면 다른 운임 항목을 계속 확인할 수 있습니다.</p>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-body">
+            <table class="w-full table-fixed text-body">
+              <colgroup>
+                <col :style="{ width: SHIPPING_COMPARE_CARRIER_COL_WIDTH }" />
+                <col
+                  v-for="col in shippingCompareColumns"
+                  :key="`convenience-col-${col.key}`"
+                  :style="{ width: SHIPPING_COMPARE_COL_WIDTHS[col.key] }"
+                />
+              </colgroup>
               <thead>
                 <tr class="border-b border-border/80 bg-card/95">
-                  <th class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">택배사</th>
+                  <th scope="col" class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-3.5">택배사</th>
                   <th
-                    v-for="col in shippingCompareColumns"
+                    scope="col"
+                    v-for="(col, colIdx) in shippingCompareColumns"
                     :key="`convenience-${col.key}`"
-                    class="whitespace-nowrap px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4"
+                    class="whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-2.5"
                   >
-                    {{ col.label }}
+                    <span v-if="colIdx === shippingCompareColumns.length - 1" class="flex w-full items-center justify-between gap-1.5">
+                      {{ col.label }}
+                      <CopyTableButton :headers="shippingCopyHeaders" :rows="convenienceCopyRows" />
+                    </span>
+                    <template v-else>{{ col.label }}</template>
                   </th>
                 </tr>
               </thead>
@@ -691,16 +737,16 @@ function formatPostalRanges(ranges: string[]): string {
                 <tr
                   v-for="result in convenienceResults"
                   :key="result.carrier.key"
-                  class="compare-hover-row border-b border-border/40 transition-colors"
+                  class="compare-hover-row border-b border-border/40 last:border-b-0 transition-colors"
                   :class="getShippingRowTone(result, cheapestConvenience?.carrier.key)"
                 >
                   <td
-                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-4"
+                    class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 align-middle transition-colors sm:px-3.5"
                     :class="getShippingStickyCellTone(result, cheapestConvenience?.carrier.key)"
                   >
                     <div class="flex items-center gap-2.5">
                       <span
-                        class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                        class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                         :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
                         :style="{ backgroundColor: result.carrier.color }"
                       >
@@ -708,7 +754,7 @@ function formatPostalRanges(ranges: string[]): string {
                       </span>
                       <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
-                          <p class="text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
+                          <p class="min-w-0 truncate whitespace-nowrap text-body font-semibold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">
                             {{ result.carrier.name }}
                           </p>
                           <span
@@ -734,7 +780,7 @@ function formatPostalRanges(ranges: string[]): string {
                   <td
                     v-for="col in shippingCompareColumns"
                     :key="`${result.carrier.key}-${col.key}`"
-                    class="px-3 py-3 align-middle transition-colors sm:px-4"
+                    class="px-2 py-3 align-middle transition-colors sm:px-2.5"
                     :class="getShippingCellBg(col.key, result, cheapestConvenience?.carrier.key)"
                   >
                     <span class="inline-flex items-center gap-0.5">
@@ -760,16 +806,20 @@ function formatPostalRanges(ranges: string[]): string {
               </tbody>
             </table>
           </div>
-          </div>
         </div>
       </div>
     </section>
+
+    <CompareSourceFooter :sources="SHIPPING_SOURCES" :updated-at="SHIPPING_DATA_VERIFIED" />
 
     <section>
       <details class="retro-panel overflow-hidden" :open="showRemoteAreaReference || undefined">
         <summary class="retro-titlebar rounded-t-2xl list-none cursor-pointer" @click.prevent="showRemoteAreaReference = !showRemoteAreaReference">
           <h2 class="retro-title">제주·도서산간 우편번호 정리표</h2>
-          <span class="retro-kbd">{{ showRemoteAreaReference ? "접기" : "열기" }}</span>
+          <div class="flex items-center gap-2">
+            <span v-if="showRemoteAreaReference" class="md:hidden"><CopyTableButton :headers="remoteAreaCopyHeaders" :rows="remoteAreaCopyRows" @click.stop /></span>
+            <span class="retro-kbd">{{ showRemoteAreaReference ? "접기" : "열기" }}</span>
+          </div>
         </summary>
 
         <div v-if="showRemoteAreaReference">
@@ -789,7 +839,7 @@ function formatPostalRanges(ranges: string[]): string {
                 <div
                   v-for="cluster in group.clusters"
                   :key="`${group.group}-${cluster.zone}`"
-                  class="rounded-xl border border-border/60 bg-white px-3 py-2.5"
+                  class="rounded-xl border border-border/60 bg-card px-3 py-2.5"
                 >
                   <div class="flex items-start justify-between gap-3">
                     <div>
@@ -804,12 +854,18 @@ function formatPostalRanges(ranges: string[]): string {
             </details>
           </div>
 
-          <div class="hidden overflow-x-auto px-4 pb-4 pt-4 md:block">
+          <div class="hidden px-4 pb-4 pt-4 md:block">
+            <div class="overflow-x-auto">
             <table class="w-full text-body leading-6">
               <thead>
                 <tr class="border-b border-border/80 bg-card/95">
-                  <th class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">지역</th>
-                  <th class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">우편번호</th>
+                  <th scope="col" class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">지역</th>
+                  <th scope="col" class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">
+                    <span class="flex w-full items-center justify-between gap-1.5">
+                      우편번호
+                      <CopyTableButton :headers="remoteAreaCopyHeaders" :rows="remoteAreaCopyRows" />
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -841,6 +897,7 @@ function formatPostalRanges(ranges: string[]): string {
                 </template>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </details>
@@ -860,5 +917,14 @@ function formatPostalRanges(ranges: string[]): string {
         </RouterLink>
       </div>
     </section>
+
+    <ShareModal
+      :show="share.showShareModal.value"
+      :kakao-busy="share.kakaoBusy.value"
+      :summary-text="share.summaryText"
+      @close="share.closeShare"
+      @share-kakao="share.shareKakao"
+      @copy-link="share.copyLink"
+    />
   </div>
 </template>

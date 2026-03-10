@@ -179,6 +179,7 @@ const jsonLd = computed(() => ({
         v-model:coupang-mode="calc.coupangMode.value"
         v-model:fulfillment-size="calc.fulfillmentSize.value"
         v-model:include-own-store="calc.includeOwnStore.value"
+        :monthly-qty="calc.monthlyQty.value"
       />
     </section>
 
@@ -193,7 +194,7 @@ const jsonLd = computed(() => ({
         <div
           v-for="(result, idx) in sortedResults"
           :key="`m-${result.marketKey}`"
-          class="overflow-hidden rounded-2xl border bg-white"
+          class="overflow-hidden rounded-2xl border bg-card"
           :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
         >
           <div class="flex items-center gap-2.5 px-3.5 py-3">
@@ -211,7 +212,10 @@ const jsonLd = computed(() => ({
             >
               {{ ALL_CHANNEL_META[result.marketKey].shortName }}
             </span>
-            <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+            <div class="min-w-0 flex-1">
+              <span class="block truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+              <span v-if="result.marketKey.startsWith('own_')" class="text-[10px] text-muted-foreground">등급 연동</span>
+            </div>
             <span
               v-if="idx === 0"
               class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
@@ -226,8 +230,8 @@ const jsonLd = computed(() => ({
               <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율</span>
-              <span class="text-[11px] font-semibold tabular-nums text-muted-foreground sm:text-caption">{{ formatPercent(result.totalFeeRate) }}</span>
+              <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
+              <span class="text-[11px] font-semibold tabular-nums text-muted-foreground sm:text-caption">{{ formatPercent(result.totalFeeRate, 2) }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
               <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
@@ -245,11 +249,11 @@ const jsonLd = computed(() => ({
         <table class="w-full text-body">
           <thead>
             <tr class="border-b border-border/80 bg-card/95">
-              <th class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
-              <th class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
-              <th class="w-28 whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground">총 수수료</th>
-              <th class="w-24 whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">수수료율</th>
-              <th class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">건당 순이익</th>
+              <th scope="col" class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
+              <th scope="col" class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
+              <th scope="col" class="w-28 whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground">총 수수료</th>
+              <th scope="col" class="w-24 whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">수수료율(VAT 포함)</th>
+              <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">건당 순이익</th>
             </tr>
           </thead>
           <tbody>
@@ -279,6 +283,7 @@ const jsonLd = computed(() => ({
                   </span>
                   <div class="flex items-center gap-1.5">
                     <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
+                    <span v-if="result.marketKey.startsWith('own_')" class="text-[10px] text-muted-foreground">(등급 연동)</span>
                     <span
                       v-if="idx === 0"
                       class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
@@ -293,7 +298,7 @@ const jsonLd = computed(() => ({
                 {{ formatWon(result.totalFee) }}
               </td>
               <td class="whitespace-nowrap px-3 py-3 text-right tabular-nums text-muted-foreground">
-                {{ formatPercent(result.totalFeeRate) }}
+                {{ formatPercent(result.totalFeeRate, 2) }}
               </td>
               <td class="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
                 {{ formatWon(result.netProfit) }}
@@ -312,7 +317,7 @@ const jsonLd = computed(() => ({
         </p>
       </div>
       <p v-if="calc.includeOwnStore.value" class="px-4 pb-3 text-tiny text-muted-foreground">
-        * 자사몰(PG) 비교는 카드 결제 수수료 중심입니다.
+        * 자사몰(PG) 비교는 카드 결제 수수료 중심이며, VAT 별도 PG는 VAT 포함 실부담으로 계산합니다.
         <br class="hidden sm:block" />
         트래픽 확보·호스팅 비용은 제외되며, 토스페이먼츠는 설정비 22만원과 연 이용료 11만원이 추가됩니다.
       </p>
