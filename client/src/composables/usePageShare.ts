@@ -14,11 +14,14 @@ interface PageShareOptions {
 export function usePageShare(options: PageShareOptions) {
   const showShareModal = ref(false);
   const kakaoBusy = ref(false);
+  const isBrowser = typeof window !== "undefined";
 
-  const page = window.location.pathname;
+  function getPage(): string {
+    return isBrowser ? window.location.pathname : "/";
+  }
 
   function openShare(): void {
-    trackEvent("ux_share_modal_open", { page });
+    trackEvent("ux_share_modal_open", { page: getPage() });
     showShareModal.value = true;
   }
 
@@ -27,20 +30,24 @@ export function usePageShare(options: PageShareOptions) {
   }
 
   async function copyLink(): Promise<void> {
+    if (!isBrowser) return;
+
     const url = window.location.href;
     const copied = await copyToClipboard(url);
     try {
       if (!copied) throw new Error("Clipboard API unavailable");
-      trackEvent("ux_share_link_copy_success", { page });
+      trackEvent("ux_share_link_copy_success", { page: getPage() });
       showAlert("링크가 복사되었습니다");
     } catch {
-      trackEvent("ux_share_link_copy_fail", { page });
+      trackEvent("ux_share_link_copy_fail", { page: getPage() });
       showAlert("링크 복사에 실패했습니다", { type: "error" });
     }
   }
 
   async function shareKakao(): Promise<void> {
     if (kakaoBusy.value) return;
+    if (!isBrowser) return;
+
     kakaoBusy.value = true;
 
     try {
@@ -63,9 +70,9 @@ export function usePageShare(options: PageShareOptions) {
           },
         ],
       });
-      trackEvent("ux_share_kakao_success", { page });
+      trackEvent("ux_share_kakao_success", { page: getPage() });
     } catch {
-      trackEvent("ux_share_kakao_fail", { page });
+      trackEvent("ux_share_kakao_fail", { page: getPage() });
       showAlert("카카오톡 공유에 실패했습니다", { type: "error" });
     } finally {
       kakaoBusy.value = false;

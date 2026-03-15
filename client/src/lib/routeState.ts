@@ -101,13 +101,18 @@ export function buildAbsoluteUrl(
 ): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const queryString = query ? toQueryString(buildQuery(query)) : "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   return queryString
-    ? `${window.location.origin}${normalizedPath}?${queryString}`
-    : `${window.location.origin}${normalizedPath}`;
+    ? `${origin}${normalizedPath}?${queryString}`
+    : `${origin}${normalizedPath}`;
 }
 
 export async function copyToClipboard(text: string): Promise<boolean> {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return false;
+  }
+
   if (window.isSecureContext && navigator.clipboard?.writeText) {
     try {
       await navigator.clipboard.writeText(text);

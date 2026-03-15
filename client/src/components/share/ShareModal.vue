@@ -20,9 +20,13 @@ function handleEscapeKey(event: KeyboardEvent): void {
   }
 }
 
+const isBrowser = typeof window !== "undefined";
+
 watch(
   () => props.show,
   (show) => {
+    if (!isBrowser) return;
+
     if (show) {
       window.addEventListener("keydown", handleEscapeKey);
       return;
@@ -34,6 +38,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
+  if (!isBrowser) return;
   window.removeEventListener("keydown", handleEscapeKey);
 });
 

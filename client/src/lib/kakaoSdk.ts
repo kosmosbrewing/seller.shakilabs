@@ -15,6 +15,10 @@ let kakaoSdkPromise: Promise<void> | null = null;
 
 /** Kakao SDK를 로드하고 초기화. 이미 로드된 경우 즉시 resolve */
 export async function ensureKakaoSdk(): Promise<void> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    throw new Error("Kakao SDK requires browser environment");
+  }
+
   if (window.Kakao) return;
   if (kakaoSdkPromise) return kakaoSdkPromise;
 
