@@ -115,6 +115,7 @@ const share = usePageShare({
 });
 
 function getReadableBadgeTextClass(marketKey: OpenMarketKey): string {
+  void marketKey;
   return "text-white";
 }
 

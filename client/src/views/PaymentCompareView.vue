@@ -162,6 +162,7 @@ const share = usePageShare({
 });
 
 function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: PaymentGatewayKey): string {
+  void cell;
   if (columnKey === "cardFee" && isLowestCardFeeGateway(gatewayKey)) {
     return "compare-cell-highlight";
   }

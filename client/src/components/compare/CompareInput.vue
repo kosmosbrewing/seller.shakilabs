@@ -29,7 +29,6 @@ import {
   type CoupangMode,
   type FulfillmentSize,
   type CategoryKey,
-  type OwnStoreKey,
 } from "@/data/marketFees";
 import { estimateTier } from "@/utils/calculator";
 import { parsePrice, parseShippingFee, PRICE_MIN, PRICE_MAX } from "@/lib/validators";
@@ -553,7 +552,7 @@ const ownStoreHintGroups = computed(() =>
             <CompareHint compact>
               <div class="space-y-2">
                 <p class="font-semibold text-foreground">PG사별 등급 수수료</p>
-                <div v-for="(group, gIdx) in ownStoreHintGroups" :key="group.name" class="mt-1.5">
+                <div v-for="group in ownStoreHintGroups" :key="group.name" class="mt-1.5">
                   <p class="text-[10px] font-semibold text-foreground mb-1">{{ group.name }}</p>
                   <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
                     <span v-for="row in group.rows" :key="row.tier" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
