@@ -1,0 +1,24 @@
+# 오픈마켓 판매자 수수료 비교 — shakilabs.com/seller
+
+> 스마트스토어, 쿠팡, 11번가, G마켓 등 주요 오픈마켓의 판매 수수료, 결제 수수료, 배송비를 한눈에 비교하는 무료 서비스입니다.
+
+## 사이트 정보
+
+- URL: https://shakilabs.com/seller
+- 언어: 한국어
+- 데이터 기준: 2026년 각 플랫폼 공식 수수료 정책
+
+## 주요 페이지
+
+- [수수료 비교](https://shakilabs.com/seller/market-compare): 카테고리별 오픈마켓 판매 수수료 비교
+- [결제 수수료 비교](https://shakilabs.com/seller/payment-compare): PG사·간편결제 수수료 비교
+- [배송비 비교](https://shakilabs.com/seller/shipping-compare): 택배사별 배송비·착불 요금 비교
+
+## 데이터 출처
+
+- 각 오픈마켓 공식 셀러센터 수수료 안내 페이지
+- PG사 공식 요금표
+
+## 연락처
+
+- 이메일: skdba1313@gmail.com

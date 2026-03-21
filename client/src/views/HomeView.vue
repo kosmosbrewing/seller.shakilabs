@@ -8,6 +8,7 @@ import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import CompareInput from "@/components/compare/CompareInput.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
+import RelatedServices from "@/components/common/RelatedServices.vue";
 import { ActionCard } from "@/components/ui/action-card";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
@@ -394,6 +395,8 @@ const jsonLd = computed(() => ({
     <section>
       <CompareFAQ />
     </section>
+
+    <RelatedServices />
 
     <AdSlot slot="bottom" />
 
