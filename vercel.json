@@ -29,5 +29,12 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/seller/assets/:path*", "destination": "/assets/:path*" },
+    { "source": "/seller/fonts/:path*", "destination": "/fonts/:path*" },
+    { "source": "/seller/favicon.png", "destination": "/favicon.png" },
+    { "source": "/seller/:path*", "destination": "/index.html" },
+    { "source": "/((?!assets|fonts|favicon|sitemap|robots).*)", "destination": "/index.html" }
   ]
 }
