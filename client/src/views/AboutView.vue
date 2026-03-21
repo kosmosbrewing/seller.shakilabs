@@ -13,7 +13,7 @@ const constantsStore = useConstantsStore();
 <template>
   <SEOHead
     title="서비스 안내"
-    description="seller.shakilabs.com은 스마트스토어, 쿠팡, 11번가, G마켓의 수수료를 무료로 비교하는 셀러 전용 도구입니다."
+    description="shakilabs.com/seller는 스마트스토어, 쿠팡, 11번가, G마켓의 수수료를 무료로 비교하는 셀러 전용 도구입니다."
   />
 
   <div class="container py-5 space-y-5">
@@ -25,7 +25,7 @@ const constantsStore = useConstantsStore();
       <div class="retro-panel-content space-y-4">
         <h2 class="text-heading font-bold">오픈마켓 수수료 비교 계산기</h2>
         <p class="text-body text-muted-foreground">
-          seller.shakilabs.com은 오픈마켓 셀러를 위한 무료 수수료 비교 도구입니다.
+          shakilabs.com/seller는 오픈마켓 셀러를 위한 무료 수수료 비교 도구입니다.
           같은 상품을 스마트스토어, 쿠팡, 11번가, G마켓/옥션에서 판매할 때
           수수료와 순이익이 얼마나 차이나는지 한눈에 비교할 수 있습니다.
         </p>

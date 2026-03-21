@@ -113,7 +113,7 @@ const jsonLd = computed(() => ({
   "@type": "WebApplication",
   "name": "오픈마켓 수수료 비교 계산기",
   "description": "스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교",
-  "url": "https://seller.shakilabs.com",
+  "url": "https://shakilabs.com/seller",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
