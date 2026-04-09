@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { SELLER_ABOUT_GUIDE, SELLER_HOME_GUIDE } from "@/data/seoGuides";
 import { RouterLink } from "vue-router";
 import { buttonVariants } from "@/components/ui/button";
 import { useConstantsStore } from "@/stores/constants";
@@ -63,5 +65,18 @@ const constantsStore = useConstantsStore();
         수수료 비교하기
       </RouterLink>
     </div>
+
+    <SeoRichGuide
+      :title="SELLER_ABOUT_GUIDE.title"
+      :intro="SELLER_ABOUT_GUIDE.intro"
+      :sections="SELLER_ABOUT_GUIDE.sections"
+      :disclaimer="SELLER_ABOUT_GUIDE.disclaimer"
+    />
+    <SeoRichGuide
+      :title="SELLER_HOME_GUIDE.title"
+      :intro="SELLER_HOME_GUIDE.intro"
+      :sections="SELLER_HOME_GUIDE.sections"
+      :faqs="SELLER_HOME_GUIDE.faqs"
+    />
   </div>
 </template>

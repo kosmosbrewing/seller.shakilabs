@@ -3,6 +3,8 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { BadgeAlert, BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { SELLER_MARKET_COMPARE_GUIDE } from "@/data/seoGuides";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
@@ -422,6 +424,14 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
       @close="share.closeShare"
       @share-kakao="share.shareKakao"
       @copy-link="share.copyLink"
+    />
+
+    <SeoRichGuide
+      :title="SELLER_MARKET_COMPARE_GUIDE.title"
+      :intro="SELLER_MARKET_COMPARE_GUIDE.intro"
+      :sections="SELLER_MARKET_COMPARE_GUIDE.sections"
+      :faqs="SELLER_MARKET_COMPARE_GUIDE.faqs"
+      :disclaimer="SELLER_MARKET_COMPARE_GUIDE.disclaimer"
     />
   </div>
 </template>

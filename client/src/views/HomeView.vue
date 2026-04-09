@@ -2,6 +2,8 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { ArrowRight, BadgeCheck, CreditCard, Medal, PackageCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { SELLER_HOME_GUIDE } from "@/data/seoGuides";
 import AdSlot from "@/components/common/AdSlot.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
@@ -407,6 +409,14 @@ const jsonLd = computed(() => ({
       @close="share.closeShare"
       @share-kakao="share.shareKakao"
       @copy-link="share.copyLink"
+    />
+
+    <SeoRichGuide
+      :title="SELLER_HOME_GUIDE.title"
+      :intro="SELLER_HOME_GUIDE.intro"
+      :sections="SELLER_HOME_GUIDE.sections"
+      :faqs="SELLER_HOME_GUIDE.faqs"
+      :disclaimer="SELLER_HOME_GUIDE.disclaimer"
     />
   </div>
 </template>

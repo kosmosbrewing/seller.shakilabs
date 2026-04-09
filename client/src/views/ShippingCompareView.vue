@@ -3,6 +3,8 @@ import { computed, ref, watch } from "vue";
 import { RouterLink } from "vue-router";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
+import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { SELLER_SHIPPING_GUIDE } from "@/data/seoGuides";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
@@ -925,6 +927,14 @@ function formatPostalRanges(ranges: string[]): string {
       @close="share.closeShare"
       @share-kakao="share.shareKakao"
       @copy-link="share.copyLink"
+    />
+
+    <SeoRichGuide
+      :title="SELLER_SHIPPING_GUIDE.title"
+      :intro="SELLER_SHIPPING_GUIDE.intro"
+      :sections="SELLER_SHIPPING_GUIDE.sections"
+      :faqs="SELLER_SHIPPING_GUIDE.faqs"
+      :disclaimer="SELLER_SHIPPING_GUIDE.disclaimer"
     />
   </div>
 </template>
