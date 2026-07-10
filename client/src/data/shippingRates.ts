@@ -76,8 +76,8 @@ export interface RemoteAreaPostalCodeSummaryGroup {
   clusters: RemoteAreaPostalCodeSummaryCluster[];
 }
 
-export const SHIPPING_DATA_UPDATED: string = "2026.03";
-export const SHIPPING_DATA_VERIFIED: string = "2026.03";
+export const SHIPPING_DATA_UPDATED: string = "2026.07";
+export const SHIPPING_DATA_VERIFIED: string = "2026.07";
 
 export const SHIPPING_WEIGHT_PRESETS = [1, 2, 3, 5, 10, 20] as const;
 
@@ -213,7 +213,7 @@ function buildBand(
   return { sizeKey, label, maxWeightKg, maxSumCm, fare };
 }
 
-// Verified against official public pages on 2026-03-07 where available.
+// 2026-07-10 기준 공식 공개 페이지와 대조했습니다.
 // For carriers without a directly indexed public tariff page, conservative estimate profiles are retained.
 export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
   {
@@ -223,11 +223,11 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "profile",
     color: "#F58220",
-    sourceUrl: "https://www.cjlogistics.com/ko/main",
-    maxWeightKg: 20,
+    sourceUrl: "https://www.cjlogistics.com/ko/utility/parcel-price",
+    maxWeightKg: 25,
     maxSumCm: 160,
     extraWeightFeePerKg: 250,
-    restrictionNote: "20kg 이하 · 3변 합 160cm 이하 · 지역별 할증 별도",
+    restrictionNote: "25kg 이하 · 3변 합 160cm 이하 · 곡물·서적류는 20kg 이하 · 지역별 할증 별도",
     estimateNote: "공개 운임표 비노출로 예약 화면 기준 추정 모델 적용",
     rateBasis: "공식 공개 운임표 미확인 · 오네 예약 기준 추정",
     sizeProfiles: buildProfiles(),
@@ -288,9 +288,12 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     rateBands: [
       buildBand("small", 3, 80, 2700),
       buildBand("medium", 5, 100, 3200),
+      buildBand("medium", 7, 100, 3700),
       buildBand("large", 10, 120, 4700),
-      buildBand("xlarge", 20, 160, 6700),
-      buildBand("xlarge", 30, 160, 8200),
+      buildBand("large", 15, 120, 5700),
+      buildBand("large", 20, 120, 6700),
+      buildBand("large", 25, 120, 9700),
+      buildBand("xlarge", 30, 160, 11700),
     ],
   },
   {
@@ -341,16 +344,16 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#E0002A",
-    sourceUrl: "https://www.lotteglogis.com/home/reservation/feeinfo/write",
+    sourceUrl: "https://lotteglogis.com/home/customs/faq?tab=0",
     maxWeightKg: 20,
     maxSumCm: 160,
     restrictionNote: "동일구역 기준 · 타권/제주/고가품 할증 별도",
     estimateNote: "롯데 택배요금조회·안내 기준",
     rateBasis: "롯데글로벌로지스 택배요금조회·안내",
     rateBands: [
-      buildBand("small", 5, 110, 5000),
-      buildBand("large", 15, 130, 6000),
-      buildBand("xlarge", 20, 160, 7000),
+      buildBand("small", 5, 110, 8000),
+      buildBand("large", 15, 130, 9000),
+      buildBand("xlarge", 20, 160, 10000),
     ],
   },
   {
