@@ -8,6 +8,18 @@ const projectRoot = resolve(__dirname, "..");
 const repositoryRoot = resolve(projectRoot, "..");
 const distRoot = resolve(projectRoot, "dist");
 const canonicalBase = "https://shakilabs.com/seller";
+const legacyRedirectSources = [
+  "/smartstore",
+  "/coupang",
+  "/11st",
+  "/gmarket",
+  "/clothing-fee-compare",
+  "/food-fee-compare",
+  "/electronics-fee-compare",
+  "/beauty-fee-compare",
+  "/living-fee-compare",
+  "/price/:amount",
+];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -22,6 +34,7 @@ function routeOutputPath(route) {
 function validateVercelConfig(configPath, expectedOutputDirectory) {
   const config = JSON.parse(readFileSync(configPath, "utf8"));
   const rewrites = config.rewrites ?? [];
+  const redirects = config.redirects ?? [];
   const routeRewrite = rewrites.find(
     (rewrite) => rewrite.source === "/seller/:path*"
   );
@@ -46,6 +59,15 @@ function validateVercelConfig(configPath, expectedOutputDirectory) {
     `${configPath}: seller root aliases must rewrite to root HTML`);
   assert(aliasRewrites.every((rewrite) => rewrites.indexOf(rewrite) < routeRewriteIndex),
     `${configPath}: seller aliases must precede the wildcard rewrite`);
+  assert(redirects.length === legacyRedirectSources.length * 2,
+    configPath + ": legacy redirect inventory is incomplete");
+  for (const source of legacyRedirectSources) {
+    for (const redirectSource of [source, "/seller" + source]) {
+      const redirect = redirects.find((candidate) => candidate.source === redirectSource);
+      assert(redirect?.destination === "/seller/market-compare" && redirect.permanent === true,
+        configPath + ": invalid legacy redirect for " + redirectSource);
+    }
+  }
 }
 
 function validateSitemap() {
