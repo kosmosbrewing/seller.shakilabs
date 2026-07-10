@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { ArrowRight, BadgeCheck, CreditCard, Medal, PackageCheck } from "lucide-vue-next";
+import { ShSurface, ShText } from "@shakilabs/ui";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { SELLER_HOME_GUIDE } from "@/data/seoGuides";
@@ -132,9 +133,9 @@ const jsonLd = computed(() => ({
   />
 
   <div class="container py-5 space-y-5">
-    <section class="retro-panel overflow-hidden">
+    <ShSurface as="section" padding="none" class="overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
-        <h1 class="retro-title">오픈마켓 수수료를 30초 안에 비교해보세요</h1>
+        <ShText as="h1" variant="title">오픈마켓 수수료를 30초 안에 비교해보세요</ShText>
       </div>
       <div class="retro-panel-content space-y-4">
         <p class="text-[11px] text-muted-foreground sm:text-body">
@@ -142,35 +143,35 @@ const jsonLd = computed(() => ({
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="retro-panel-muted p-3">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 1</p>
-            <p class="mt-1.5 text-body font-bold text-foreground">핵심 정보 3개 입력</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">
+            <ShText variant="label" tone="primary">입력</ShText>
+            <ShText class="mt-1.5" variant="heading">핵심 정보 3개 입력</ShText>
+            <ShText class="mt-1.5" variant="caption" tone="muted">
               판매가, 카테고리, 배송비만 넣으면
               <br class="hidden sm:block" />
               어디가 유리한지 바로 계산됩니다.
-            </p>
+            </ShText>
           </div>
           <div class="retro-panel-muted p-3">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 2</p>
-            <p class="mt-1.5 text-body font-bold text-foreground">최적 마켓 확인</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">
+            <ShText variant="label" tone="primary">비교</ShText>
+            <ShText class="mt-1.5" variant="heading">최적 마켓 확인</ShText>
+            <ShText class="mt-1.5" variant="caption" tone="muted">
               1위 마켓과 2위 차이 금액을
               <br class="hidden sm:block" />
               한 번에 확인할 수 있습니다.
-            </p>
+            </ShText>
           </div>
           <div class="retro-panel-muted p-3">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-primary">STEP 3</p>
-            <p class="mt-1.5 text-body font-bold text-foreground">상세표로 검증</p>
-            <p class="mt-1.5 text-caption text-muted-foreground">
+            <ShText variant="label" tone="primary">검토</ShText>
+            <ShText class="mt-1.5" variant="heading">상세표로 검증</ShText>
+            <ShText class="mt-1.5" variant="caption" tone="muted">
               상세 비교표와 월간 시뮬레이션으로
               <br class="hidden sm:block" />
               차이를 바로 검증할 수 있습니다.
-            </p>
+            </ShText>
           </div>
         </div>
       </div>
-    </section>
+    </ShSurface>
 
     <section id="input">
       <CompareInput
