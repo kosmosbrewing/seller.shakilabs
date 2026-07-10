@@ -53,7 +53,7 @@ export const NAVERPAY_COMPARISON: NaverPayCompareRow[] = [
 ];
 
 export const PAYMENT_DATA_UPDATED: string = "2026.03";
-export const PAYMENT_DATA_VERIFIED: string = "2026.03";
+export const PAYMENT_DATA_VERIFIED: string = "2026.07";
 const PAYMENT_GATEWAY_VAT_EXCLUSIVE_KEYS: PaymentGatewayKey[] = ["tosspayments", "kakaopay", "payco"];
 
 export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
