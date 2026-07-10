@@ -33,3 +33,5 @@ npm-debug.log*
 Thumbs.db
 
 client/artifacts/
+.vercel/
+client/.vercel/

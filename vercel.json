@@ -1,7 +1,11 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "installCommand": "cd client && npm ci",
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
     { "source": "/smartstore", "destination": "/market-compare", "permanent": true },
     { "source": "/coupang", "destination": "/market-compare", "permanent": true },
@@ -31,10 +35,8 @@
     }
   ],
   "rewrites": [
-    { "source": "/seller/assets/:path*", "destination": "/assets/:path*" },
-    { "source": "/seller/fonts/:path*", "destination": "/fonts/:path*" },
-    { "source": "/seller/favicon.png", "destination": "/favicon.png" },
-    { "source": "/seller/:path*", "destination": "/index.html" },
-    { "source": "/((?!assets|fonts|favicon|sitemap|robots).*)", "destination": "/index.html" }
+    { "source": "/seller", "destination": "/" },
+    { "source": "/seller/", "destination": "/" },
+    { "source": "/seller/:path*", "destination": "/:path*" }
   ]
 }
