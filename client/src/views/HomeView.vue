@@ -11,7 +11,7 @@ import CompareResults from "@/components/compare/CompareResults.vue";
 import CostAxisLinks from "@/components/compare/CostAxisLinks.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
-import RelatedServices from "@/components/common/RelatedServices.vue";
+import SellerRelatedActions from "@/components/seller/SellerRelatedActions.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { trackEvent } from "@/lib/analytics";
@@ -19,21 +19,15 @@ import { trackEvent } from "@/lib/analytics";
 const calc = useMarketFeeCalc();
 const share = useShare(calc);
 
-const sessionStartedAt = performance.now();
 const hasTrackedFirstInput = ref(false);
 const hasTrackedResultsViewed = ref(false);
 let resultsObserver: IntersectionObserver | null = null;
 
-function elapsedMs(): number {
-  return Math.round(performance.now() - sessionStartedAt);
-}
-
 function trackUxEvent(eventName: string, params?: Record<string, unknown>): void {
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   trackEvent(eventName, {
-    page: "home",
-    device: isMobile ? "mobile" : "desktop",
-    elapsed_ms: elapsedMs(),
+    app_id: "seller",
+    calculator_id: "market_fee_compare",
+    page_path: "/seller",
     ...params,
   });
 }
@@ -44,7 +38,10 @@ function openShareFromSummary(): void {
 }
 
 function trackCostAxisClick(target: "market" | "payment" | "shipping"): void {
-  trackUxEvent("ux_cost_axis_click", { target });
+  trackUxEvent("related_tool_click", {
+    to_tool: `seller_${target}`,
+    placement: "cost_axis",
+  });
 }
 
 watch(
@@ -65,11 +62,7 @@ watch(
     const hasChanged = nextValues.some((value, index) => value !== prevValues[index]);
     if (!hasChanged) return;
     hasTrackedFirstInput.value = true;
-    trackUxEvent("ux_first_input_completed", {
-      price: calc.price.value,
-      shipping_fee: calc.shippingFee.value,
-      category: calc.category.value,
-    });
+    trackUxEvent("calculator_start");
   }
 );
 
@@ -83,7 +76,7 @@ onMounted(() => {
         const entry = entries[0];
         if (!entry?.isIntersecting || hasTrackedResultsViewed.value) return;
         hasTrackedResultsViewed.value = true;
-        trackUxEvent("ux_results_viewed");
+        trackUxEvent("result_view", { result_type: "market_comparison" });
         resultsObserver?.disconnect();
         resultsObserver = null;
       },
@@ -142,6 +135,8 @@ const jsonLd = computed(() => ({
       @share="openShareFromSummary"
     />
 
+    <SellerRelatedActions />
+
     <AdSlot slot="top" label="광고" />
 
     <section id="simulation">
@@ -157,8 +152,6 @@ const jsonLd = computed(() => ({
     <section>
       <CompareFAQ />
     </section>
-
-    <RelatedServices />
 
     <AdSlot slot="bottom" />
 
