@@ -8,7 +8,7 @@ import { ShSurface, ShText } from "@shakilabs/ui";
       <ShText as="h1" variant="title">오픈마켓 수수료를 30초 안에 비교해보세요</ShText>
     </div>
     <div class="retro-panel-content space-y-4">
-      <p class="text-[11px] text-muted-foreground sm:text-body">
+      <p class="text-body text-muted-foreground">
         판매가, 카테고리, 배송비만 입력하면 스마트스토어/쿠팡/11번가/G마켓의 건당 수수료와 순이익을 바로 보여줍니다.
       </p>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">

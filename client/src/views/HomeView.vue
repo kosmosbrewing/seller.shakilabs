@@ -11,7 +11,7 @@ import CompareResults from "@/components/compare/CompareResults.vue";
 import CostAxisLinks from "@/components/compare/CostAxisLinks.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
-import RelatedServices from "@/components/common/RelatedServices.vue";
+import SellerRelatedServices from "@/components/seller/SellerRelatedServices.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { trackEvent } from "@/lib/analytics";
@@ -119,7 +119,7 @@ const jsonLd = computed(() => ({
     :json-ld="jsonLd"
   />
 
-  <div class="container py-5 space-y-5">
+  <div class="text-resize-layout container space-y-5 py-5">
     <CompareIntro />
 
     <section id="input">
@@ -158,7 +158,7 @@ const jsonLd = computed(() => ({
       <CompareFAQ />
     </section>
 
-    <RelatedServices />
+    <SellerRelatedServices />
 
     <AdSlot slot="bottom" />
 

@@ -18,14 +18,15 @@ export interface ChannelMeta {
   name: string;
   shortName: string;
   color: string;
+  foreground: string;
 }
 
 // 마켓 메타 정보
 export const MARKET_META: Record<MarketKey, ChannelMeta> = {
-  smartstore: { key: "smartstore", name: "스마트스토어", shortName: "네쇼", color: "#03C75A" },
-  coupang: { key: "coupang", name: "쿠팡", shortName: "쿠팡", color: "#E31937" },
-  elevenst: { key: "elevenst", name: "11번가", shortName: "11번", color: "#FF6B00" },
-  gmarket: { key: "gmarket", name: "G마켓/옥션", shortName: "G마켓", color: "#00B050" },
+  smartstore: { key: "smartstore", name: "스마트스토어", shortName: "네쇼", color: "#03C75A", foreground: "#102A1B" },
+  coupang: { key: "coupang", name: "쿠팡", shortName: "쿠팡", color: "#E31937", foreground: "#FFFFFF" },
+  elevenst: { key: "elevenst", name: "11번가", shortName: "11번", color: "#FF6B00", foreground: "#2B1600" },
+  gmarket: { key: "gmarket", name: "G마켓/옥션", shortName: "G마켓", color: "#00B050", foreground: "#102A1B" },
 };
 
 export const MARKET_ORDER: MarketKey[] = ["smartstore", "coupang", "elevenst", "gmarket"];
@@ -66,11 +67,11 @@ export const OWN_STORE_RATES: Record<OwnStoreKey, OwnStoreRateMap> = {
 };
 
 export const OWN_STORE_META: Record<OwnStoreKey, ChannelMeta> = {
-  own_tosspay: { key: "own_tosspay", name: "자사몰 · 토스페이먼츠", shortName: "토스PG", color: "#0064FF" },
-  own_naverorder: { key: "own_naverorder", name: "자사몰 · 네이버페이 주문형", shortName: "N주문", color: "#03C75A" },
-  own_naverpay: { key: "own_naverpay", name: "자사몰 · 네이버페이 결제형", shortName: "N결제", color: "#03C75A" },
-  own_kakaopay: { key: "own_kakaopay", name: "자사몰 · 카카오페이", shortName: "카카오", color: "#FFCD00" },
-  own_payco: { key: "own_payco", name: "자사몰 · 페이코", shortName: "PAYCO", color: "#FA2828" },
+  own_tosspay: { key: "own_tosspay", name: "자사몰 · 토스페이먼츠", shortName: "토스PG", color: "#0064FF", foreground: "#FFFFFF" },
+  own_naverorder: { key: "own_naverorder", name: "자사몰 · 네이버페이 주문형", shortName: "N주문", color: "#03C75A", foreground: "#102A1B" },
+  own_naverpay: { key: "own_naverpay", name: "자사몰 · 네이버페이 결제형", shortName: "N결제", color: "#03C75A", foreground: "#102A1B" },
+  own_kakaopay: { key: "own_kakaopay", name: "자사몰 · 카카오페이", shortName: "카카오", color: "#FFCD00", foreground: "#3B1E00" },
+  own_payco: { key: "own_payco", name: "자사몰 · 페이코", shortName: "PAYCO", color: "#FA2828", foreground: "#1F0A0A" },
 };
 
 export const OWN_STORE_ORDER: OwnStoreKey[] = ["own_tosspay", "own_naverorder", "own_naverpay", "own_kakaopay", "own_payco"];

@@ -38,25 +38,25 @@ const summaryDelta = computed(() => {
       <SectionShareButton @click="emit('share')" />
     </div>
 
-    <div class="space-y-3 px-3.5 py-3 md:hidden">
+    <div class="seller-mobile-list space-y-3 px-3.5 py-3 md:hidden">
       <div
         v-for="(result, idx) in sortedResults"
         :key="`m-${result.marketKey}`"
         class="overflow-hidden rounded-2xl border bg-card"
         :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
       >
-        <div class="flex items-center gap-2.5 px-3.5 py-3">
+        <div class="seller-result-header flex items-center gap-2.5 px-3.5 py-3">
           <span
-            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-semibold"
             :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
           >
             <Medal class="h-3.5 w-3.5" />
             {{ idx + 1 }}위
           </span>
           <span
-            class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+            class="seller-market-badge inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-xs font-bold"
             :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
-            :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
+            :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
           >
             {{ ALL_CHANNEL_META[result.marketKey].shortName }}
           </span>
@@ -64,31 +64,31 @@ const summaryDelta = computed(() => {
             <span class="block truncate text-body font-bold text-foreground">
               {{ ALL_CHANNEL_META[result.marketKey].name }}
             </span>
-            <span v-if="result.marketKey.startsWith('own_')" class="text-[10px] text-muted-foreground">등급 연동</span>
+            <span v-if="result.marketKey.startsWith('own_')" class="text-xs text-muted-foreground">등급 연동</span>
           </div>
           <span
             v-if="idx === 0"
-            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[10px] font-semibold text-white sm:text-[11px]"
+            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-xs font-semibold text-white"
           >
             <BadgeCheck class="h-3.5 w-3.5" />
             추천
           </span>
         </div>
-        <div class="space-y-0 border-t border-border/60">
+        <div class="seller-result-metrics space-y-0 border-t border-border/60">
           <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
-            <span class="text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
+            <span class="shrink-0 text-caption font-semibold text-muted-foreground">총 수수료</span>
+            <span class="text-caption font-semibold tabular-nums text-fee">{{ formatWon(result.totalFee) }}</span>
           </div>
           <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
-            <span class="text-[11px] font-semibold tabular-nums text-muted-foreground sm:text-caption">
+            <span class="shrink-0 text-caption font-semibold text-muted-foreground">수수료율(VAT 포함)</span>
+            <span class="text-caption font-semibold tabular-nums text-muted-foreground">
               {{ formatPercent(result.totalFeeRate, 2) }}
             </span>
           </div>
           <div class="flex items-center justify-between gap-3 px-3.5 py-2.5">
-            <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
+            <span class="shrink-0 text-caption font-semibold text-muted-foreground">건당 순이익</span>
             <span
-              class="text-[11px] font-bold tabular-nums sm:text-caption"
+              class="text-caption font-bold tabular-nums"
               :class="idx === 0 ? 'text-profit' : 'text-foreground'"
             >
               {{ formatWon(result.netProfit) }}
@@ -131,7 +131,7 @@ const summaryDelta = computed(() => {
                   <span
                     class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
                     :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
-                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
+                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
                   >
                     {{ ALL_CHANNEL_META[result.marketKey].shortName }}
                   </span>
