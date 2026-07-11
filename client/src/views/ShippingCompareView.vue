@@ -427,6 +427,9 @@ function formatPostalRanges(ranges: string[]): string {
                       {{ SHIPPING_SIZE_LABELS[sizeKey] }}
                     </Button>
                   </div>
+                  <label for="shipping-sum-input" class="text-caption font-semibold text-muted-foreground">
+                    상품 크기 3변 합
+                  </label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">cm</span>
                     <input
@@ -437,11 +440,12 @@ function formatPostalRanges(ranges: string[]): string {
                       class="retro-input pl-10 tabular-nums text-right"
                       :value="sumDisplay"
                       placeholder="3변 합"
+                      aria-describedby="shipping-sum-help"
                       @input="handleSumInput"
                       @blur="handleSumBlur"
                     />
                   </div>
-                  <p class="text-caption text-muted-foreground">
+                  <p id="shipping-sum-help" class="text-caption text-muted-foreground">
                     입력 시 자동으로 <span class="font-bold text-foreground">{{ resolvedSizeLabel }}</span> 구간을 적용합니다.
                   </p>
                 </div>

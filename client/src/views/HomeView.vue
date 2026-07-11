@@ -119,7 +119,7 @@ const jsonLd = computed(() => ({
     :json-ld="jsonLd"
   />
 
-  <div class="container py-5 space-y-5">
+  <div class="text-resize-layout container space-y-5 py-5">
     <CompareIntro />
 
     <section id="input">

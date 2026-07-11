@@ -1,0 +1,123 @@
+@media (max-width: 400px) {
+  .text-caption,
+  .text-tiny,
+  .text-xs,
+  [class*="text-[0.6"],
+  [class*="text-[0.7"],
+  [class*="text-[10px]"],
+  [class*="text-[11px]"],
+  [class~="!text-xs"] {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  main button,
+  main a[target="_blank"],
+  main a.underline,
+  main summary,
+  footer a {
+    min-height: 24px;
+  }
+
+  main a[target="_blank"],
+  main a.underline,
+  main summary,
+  footer a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  main button,
+  footer a {
+    min-width: 24px;
+  }
+
+  .text-resize-layout.container {
+    padding-inline: 12px;
+  }
+
+  .text-resize-layout .retro-panel-content,
+  .text-resize-layout .retro-titlebar {
+    padding-inline: 12px;
+  }
+
+  .text-resize-layout :is(h1, h2, h3, p, a, button, span, strong, label) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .text-resize-layout .seller-input-card {
+    padding: 12px;
+  }
+
+  .text-resize-layout .seller-step-index {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+  }
+
+  .text-resize-layout .seller-stepper {
+    gap: 6px;
+  }
+
+  .text-resize-layout .seller-stepper > button {
+    width: 44px;
+    min-width: 44px;
+  }
+
+  .text-resize-layout .seller-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .text-resize-layout .seller-shipping-presets > button {
+    min-width: 96px;
+  }
+
+  .text-resize-layout .seller-mobile-list {
+    padding: 12px;
+  }
+
+  .text-resize-layout .seller-result-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .text-resize-layout .seller-market-badge {
+    min-width: 64px;
+    height: 32px;
+  }
+
+  .text-resize-layout .seller-result-header .truncate {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .text-resize-layout .seller-result-header > .min-w-0 {
+    flex-basis: 100%;
+  }
+
+  .text-resize-layout .seller-result-metrics > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 8px 12px;
+  }
+
+  .text-resize-layout .seller-result-metrics .text-right {
+    text-align: left;
+  }
+
+  .text-resize-layout section > .retro-panel-content > .grid > a {
+    padding: 12px;
+  }
+
+  .text-resize-layout section > .retro-panel-content > .grid > a > div {
+    gap: 8px;
+  }
+}
+
+:root:not(.dark) nav[aria-label="주요 메뉴"] a {
+  color: white;
+}

@@ -208,15 +208,15 @@ const ownStoreHintGroups = computed(() =>
     <div class="retro-panel-content space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <!-- 판매가 카드 -->
-        <div class="rounded-xl border border-border/60 p-3">
+        <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
               <label for="price-input">판매가</label>
             </p>
           </div>
           <div class="mt-3 space-y-2">
-            <div class="flex items-stretch gap-1.5">
+            <div class="seller-stepper flex items-stretch gap-1.5">
               <Button
                 type="button"
                 variant="outline"
@@ -248,7 +248,7 @@ const ownStoreHintGroups = computed(() =>
                 +
               </Button>
             </div>
-            <div class="grid grid-cols-4 gap-1.5">
+            <div class="seller-quick-grid grid grid-cols-4 gap-1.5">
               <Button
                 v-for="preset in PRICE_QUICK"
                 :key="preset.value"
@@ -268,10 +268,10 @@ const ownStoreHintGroups = computed(() =>
         </div>
 
         <!-- 카테고리 카드 -->
-        <div class="rounded-xl border border-border/60 p-3">
+        <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
               <span>카테고리</span>
             </p>
           </div>
@@ -283,7 +283,7 @@ const ownStoreHintGroups = computed(() =>
               :variant="category === cat.key ? 'default' : 'outline'"
               size="chip"
               :class="[
-                'h-full justify-center gap-1 whitespace-nowrap px-1.5 text-center text-[11px] leading-tight',
+                  'h-full justify-center gap-1 whitespace-normal px-1.5 text-center text-xs leading-tight',
                 category === cat.key ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
               ]"
               @click="emit('update:category', cat.key)"
@@ -295,15 +295,15 @@ const ownStoreHintGroups = computed(() =>
         </div>
 
         <!-- 배송비 카드 -->
-        <div class="rounded-xl border border-border/60 p-3">
+        <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
               <label for="shipping-input">배송비</label>
             </p>
           </div>
           <div class="mt-3 space-y-2">
-            <div class="flex items-stretch gap-1.5">
+            <div class="seller-stepper flex items-stretch gap-1.5">
               <Button
                 type="button"
                 variant="outline"
@@ -335,7 +335,7 @@ const ownStoreHintGroups = computed(() =>
                 +
               </Button>
             </div>
-            <div class="flex flex-wrap gap-1.5">
+            <div class="seller-shipping-presets flex flex-wrap gap-1.5">
               <Button
                 v-for="sp in SHIPPING_PRESETS"
                 :key="sp.value"
@@ -575,7 +575,7 @@ const ownStoreHintGroups = computed(() =>
               :key="key"
               class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
               :class="key === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
-              :style="{ backgroundColor: OWN_STORE_META[key].color }"
+              :style="{ backgroundColor: OWN_STORE_META[key].color, color: OWN_STORE_META[key].foreground }"
             >
               {{ OWN_STORE_META[key].shortName }}
             </span>

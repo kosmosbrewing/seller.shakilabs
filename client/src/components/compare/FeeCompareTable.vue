@@ -70,7 +70,7 @@ const copyRows = computed(() =>
             <span
               class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
               :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
-              :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
+              :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
             >
               {{ ALL_CHANNEL_META[result.marketKey].shortName }}
             </span>
@@ -141,7 +141,7 @@ const copyRows = computed(() =>
                   <span
                     class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
                     :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
-                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
+                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
                   >
                     {{ ALL_CHANNEL_META[result.marketKey].shortName }}
                   </span>
