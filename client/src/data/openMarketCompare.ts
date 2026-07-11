@@ -45,7 +45,7 @@ export interface OpenMarketCompareMeta {
 }
 
 export const MARKET_COMPARE_UPDATED: string = "2025.10";
-export const MARKET_COMPARE_VERIFIED: string = "2026.03";
+export const MARKET_COMPARE_VERIFIED: string = "2026.07";
 
 export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
   {
@@ -54,7 +54,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shortName: "네쇼",
     color: "#03C75A",
     sourceName: "정산 기준 수수료율",
-    sourceUrl: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=15759",
+    sourceUrl: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=3558",
     microBusinessRate: 2.95,
     setupFee: {
       core: "무료",
@@ -260,7 +260,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
 export const OPEN_MARKET_SOURCES: Array<{ name: string; url: string; basis: string }> = [
   {
     name: "스마트스토어",
-    url: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=15759",
+    url: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=3558",
     basis: "정산 기준 수수료율",
   },
   {

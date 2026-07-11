@@ -229,6 +229,6 @@ export const MONTHLY_FEES: Partial<Record<MarketKey, { amount: number; threshold
   gmarket: { amount: 55_000, threshold: "월 판매 500만원 초과" },
 };
 
-// 수수료 데이터 최종 업데이트 날짜 (2025.10 인하 반영, 2026.03 재검증 — 변동 없음)
+// 수수료 데이터 최종 업데이트 날짜 (2025.10 인하 반영, 2026.07 재검증 — 변동 없음)
 export const FEE_DATA_UPDATED = "2025.10";
-export const FEE_DATA_VERIFIED = "2026.03";
+export const FEE_DATA_VERIFIED = "2026.07";
