@@ -137,7 +137,7 @@ const monthlySpread = computed(() => {
     <!-- 데스크톱: 테이블 레이아웃 -->
     <div class="hidden md:block">
     <div class="overflow-x-auto">
-      <table class="w-full table-fixed text-body">
+      <table aria-label="월별 판매 손익 시뮬레이션" class="w-full table-fixed text-body">
         <colgroup>
           <col class="w-[7%]" />
           <col />

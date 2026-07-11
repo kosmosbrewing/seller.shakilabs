@@ -221,7 +221,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                             <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                             <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
                             <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                            <table class="w-full text-[10px] tabular-nums">
+                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px] tabular-nums">
                               <tbody>
                                 <tr v-for="row in section.rows" :key="row.label" class="border-b border-border/20 last:border-0">
                                   <td class="py-1 pr-2">{{ row.label }}</td>
@@ -235,7 +235,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <!-- 마켓 특징 -->
                         <template v-if="market.noteFeatures">
                           <p class="font-semibold text-foreground">{{ market.name }} 특징</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px]">
                             <tbody>
                               <tr v-for="feat in market.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -264,7 +264,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
         <p class="scroll-hint">표를 좌우로 밀면 다른 비교 항목을 계속 확인할 수 있습니다.</p>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-body">
+          <table aria-label="오픈마켓 수수료 비교" class="w-full text-body">
             <thead>
               <tr class="border-b border-border/80 bg-card/95">
                 <th scope="col" class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">오픈마켓</th>
@@ -351,7 +351,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                             <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                             <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
                             <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                            <table class="w-full text-[10px] tabular-nums">
+                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px] tabular-nums">
                               <tbody>
                                 <tr v-for="row in section.rows" :key="row.label" class="border-b border-border/20 last:border-0">
                                   <td class="py-1 pr-2">{{ row.label }}</td>
@@ -365,7 +365,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <!-- 마켓 특징 -->
                         <template v-if="market.noteFeatures">
                           <p class="font-semibold text-foreground">{{ market.name }} 특징</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px]">
                             <tbody>
                               <tr v-for="feat in market.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>

@@ -261,7 +261,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 네이버: 결제형 vs 주문형 비교 -->
                         <template v-if="gateway.key === 'naverOrder' || gateway.key === 'naverPayment'">
                           <p class="font-semibold text-foreground">결제형 vs 주문형 차이점</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
                             <thead>
                               <tr class="border-b border-border/50">
                                 <th scope="col" class="pb-1.5 pr-1.5 text-left font-medium text-muted-foreground">구분</th>
@@ -282,7 +282,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 서비스 특징 -->
                         <template v-if="gateway.noteFeatures">
                           <p class="font-semibold text-foreground">{{ gateway.name }} 특징</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
                             <tbody>
                               <tr v-for="feat in gateway.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -311,7 +311,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
         <p class="scroll-hint">표를 좌우로 밀면 다른 비교 항목을 계속 확인할 수 있습니다.</p>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-body">
+          <table aria-label="온라인 결제 수수료 비교" class="w-full text-body">
             <thead>
               <tr class="border-b border-border/80 bg-card/95">
                 <th scope="col" class="sticky left-0 z-20 whitespace-nowrap bg-card px-3 py-3 text-left text-caption font-semibold text-muted-foreground sm:px-4">결제 서비스</th>
@@ -389,7 +389,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 네이버: 결제형 vs 주문형 비교 -->
                         <template v-if="gateway.key === 'naverOrder' || gateway.key === 'naverPayment'">
                           <p class="font-semibold text-foreground">결제형 vs 주문형 차이점</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
                             <thead>
                               <tr class="border-b border-border/50">
                                 <th scope="col" class="pb-1.5 pr-1.5 text-left font-medium text-muted-foreground">구분</th>
@@ -410,7 +410,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 서비스 특징 -->
                         <template v-if="gateway.noteFeatures">
                           <p class="font-semibold text-foreground">{{ gateway.name }} 특징</p>
-                          <table class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
                             <tbody>
                               <tr v-for="feat in gateway.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>

@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
+import {
+  ShBadge,
+  ShTable,
+  ShTableBody,
+  ShTableCell,
+  ShTableHead,
+  ShTableHeader,
+  ShTableRow,
+} from "@shakilabs/ui";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
 import { formatPercent, formatWon } from "@/lib/utils";
@@ -90,38 +99,37 @@ const summaryDelta = computed(() => {
     </div>
 
     <div class="hidden md:block">
-      <p class="scroll-hint">표를 좌우로 밀어 확인하세요.</p>
-      <div class="overflow-x-auto">
-        <table class="w-full text-body">
-          <thead>
-            <tr class="border-b border-border/80 bg-card/95">
-              <th scope="col" class="w-20 whitespace-nowrap px-4 py-3 text-left text-caption font-semibold text-muted-foreground">순위</th>
-              <th scope="col" class="px-4 py-3 text-left text-caption font-semibold text-muted-foreground">마켓</th>
-              <th scope="col" class="w-28 whitespace-nowrap px-2 py-3 text-left text-caption font-semibold text-muted-foreground">총 수수료</th>
-              <th scope="col" class="w-24 whitespace-nowrap px-3 py-3 text-right text-caption font-semibold text-muted-foreground">수수료율(VAT 포함)</th>
-              <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-caption font-semibold text-muted-foreground">건당 순이익</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
+      <ShTable
+        aria-label="판매 채널별 수수료와 순이익 비교 결과"
+        density="compact"
+        min-width="42rem"
+        scroll-hint="표를 좌우로 스크롤해 전체 채널을 확인하세요."
+      >
+        <ShTableHeader>
+          <ShTableRow>
+            <ShTableHead>순위</ShTableHead>
+            <ShTableHead>마켓</ShTableHead>
+            <ShTableHead numeric>총 수수료</ShTableHead>
+            <ShTableHead numeric>수수료율(VAT 포함)</ShTableHead>
+            <ShTableHead numeric>건당 순이익</ShTableHead>
+          </ShTableRow>
+        </ShTableHeader>
+        <ShTableBody>
+            <ShTableRow
               v-for="(result, idx) in sortedResults"
               :key="result.marketKey"
-              class="border-b border-border/40 transition-colors"
-              :class="idx === 0 ? 'bg-emerald-50/70 hover:bg-emerald-100/70 dark:bg-emerald-950/15 dark:hover:bg-emerald-950/25' : 'hover:bg-accent/30'"
+              :selected="idx === 0"
             >
-              <td class="whitespace-nowrap px-4 py-3">
-                <span
-                  class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                  :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
-                >
+              <ShTableCell>
+                <ShBadge :tone="idx === 0 ? 'success' : 'neutral'">
                   <Medal class="h-3.5 w-3.5" />
                   {{ idx + 1 }}위
-                </span>
-              </td>
-              <td class="px-4 py-3">
+                </ShBadge>
+              </ShTableCell>
+              <ShTableCell>
                 <div class="flex items-center gap-2.5">
                   <span
-                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
+                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
                     :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
                     :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color }"
                   >
@@ -130,32 +138,25 @@ const summaryDelta = computed(() => {
                   <div class="flex items-center gap-1.5">
                     <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
                     <span v-if="result.marketKey.startsWith('own_')" class="text-[10px] text-muted-foreground">(등급 연동)</span>
-                    <span
-                      v-if="idx === 0"
-                      class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
-                    >
+                    <ShBadge v-if="idx === 0" tone="success">
                       <BadgeCheck class="h-3.5 w-3.5" />
                       추천
-                    </span>
+                    </ShBadge>
                   </div>
                 </div>
-              </td>
-              <td class="whitespace-nowrap px-2 py-3 text-left font-semibold tabular-nums text-fee">
+              </ShTableCell>
+              <ShTableCell numeric class="font-semibold text-fee">
                 {{ formatWon(result.totalFee) }}
-              </td>
-              <td class="whitespace-nowrap px-3 py-3 text-right tabular-nums text-muted-foreground">
+              </ShTableCell>
+              <ShTableCell numeric class="text-muted-foreground">
                 {{ formatPercent(result.totalFeeRate, 2) }}
-              </td>
-              <td
-                class="whitespace-nowrap px-4 py-3 text-right font-bold tabular-nums"
-                :class="idx === 0 ? 'text-profit' : 'text-foreground'"
-              >
+              </ShTableCell>
+              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
                 {{ formatWon(result.netProfit) }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </ShTableCell>
+            </ShTableRow>
+        </ShTableBody>
+      </ShTable>
     </div>
 
     <div v-if="bestResult && runnerUp" class="border-t border-border/40 px-4 py-3">
