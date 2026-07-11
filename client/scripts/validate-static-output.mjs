@@ -130,7 +130,7 @@ function validateNotFound() {
   assert(/name="robots" content="noindex,nofollow"/.test(html),
     "404.html must be noindex,nofollow");
   assert(html.includes(">404<"), "404.html must render the recovery page");
-  assert(html.includes('href="/seller/"'),
+  assert(html.includes('href="/seller"'),
     "404.html must link back to an existing seller page");
 }
 

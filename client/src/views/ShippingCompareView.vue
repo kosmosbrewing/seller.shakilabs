@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { RouterLink } from "vue-router";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -914,9 +913,9 @@ function formatPostalRanges(ranges: string[]): string {
           <br class="hidden sm:block" />
           어디서 더 남는지 직접 계산해보세요.
         </p>
-        <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
-        </RouterLink>
+        </a>
       </div>
     </section>
 

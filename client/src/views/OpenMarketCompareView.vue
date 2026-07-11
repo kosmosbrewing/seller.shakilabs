@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { RouterLink } from "vue-router";
 import { BadgeAlert, BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -411,9 +410,9 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
           <br class="hidden sm:block" />
           어느 마켓이 가장 유리한지 바로 계산해보세요.
         </p>
-        <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
-        </RouterLink>
+        </a>
       </div>
     </section>
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { RouterLink } from "vue-router";
 import { BadgeAlert, BadgeCheck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -456,9 +455,9 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
           <br class="hidden sm:block" />
           PG 비용까지 합쳐서 직접 계산해보세요.
         </p>
-        <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
-        </RouterLink>
+        </a>
       </div>
     </section>
 

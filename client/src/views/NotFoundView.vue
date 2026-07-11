@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SEOHead from "@/components/common/SEOHead.vue";
-import { RouterLink } from "vue-router";
 import { buttonVariants } from "@/components/ui/button";
 </script>
 
@@ -17,8 +16,8 @@ import { buttonVariants } from "@/components/ui/button";
     <p class="text-body text-muted-foreground">
       마켓 수수료가 꼬였어요. 홈으로 돌아가볼까요?
     </p>
-    <RouterLink :class="[buttonVariants({ variant: 'default' }), 'mt-4']" to="/">
+    <a :class="[buttonVariants({ variant: 'default' }), 'mt-4']" href="/seller">
       홈으로 돌아가기
-    </RouterLink>
+    </a>
   </div>
 </template>

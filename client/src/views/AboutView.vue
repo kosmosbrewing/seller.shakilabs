@@ -2,7 +2,6 @@
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { SELLER_ABOUT_GUIDE, SELLER_HOME_GUIDE } from "@/data/seoGuides";
-import { RouterLink } from "vue-router";
 import { buttonVariants } from "@/components/ui/button";
 import { useConstantsStore } from "@/stores/constants";
 import { FEE_DATA_UPDATED, FEE_DATA_VERIFIED } from "@/data/marketFees";
@@ -61,9 +60,9 @@ const constantsStore = useConstantsStore();
     </div>
 
     <div class="text-center">
-      <RouterLink :class="buttonVariants({ variant: 'default' })" to="/">
+      <a :class="buttonVariants({ variant: 'default' })" href="/seller">
         수수료 비교하기
-      </RouterLink>
+      </a>
     </div>
 
     <SeoRichGuide
