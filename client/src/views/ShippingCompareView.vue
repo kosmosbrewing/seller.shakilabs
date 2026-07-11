@@ -432,6 +432,7 @@ function formatPostalRanges(ranges: string[]): string {
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-body text-muted-foreground">cm</span>
                     <input
                       id="shipping-sum-input"
+                      aria-label="가로·세로·높이 3변 합"
                       type="text"
                       inputmode="numeric"
                       class="retro-input pl-10 tabular-nums text-right"
@@ -529,7 +530,7 @@ function formatPostalRanges(ranges: string[]): string {
 
           <!-- 데스크톱: 테이블 레이아웃 -->
           <div class="hidden md:block">
-            <table class="w-full table-fixed text-body">
+            <table aria-label="택배비 서비스 비교" class="w-full table-fixed text-body">
               <colgroup>
                 <col :style="{ width: SHIPPING_COMPARE_CARRIER_COL_WIDTH }" />
                 <col
@@ -709,7 +710,7 @@ function formatPostalRanges(ranges: string[]): string {
 
           <!-- 데스크톱: 테이블 레이아웃 -->
           <div class="hidden md:block">
-            <table class="w-full table-fixed text-body">
+            <table aria-label="택배비 서비스 비교" class="w-full table-fixed text-body">
               <colgroup>
                 <col :style="{ width: SHIPPING_COMPARE_CARRIER_COL_WIDTH }" />
                 <col
@@ -858,7 +859,7 @@ function formatPostalRanges(ranges: string[]): string {
 
           <div class="hidden px-4 pb-4 pt-4 md:block">
             <div class="overflow-x-auto">
-            <table class="w-full text-body leading-6">
+            <table aria-label="택배비 서비스 비교" class="w-full text-body leading-6">
               <thead>
                 <tr class="border-b border-border/80 bg-card/95">
                   <th scope="col" class="px-3 py-1.5 text-left text-caption font-semibold text-muted-foreground sm:px-4">지역</th>
