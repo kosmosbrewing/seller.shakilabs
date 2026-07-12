@@ -5,7 +5,7 @@ import { ShSurface, ShText } from "@shakilabs/ui";
 <template>
   <ShSurface as="section" padding="none" class="overflow-hidden">
     <div class="retro-titlebar rounded-t-2xl">
-      <ShText as="h1" variant="title">오픈마켓 수수료를 30초 안에 비교해보세요</ShText>
+      <ShText as="h2" variant="title">30초 수수료 비교 안내</ShText>
     </div>
     <div class="retro-panel-content space-y-4">
       <p class="text-body text-muted-foreground">

@@ -10,6 +10,7 @@ import CompareHint from "@/components/common/CompareHint.vue";
 import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
+import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
@@ -176,10 +177,12 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
   <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
   <div class="container space-y-5 py-5">
+    <CalculatorPageHeader title="결제 서비스 수수료 비교" />
+
     <div class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
         <div class="flex items-center gap-2">
-          <h1 class="retro-title">결제 서비스 비교</h1>
+          <h2 class="retro-title">서비스별 비교 기준</h2>
           <FreshBadge :message="`${PAYMENT_DATA_VERIFIED} 기준`" />
         </div>
         <SectionShareButton @click="share.openShare" />
