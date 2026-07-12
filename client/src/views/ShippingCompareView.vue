@@ -10,6 +10,7 @@ import CompareHint from "@/components/common/CompareHint.vue";
 import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
+import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
@@ -321,10 +322,12 @@ function formatPostalRanges(ranges: string[]): string {
   <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
   <div class="container space-y-5 py-5">
+    <CalculatorPageHeader title="택배비 비교" />
+
     <div class="retro-panel overflow-hidden">
       <div class="retro-titlebar rounded-t-2xl">
         <div class="flex items-center gap-2">
-          <h1 class="retro-title">택배비 비교</h1>
+          <h2 class="retro-title">비교 기준 안내</h2>
           <FreshBadge :message="`${SHIPPING_DATA_VERIFIED} 기준`" />
         </div>
         <SectionShareButton @click="share.openShare" />

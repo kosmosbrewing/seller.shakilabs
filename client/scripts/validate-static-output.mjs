@@ -107,6 +107,7 @@ function validatePublicRoutes() {
     const actualCanonical = html.match(
       /<link rel="canonical" href="([^"]+)"\s*\/?>/
     )?.[1];
+    const h1Count = html.match(/<h1\b/gi)?.length ?? 0;
 
     assert(actualTitle, `Missing title for ${route}`);
     assert(!titles.has(actualTitle), `Duplicate title for ${route}: ${actualTitle}`);
@@ -115,6 +116,9 @@ function validatePublicRoutes() {
     assert(!/name="robots" content="noindex/.test(html),
       `Public route must be indexable: ${route}`);
     assert(html.includes('id="app"'), `Missing app root for ${route}`);
+    assert(h1Count === 1, `Expected one H1 for ${route}, found ${h1Count}`);
+    assert(!/<noscript>/i.test(html),
+      `Rendered route must not retain the shell noscript for ${route}`);
     assert(!rawDocuments.has(html), `Duplicate raw HTML for ${route}`);
 
     titles.add(actualTitle);

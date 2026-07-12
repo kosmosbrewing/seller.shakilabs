@@ -12,6 +12,7 @@ import CostAxisLinks from "@/components/compare/CostAxisLinks.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
 import SellerRelatedServices from "@/components/seller/SellerRelatedServices.vue";
+import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { trackEvent } from "@/lib/analytics";
@@ -120,6 +121,8 @@ const jsonLd = computed(() => ({
   />
 
   <div class="text-resize-layout container space-y-5 py-5">
+    <CalculatorPageHeader title="오픈마켓 수수료 계산기" />
+
     <CompareIntro />
 
     <section id="input">
