@@ -221,7 +221,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
             class="overflow-hidden rounded-2xl border bg-card"
             :class="isLowestCardFeeGateway(gateway.key) ? 'border-profit/40' : 'border-border/70'"
           >
-            <div class="flex items-center gap-2.5 px-3.5 py-3">
+            <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
               <span
                 class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                 :class="getGatewayBadgeTextClass(gateway.key)"
@@ -229,7 +229,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
               >
                 {{ gateway.shortName }}
               </span>
-              <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ gateway.name }}</span>
+              <span class="compare-mobile-entity-name min-w-0 flex-1 text-body font-bold text-foreground">{{ gateway.name }}</span>
             </div>
             <div class="space-y-0 border-t border-border/60">
               <div
@@ -455,7 +455,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
           <br class="hidden sm:block" />
           PG 비용까지 합쳐서 직접 계산해보세요.
         </p>
-        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
+        <a class="w-full min-w-0 max-w-full whitespace-normal text-center sm:w-auto" :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
         </a>
       </div>

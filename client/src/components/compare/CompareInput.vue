@@ -248,7 +248,7 @@ const ownStoreHintGroups = computed(() =>
                 +
               </Button>
             </div>
-            <div class="seller-quick-grid grid grid-cols-4 gap-1.5">
+            <div class="seller-quick-grid grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-1.5">
               <Button
                 v-for="preset in PRICE_QUICK"
                 :key="preset.value"
@@ -275,7 +275,7 @@ const ownStoreHintGroups = computed(() =>
               <span>카테고리</span>
             </p>
           </div>
-          <div class="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+          <div class="grid mt-3 grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-1.5">
             <Button
               v-for="cat in CATEGORIES"
               :key="cat.key"
@@ -283,7 +283,7 @@ const ownStoreHintGroups = computed(() =>
               :variant="category === cat.key ? 'default' : 'outline'"
               size="chip"
               :class="[
-                  'h-full justify-center gap-1 whitespace-normal px-1.5 text-center text-xs leading-tight',
+                  'h-full justify-center gap-1 whitespace-nowrap px-1.5 text-center text-xs leading-tight',
                 category === cat.key ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
               ]"
               @click="emit('update:category', cat.key)"

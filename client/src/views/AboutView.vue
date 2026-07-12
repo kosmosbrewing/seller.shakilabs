@@ -32,7 +32,7 @@ const constantsStore = useConstantsStore();
         </p>
 
         <h2 class="text-heading font-bold">주요 기능</h2>
-        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+        <ul class="about-feature-list text-body text-muted-foreground space-y-1 list-disc list-inside">
           <li>4개 마켓 수수료 즉시 비교 (로그인/연동 불필요)</li>
           <li>카테고리별, 매출등급별, 판매방식별 세분화 계산</li>
           <li>월간/연간 시뮬레이션으로 장기 비용 차이 확인</li>
@@ -40,7 +40,7 @@ const constantsStore = useConstantsStore();
         </ul>
 
         <h2 class="text-heading font-bold">수수료 데이터 기준</h2>
-        <ul class="text-body text-muted-foreground space-y-1 list-disc list-inside">
+        <ul class="about-feature-list text-body text-muted-foreground space-y-1 list-disc list-inside">
           <li>마켓 수수료: {{ FEE_DATA_UPDATED }} 변경 · {{ FEE_DATA_VERIFIED }} 공식 문서 재검증</li>
           <li>결제 수수료: {{ PAYMENT_DATA_UPDATED }} 변경 · {{ PAYMENT_DATA_VERIFIED }} 공식 문서 재검증</li>
           <li>택배비: {{ SHIPPING_DATA_UPDATED }} 변경 · {{ SHIPPING_DATA_VERIFIED }} 공식 문서 재검증</li>

@@ -172,7 +172,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
             class="overflow-hidden rounded-2xl border bg-card"
             :class="market.key === lowestFeeMarket ? 'border-profit/40' : 'border-border/70'"
           >
-            <div class="flex items-center gap-2.5 px-3.5 py-3">
+            <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
               <span
                 class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                 :class="getReadableBadgeTextClass(market.key)"
@@ -180,7 +180,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
               >
                 {{ market.shortName }}
               </span>
-              <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ market.name }}</span>
+              <span class="compare-mobile-entity-name min-w-0 flex-1 text-body font-bold text-foreground">{{ market.name }}</span>
             </div>
             <div class="space-y-0 border-t border-border/60">
               <div
@@ -410,7 +410,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
           <br class="hidden sm:block" />
           어느 마켓이 가장 유리한지 바로 계산해보세요.
         </p>
-        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
+        <a class="w-full min-w-0 max-w-full whitespace-normal text-center sm:w-auto" :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
         </a>
       </div>

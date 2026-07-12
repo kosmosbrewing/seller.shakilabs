@@ -489,7 +489,7 @@ function formatPostalRanges(ranges: string[]): string {
                 !result.isAvailable ? 'border-border/50 opacity-75' : cheapestGeneral?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
               ]"
             >
-              <div class="flex items-center gap-2.5 px-3.5 py-3">
+              <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
                 <span
                   class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                   :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
@@ -497,8 +497,8 @@ function formatPostalRanges(ranges: string[]): string {
                 >
                   {{ result.carrier.shortName }}
                 </span>
-                <div class="min-w-0 flex-1">
-                  <span class="block truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
+                <div class="compare-mobile-entity-copy min-w-0 flex-1">
+                  <span class="compare-mobile-entity-name block text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
                   <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
                 </div>
               </div>
@@ -669,7 +669,7 @@ function formatPostalRanges(ranges: string[]): string {
                 !result.isAvailable ? 'border-border/50 opacity-75' : cheapestConvenience?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
               ]"
             >
-              <div class="flex items-center gap-2.5 px-3.5 py-3">
+              <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
                 <span
                   class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
                   :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
@@ -677,8 +677,8 @@ function formatPostalRanges(ranges: string[]): string {
                 >
                   {{ result.carrier.shortName }}
                 </span>
-                <div class="min-w-0 flex-1">
-                  <span class="block truncate text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
+                <div class="compare-mobile-entity-copy min-w-0 flex-1">
+                  <span class="compare-mobile-entity-name block text-body font-bold" :class="result.isAvailable ? 'text-foreground' : 'text-muted-foreground'">{{ result.carrier.name }}</span>
                   <p class="text-tiny text-muted-foreground">{{ result.effectiveSizeLabel }} 구간</p>
                 </div>
               </div>
@@ -918,7 +918,7 @@ function formatPostalRanges(ranges: string[]): string {
           <br class="hidden sm:block" />
           어디서 더 남는지 직접 계산해보세요.
         </p>
-        <a :class="buttonVariants({ variant: 'default' })" href="/seller">
+        <a class="w-full min-w-0 max-w-full whitespace-normal text-center sm:w-auto" :class="buttonVariants({ variant: 'default' })" href="/seller">
           수수료 계산기 사용하기
         </a>
       </div>

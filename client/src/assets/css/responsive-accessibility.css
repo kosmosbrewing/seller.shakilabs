@@ -1,3 +1,8 @@
+.tabular-nums {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
 @media (max-width: 400px) {
   .text-caption,
   .text-tiny,
@@ -32,7 +37,8 @@
     min-width: 24px;
   }
 
-  .text-resize-layout.container {
+  .text-resize-layout.container,
+  .text-resize-layout .container {
     padding-inline: 12px;
   }
 
@@ -41,9 +47,48 @@
     padding-inline: 12px;
   }
 
-  .text-resize-layout :is(h1, h2, h3, p, a, button, span, strong, label) {
+  .text-resize-layout :is(h1, h2, h3, h4) {
+    min-width: 0;
+    overflow-wrap: break-word;
+    text-wrap-style: balance;
+    word-break: keep-all;
+  }
+
+  .text-resize-layout :is(p, li, dt, dd) {
     min-width: 0;
     overflow-wrap: anywhere;
+    text-wrap-style: pretty;
+  }
+
+  .text-resize-layout .about-feature-list > li {
+    text-wrap-style: balance;
+  }
+
+  .retro-link[href^="mailto:"] {
+    overflow-wrap: anywhere;
+  }
+
+  .text-resize-layout button.inline-flex {
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+
+  .text-resize-layout .compare-mobile-entity-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .text-resize-layout .compare-mobile-entity-copy,
+  .text-resize-layout .compare-mobile-entity-name {
+    width: 100%;
+  }
+
+  .text-resize-layout .compare-mobile-entity-name {
+    overflow: visible;
+    overflow-wrap: break-word;
+    text-overflow: clip;
+    white-space: normal;
+    word-break: keep-all;
   }
 
   .text-resize-layout .seller-input-card {
