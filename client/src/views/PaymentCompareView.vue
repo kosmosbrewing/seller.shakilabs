@@ -11,6 +11,7 @@ import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
+import PaymentFeeChart from "@/components/seller/PaymentFeeChart.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
@@ -448,6 +449,8 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
         <CompareSourceFooter :sources="PAYMENT_SOURCES" :updated-at="PAYMENT_DATA_VERIFIED" />
       </div>
     </div>
+
+    <PaymentFeeChart />
 
     <AdSlot slot="payment-compare" label="결제 서비스 비교 페이지 광고" />
 
