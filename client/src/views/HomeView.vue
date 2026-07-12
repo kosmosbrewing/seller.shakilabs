@@ -13,6 +13,8 @@ import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
 import SellerRelatedServices from "@/components/seller/SellerRelatedServices.vue";
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
+import MonthlySimulationChart from "@/components/seller/MonthlySimulationChart.vue";
+import SellerFeeResultCharts from "@/components/seller/SellerFeeResultCharts.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { trackEvent } from "@/lib/analytics";
@@ -145,6 +147,8 @@ const jsonLd = computed(() => ({
       @share="openShareFromSummary"
     />
 
+    <SellerFeeResultCharts :results="calc.results.value" />
+
     <AdSlot slot="top" label="광고" />
 
     <section id="simulation">
@@ -154,6 +158,8 @@ const jsonLd = computed(() => ({
         v-model:monthly-qty="calc.monthlyQty.value"
       />
     </section>
+
+    <MonthlySimulationChart :results="calc.monthlySimResults.value" />
 
     <CostAxisLinks @select="trackCostAxisClick" />
 

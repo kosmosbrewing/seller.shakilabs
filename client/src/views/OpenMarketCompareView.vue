@@ -11,6 +11,7 @@ import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
+import OpenMarketFeeChart from "@/components/seller/OpenMarketFeeChart.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
@@ -403,6 +404,8 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
         <CompareSourceFooter :sources="OPEN_MARKET_SOURCES" :updated-at="MARKET_COMPARE_VERIFIED" />
       </div>
     </div>
+
+    <OpenMarketFeeChart />
 
     <AdSlot slot="market-compare" label="오픈마켓 비교 페이지 광고" />
 

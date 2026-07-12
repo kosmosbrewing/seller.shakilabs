@@ -11,6 +11,7 @@ import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
+import ShippingFareChart from "@/components/seller/ShippingFareChart.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
@@ -458,6 +459,11 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
       </div>
     </section>
+
+    <ShippingFareChart
+      :general-results="generalResults"
+      :convenience-results="convenienceResults"
+    />
 
     <section id="shipping-general-results">
       <div class="retro-panel overflow-hidden">
