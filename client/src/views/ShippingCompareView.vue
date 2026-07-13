@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -76,6 +77,14 @@ const showRemoteAreaReference = ref(false);
 
 const weightDisplay = ref(String(weightKg.value));
 const sumDisplay = ref(sumCm.value != null ? String(sumCm.value) : "");
+const shippingWeightOptions = SHIPPING_WEIGHT_PRESETS.map((value) => ({
+  label: `${value}kg`,
+  value,
+}));
+const shippingSizeOptions = SHIPPING_SIZE_ORDER.map((value) => ({
+  label: SHIPPING_SIZE_LABELS[value],
+  value,
+}));
 
 watch(weightKg, (value) => {
   weightDisplay.value = String(value);
@@ -392,20 +401,11 @@ function formatPostalRanges(ranges: string[]): string {
                       +
                     </Button>
                   </div>
-                  <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                    <Button
-                      v-for="preset in SHIPPING_WEIGHT_PRESETS"
-                      :key="preset"
-                      type="button"
-                      :variant="weightKg === preset ? 'default' : 'outline'"
-                      size="chip"
-                      class="justify-center px-0"
-                      :class="weightKg === preset ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'"
-                      @click="weightKg = preset"
-                    >
-                      {{ preset }}kg
-                    </Button>
-                  </div>
+                  <ShPresetGroup
+                    v-model="weightKg"
+                    :options="shippingWeightOptions"
+                    label="배송 무게 빠른 선택"
+                  />
                 </div>
               </div>
 
@@ -417,20 +417,12 @@ function formatPostalRanges(ranges: string[]): string {
                   </p>
                 </div>
                 <div class="mt-3 max-w-[18rem] space-y-2">
-                  <div class="grid grid-cols-4 gap-1.5">
-                    <Button
-                      v-for="sizeKey in SHIPPING_SIZE_ORDER"
-                      :key="sizeKey"
-                      type="button"
-                      :variant="resolvedSize === sizeKey ? 'default' : 'outline'"
-                      size="chip"
-                      class="justify-center px-0"
-                      :class="resolvedSize === sizeKey ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'"
-                      @click="selectSize(sizeKey)"
-                    >
-                      {{ SHIPPING_SIZE_LABELS[sizeKey] }}
-                    </Button>
-                  </div>
+                  <ShPresetGroup
+                    :model-value="resolvedSize"
+                    :options="shippingSizeOptions"
+                    label="배송 크기 선택"
+                    @update:model-value="selectSize"
+                  />
                   <label for="shipping-sum-input" class="text-caption font-semibold text-muted-foreground">
                     상품 크기 3변 합
                   </label>
