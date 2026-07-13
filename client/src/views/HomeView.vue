@@ -15,6 +15,7 @@ import SellerRelatedServices from "@/components/seller/SellerRelatedServices.vue
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
 import MonthlySimulationChart from "@/components/seller/MonthlySimulationChart.vue";
 import SellerFeeResultCharts from "@/components/seller/SellerFeeResultCharts.vue";
+import SellerRelatedActions from "@/components/seller/SellerRelatedActions.vue";
 import { useMarketFeeCalc } from "@/composables/useMarketFeeCalc";
 import { useShare } from "@/composables/useShare";
 import { trackEvent } from "@/lib/analytics";
@@ -22,21 +23,15 @@ import { trackEvent } from "@/lib/analytics";
 const calc = useMarketFeeCalc();
 const share = useShare(calc);
 
-const sessionStartedAt = performance.now();
 const hasTrackedFirstInput = ref(false);
 const hasTrackedResultsViewed = ref(false);
 let resultsObserver: IntersectionObserver | null = null;
 
-function elapsedMs(): number {
-  return Math.round(performance.now() - sessionStartedAt);
-}
-
 function trackUxEvent(eventName: string, params?: Record<string, unknown>): void {
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
   trackEvent(eventName, {
-    page: "home",
-    device: isMobile ? "mobile" : "desktop",
-    elapsed_ms: elapsedMs(),
+    app_id: "seller",
+    calculator_id: "market_fee_compare",
+    page_path: "/seller",
     ...params,
   });
 }
@@ -47,7 +42,10 @@ function openShareFromSummary(): void {
 }
 
 function trackCostAxisClick(target: "market" | "payment" | "shipping"): void {
-  trackUxEvent("ux_cost_axis_click", { target });
+  trackUxEvent("related_tool_click", {
+    to_tool: `seller_${target}`,
+    placement: "cost_axis",
+  });
 }
 
 watch(
@@ -68,11 +66,7 @@ watch(
     const hasChanged = nextValues.some((value, index) => value !== prevValues[index]);
     if (!hasChanged) return;
     hasTrackedFirstInput.value = true;
-    trackUxEvent("ux_first_input_completed", {
-      price: calc.price.value,
-      shipping_fee: calc.shippingFee.value,
-      category: calc.category.value,
-    });
+    trackUxEvent("calculator_start");
   }
 );
 
@@ -86,7 +80,7 @@ onMounted(() => {
         const entry = entries[0];
         if (!entry?.isIntersecting || hasTrackedResultsViewed.value) return;
         hasTrackedResultsViewed.value = true;
-        trackUxEvent("ux_results_viewed");
+        trackUxEvent("result_view", { result_type: "market_comparison" });
         resultsObserver?.disconnect();
         resultsObserver = null;
       },
@@ -148,6 +142,8 @@ const jsonLd = computed(() => ({
     />
 
     <SellerFeeResultCharts :results="calc.results.value" />
+
+    <SellerRelatedActions />
 
     <AdSlot slot="top" label="광고" />
 

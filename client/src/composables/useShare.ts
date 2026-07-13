@@ -23,11 +23,10 @@ export function useShare(ctx: ShareContext) {
 
   function trackShareEvent(eventName: string, params?: Record<string, unknown>): void {
     trackEvent(eventName, {
-      page: "home",
-      price: ctx.price.value,
-      category: ctx.category.value,
-      monthly_qty: ctx.monthlyQty.value,
-      best_market: ctx.bestMarket.value?.marketKey ?? "unknown",
+      app_id: "seller",
+      calculator_id: "market_fee_compare",
+      page_path: "/seller",
+      result_type: ctx.bestMarket.value?.marketKey ?? "unknown",
       ...params,
     });
   }
