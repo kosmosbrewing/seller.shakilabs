@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/components/ui/accordion";
 import { useHead } from "@unhead/vue";
+import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import { MONTHLY_FEES } from "@/data/marketFees";
 
 const monthlyFeeText = computed(() => {
@@ -73,21 +68,5 @@ useHead(() => ({
 </script>
 
 <template>
-  <div class="retro-panel overflow-hidden">
-    <div class="retro-titlebar rounded-t-2xl">
-      <h2 class="retro-title">자주 묻는 질문</h2>
-    </div>
-    <div class="retro-panel-content">
-      <Accordion type="single" collapsible>
-        <AccordionItem v-for="(faq, idx) in faqs" :key="idx" :value="`faq-${idx}`">
-          <AccordionTrigger class="text-caption text-left">
-            {{ faq.q }}
-          </AccordionTrigger>
-          <AccordionContent>
-            {{ faq.a }}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  </div>
+  <FaqAccordionPanel :items="faqs" />
 </template>
