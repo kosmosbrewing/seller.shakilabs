@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { BadgeCheck, Medal } from "lucide-vue-next";
 import { formatWon } from "@/lib/utils";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
 import { QTY_PRESETS } from "@/data/pricePresets";
-import { Button } from "@/components/ui/button";
 
 import { parseMonthlyQty } from "@/lib/validators";
 import type { MonthlySimResult } from "@/utils/calculator";
@@ -68,18 +68,12 @@ const monthlySpread = computed(() => {
           />
           <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-tiny text-muted-foreground">건</span>
         </div>
-        <div class="flex flex-wrap gap-1">
-          <Button
-            v-for="preset in QTY_PRESETS"
-            :key="preset.value"
-            type="button"
-            :variant="monthlyQty === preset.value ? 'default' : 'outline'"
-            size="chipSm"
-            @click="emit('update:monthlyQty', preset.value)"
-          >
-            {{ preset.label }}
-          </Button>
-        </div>
+        <ShPresetGroup
+          :model-value="monthlyQty"
+          :options="QTY_PRESETS"
+          label="월 판매 건수 빠른 선택"
+          @update:model-value="emit('update:monthlyQty', $event)"
+        />
       </div>
     </div>
 

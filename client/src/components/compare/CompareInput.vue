@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
+import { ShPresetGroup } from "@shakilabs/ui";
 import { ChevronDown } from "lucide-vue-next";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import CompareHint from "@/components/common/CompareHint.vue";
@@ -58,16 +59,35 @@ const emit = defineEmits<{
 
 const showAdvanced = ref(false);
 
-// 마켓별 브랜드 칩 활성 스타일
-const smartstoreChipActive = "border-market-smartstore bg-market-smartstore text-white hover:border-market-smartstore hover:bg-market-smartstore/90 hover:text-white active:border-market-smartstore active:bg-market-smartstore/95 active:text-white";
-const coupangChipActive = "border-market-coupang bg-market-coupang text-white hover:border-market-coupang hover:bg-market-coupang/90 hover:text-white active:border-market-coupang active:bg-market-coupang/95 active:text-white";
-
 const SHIPPING_PRESETS = [
   { value: 0, label: "무료배송" },
   { value: 3000, label: "3,000원" },
   { value: 5000, label: "5,000원" },
 ] as const;
 const SHIPPING_STEP_UNIT = 1_000;
+const categoryOptions = CATEGORIES.map((category) => ({
+  label: `${category.emoji} ${category.label}`,
+  value: category.key,
+}));
+
+function labelOptions<T extends string>(labels: Record<T, string>): Array<{ label: string; value: T }> {
+  return Object.entries(labels).map(([value, label]) => ({
+    label: String(label),
+    value: value as T,
+  }));
+}
+
+const smartstoreTierOptions = computed(() =>
+  labelOptions(SMARTSTORE_TIER_LABELS).map((option) => ({
+    ...option,
+    label: option.value === tierEstimation.value.recommendedTier
+      ? `${option.label} · 추천`
+      : option.label,
+  })),
+);
+const smartstoreSourceOptions = labelOptions(SMARTSTORE_SOURCE_LABELS);
+const coupangModeOptions = labelOptions(COUPANG_MODE_LABELS);
+const fulfillmentSizeOptions = labelOptions(FULFILLMENT_SIZE_LABELS);
 
 // 가격 입력 처리 (콤마 포맷)
 const priceDisplay = ref(props.price.toLocaleString("ko-KR"));
@@ -248,22 +268,12 @@ const ownStoreHintGroups = computed(() =>
                 +
               </Button>
             </div>
-            <div class="seller-quick-grid grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-1.5">
-              <Button
-                v-for="preset in PRICE_QUICK"
-                :key="preset.value"
-                type="button"
-                :variant="price === preset.value ? 'default' : 'outline'"
-                size="chip"
-                :class="[
-                  'w-full justify-center px-0',
-                  price === preset.value ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
-                ]"
-                @click="emit('update:price', preset.value)"
-              >
-                {{ preset.label }}
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="price"
+              :options="PRICE_QUICK"
+              label="판매가 빠른 선택"
+              @update:model-value="emit('update:price', $event)"
+            />
           </div>
         </div>
 
@@ -275,23 +285,13 @@ const ownStoreHintGroups = computed(() =>
               <span>카테고리</span>
             </p>
           </div>
-          <div class="grid mt-3 grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-1.5">
-            <Button
-              v-for="cat in CATEGORIES"
-              :key="cat.key"
-              type="button"
-              :variant="category === cat.key ? 'default' : 'outline'"
-              size="chip"
-              :class="[
-                  'h-full justify-center gap-1 whitespace-nowrap px-1.5 text-center text-xs leading-tight',
-                category === cat.key ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
-              ]"
-              @click="emit('update:category', cat.key)"
-            >
-              <span class="leading-none">{{ cat.emoji }}</span>
-              <span>{{ cat.label }}</span>
-            </Button>
-          </div>
+          <ShPresetGroup
+            :model-value="category"
+            :options="categoryOptions"
+            label="상품 카테고리 선택"
+            class="mt-3"
+            @update:model-value="emit('update:category', $event)"
+          />
         </div>
 
         <!-- 배송비 카드 -->
@@ -335,22 +335,12 @@ const ownStoreHintGroups = computed(() =>
                 +
               </Button>
             </div>
-            <div class="seller-shipping-presets flex flex-wrap gap-1.5">
-              <Button
-                v-for="sp in SHIPPING_PRESETS"
-                :key="sp.value"
-                type="button"
-                :variant="shippingFee === sp.value ? 'default' : 'outline'"
-                size="chip"
-                :class="[
-                  'min-w-[4.5rem] flex-1 justify-center',
-                  shippingFee === sp.value ? 'text-white hover:text-white active:text-white' : 'active:text-foreground'
-                ]"
-                @click="emit('update:shippingFee', sp.value)"
-              >
-                {{ sp.label }}
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="shippingFee"
+              :options="SHIPPING_PRESETS"
+              label="배송비 빠른 선택"
+              @update:model-value="emit('update:shippingFee', $event)"
+            />
           </div>
         </div>
       </div>
@@ -414,29 +404,12 @@ const ownStoreHintGroups = computed(() =>
               <br />
               <span>&middot; 추정 연매출 {{ formatRevenue(tierEstimation.estimatedRevenue) }} ({{ props.price.toLocaleString("ko-KR") }}원 &times; {{ props.monthlyQty }}건 &times; 12개월)</span>
             </p>
-            <div class="flex flex-wrap gap-1.5">
-              <Button
-                v-for="(label, key) in SMARTSTORE_TIER_LABELS"
-                :key="key"
-                type="button"
-                variant="outline"
-                size="chip"
-                :class="smartstoreTier === key ? smartstoreChipActive : ''"
-                class="relative"
-                @click="emit('update:smartstoreTier', key as SmartStoreTier)"
-              >
-                {{ label }}
-                <span
-                  v-if="key === tierEstimation.recommendedTier"
-                  class="ml-1 inline-flex items-center rounded-full px-1.5 py-px text-[9px] font-bold"
-                  :class="smartstoreTier === key
-                    ? 'bg-white/90 text-market-smartstore'
-                    : 'bg-market-smartstore text-white'"
-                >
-                  추천
-                </span>
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="smartstoreTier"
+              :options="smartstoreTierOptions"
+              label="매출등급 선택"
+              @update:model-value="emit('update:smartstoreTier', $event)"
+            />
           </div>
 
           <!-- 스마트스토어 유입 경로 -->
@@ -444,19 +417,12 @@ const ownStoreHintGroups = computed(() =>
             <label class="block text-caption font-semibold text-foreground mb-1">
               스마트스토어 유입 경로
             </label>
-            <div class="flex flex-wrap gap-1.5">
-              <Button
-                v-for="(label, key) in SMARTSTORE_SOURCE_LABELS"
-                :key="key"
-                type="button"
-                variant="outline"
-                size="chip"
-                :class="smartstoreSource === key ? smartstoreChipActive : ''"
-                @click="emit('update:smartstoreSource', key as SmartStoreSource)"
-              >
-                {{ label }}
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="smartstoreSource"
+              :options="smartstoreSourceOptions"
+              label="스마트스토어 유입 경로 선택"
+              @update:model-value="emit('update:smartstoreSource', $event)"
+            />
           </div>
 
           <!-- 쿠팡 판매 방식 -->
@@ -486,19 +452,12 @@ const ownStoreHintGroups = computed(() =>
                 </div>
               </CompareHint>
             </label>
-            <div class="flex flex-wrap gap-1.5">
-              <Button
-                v-for="(label, key) in COUPANG_MODE_LABELS"
-                :key="key"
-                type="button"
-                variant="outline"
-                size="chip"
-                :class="coupangMode === key ? coupangChipActive : ''"
-                @click="emit('update:coupangMode', key as CoupangMode)"
-              >
-                {{ label }}
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="coupangMode"
+              :options="coupangModeOptions"
+              label="쿠팡 판매 방식 선택"
+              @update:model-value="emit('update:coupangMode', $event)"
+            />
           </div>
 
           <!-- 로켓그로스 물류 크기 (쿠팡 로켓그로스 선택 시) -->
@@ -506,19 +465,12 @@ const ownStoreHintGroups = computed(() =>
             <label class="block text-caption font-semibold text-foreground mb-1">
               로켓그로스 물류 크기
             </label>
-            <div class="flex flex-wrap gap-1.5">
-              <Button
-                v-for="(label, key) in FULFILLMENT_SIZE_LABELS"
-                :key="key"
-                type="button"
-                variant="outline"
-                size="chip"
-                :class="fulfillmentSize === key ? coupangChipActive : ''"
-                @click="emit('update:fulfillmentSize', key as FulfillmentSize)"
-              >
-                {{ label }}
-              </Button>
-            </div>
+            <ShPresetGroup
+              :model-value="fulfillmentSize"
+              :options="fulfillmentSizeOptions"
+              label="로켓그로스 물류 크기 선택"
+              @update:model-value="emit('update:fulfillmentSize', $event)"
+            />
           </div>
 
         </div>
