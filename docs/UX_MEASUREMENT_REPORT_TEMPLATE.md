@@ -1,7 +1,7 @@
 # UX Measurement Report Template (ISSUE-11)
 
 ## 1) Scope
-- Service: seller.shakilabs.com
+- Service: https://shakilabs.com/seller
 - Measurement period: YYYY-MM-DD ~ YYYY-MM-DD (7 days)
 - Segment:
   - Device: mobile / desktop
