@@ -4,6 +4,7 @@ import { ShPresetGroup } from "@shakilabs/ui";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { buildFaqPageJsonLd } from "@/composables/useSEO";
 import { SELLER_SHIPPING_GUIDE } from "@/data/seoGuides";
 import FreshBadge from "@/components/common/FreshBadge.vue";
 import AdSlot from "@/components/common/AdSlot.vue";
@@ -170,6 +171,8 @@ const jsonLd = computed(() => [
       "name": "ShakiLabs",
     },
   },
+  // 화면 하단 SeoRichGuide에 노출되는 FAQ와 동일 텍스트 (페이지당 FAQPage 1개)
+  ...buildFaqPageJsonLd(SELLER_SHIPPING_GUIDE.faqs),
 ]);
 
 function handleWeightInput(event: Event): void {
