@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
+import { buildFaqPageJsonLd } from "@/composables/useSEO";
 import { SELLER_ABOUT_GUIDE, SELLER_HOME_GUIDE } from "@/data/seoGuides";
 import { buttonVariants } from "@/components/ui/button";
 import { useConstantsStore } from "@/stores/constants";
@@ -9,12 +10,16 @@ import { PAYMENT_DATA_UPDATED, PAYMENT_DATA_VERIFIED } from "@/data/paymentGatew
 import { SHIPPING_DATA_UPDATED, SHIPPING_DATA_VERIFIED } from "@/data/shippingRates";
 
 const constantsStore = useConstantsStore();
+
+// 페이지 하단 SeoRichGuide에 노출되는 SELLER_HOME_GUIDE FAQ와 동일 텍스트 (페이지당 FAQPage 1개)
+const jsonLd = buildFaqPageJsonLd(SELLER_HOME_GUIDE.faqs);
 </script>
 
 <template>
   <SEOHead
     title="서비스 안내"
     description="shakilabs.com/seller는 스마트스토어, 쿠팡, 11번가, G마켓의 수수료를 무료로 비교하는 셀러 전용 도구입니다."
+    :json-ld="jsonLd"
   />
 
   <div class="container py-5 space-y-5">

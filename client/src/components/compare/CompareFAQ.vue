@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useHead } from "@unhead/vue";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
+import { buildFaqPageJsonLd } from "@/composables/useSEO";
 import { MONTHLY_FEES } from "@/data/marketFees";
 
 const monthlyFeeText = computed(() => {
@@ -42,28 +43,13 @@ const faqs = computed(() => [
   },
 ]);
 
-// FAQ JSON-LD (FAQPage 구조화 데이터)
-const faqJsonLd = computed(() => ({
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqs.value.map((faq) => ({
-    "@type": "Question",
-    "name": faq.q,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.a,
-    },
-  })),
-}));
-
+// FAQ JSON-LD (FAQPage 구조화 데이터) — 공용 빌더 재사용으로 스키마 형식을 단일화
 useHead(() => ({
-  script: [
-    {
-      key: "faq-json-ld",
-      type: "application/ld+json",
-      textContent: JSON.stringify(faqJsonLd.value),
-    },
-  ],
+  script: buildFaqPageJsonLd(faqs.value).map((entry) => ({
+    key: "faq-json-ld",
+    type: "application/ld+json",
+    textContent: JSON.stringify(entry),
+  })),
 }));
 </script>
 
