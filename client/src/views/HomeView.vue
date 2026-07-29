@@ -160,7 +160,7 @@ const jsonLd = computed(() => ({
     <CostAxisLinks @select="trackCostAxisClick" />
 
     <section>
-      <CompareFAQ />
+      <CompareFAQ :extra="SELLER_HOME_GUIDE.faqs" />
     </section>
 
     <SellerRelatedServices />
@@ -179,9 +179,7 @@ const jsonLd = computed(() => ({
     <SeoRichGuide
       :title="SELLER_HOME_GUIDE.title"
       :intro="SELLER_HOME_GUIDE.intro"
-      :sections="SELLER_HOME_GUIDE.sections"
-      :faqs="SELLER_HOME_GUIDE.faqs"
-      :disclaimer="SELLER_HOME_GUIDE.disclaimer"
+      :sections="SELLER_HOME_GUIDE.sections"      :disclaimer="SELLER_HOME_GUIDE.disclaimer"
     />
   </div>
 </template>
