@@ -5,6 +5,11 @@ import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import { buildFaqPageJsonLd } from "@/composables/useSEO";
 import { MONTHLY_FEES } from "@/data/marketFees";
 
+// SEO 가이드에 따로 있던 FAQ를 이 아코디언으로 합쳐 이중 노출을 없앤다
+defineProps<{
+  extra?: ReadonlyArray<{ q: string; a: string }>;
+}>();
+
 const monthlyFeeText = computed(() => {
   const c = MONTHLY_FEES.coupang!;
   const e = MONTHLY_FEES.elevenst!;
@@ -54,5 +59,5 @@ useHead(() => ({
 </script>
 
 <template>
-  <FaqAccordionPanel :items="faqs" />
+  <FaqAccordionPanel :items="faqs" :extra="extra" />
 </template>
