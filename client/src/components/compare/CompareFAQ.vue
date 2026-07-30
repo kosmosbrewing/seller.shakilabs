@@ -3,10 +3,11 @@ import { computed } from "vue";
 import { useHead } from "@unhead/vue";
 import FaqAccordionPanel from "@/components/common/FaqAccordionPanel.vue";
 import { buildFaqPageJsonLd } from "@/composables/useSEO";
+import { mergeFaqs } from "@/lib/faqMerge";
 import { MONTHLY_FEES } from "@/data/marketFees";
 
 // SEO 가이드에 따로 있던 FAQ를 이 아코디언으로 합쳐 이중 노출을 없앤다
-defineProps<{
+const props = defineProps<{
   extra?: ReadonlyArray<{ q: string; a: string }>;
 }>();
 
@@ -48,9 +49,12 @@ const faqs = computed(() => [
   },
 ]);
 
+// 화면에 실제 렌더되는 병합 FAQ와 구조화 데이터를 일치시킨다 (스키마 규칙)
+const mergedFaqs = computed(() => mergeFaqs(faqs.value, props.extra));
+
 // FAQ JSON-LD (FAQPage 구조화 데이터) — 공용 빌더 재사용으로 스키마 형식을 단일화
 useHead(() => ({
-  script: buildFaqPageJsonLd(faqs.value).map((entry) => ({
+  script: buildFaqPageJsonLd(mergedFaqs.value).map((entry) => ({
     key: "faq-json-ld",
     type: "application/ld+json",
     textContent: JSON.stringify(entry),
@@ -59,5 +63,5 @@ useHead(() => ({
 </script>
 
 <template>
-  <FaqAccordionPanel :items="faqs" :extra="extra" />
+  <FaqAccordionPanel :items="mergedFaqs" />
 </template>
