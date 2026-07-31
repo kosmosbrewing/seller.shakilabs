@@ -8,6 +8,7 @@ import ShareModal from "@/components/share/ShareModal.vue";
 import CompareIntro from "@/components/compare/CompareIntro.vue";
 import CompareInput from "@/components/compare/CompareInput.vue";
 import CompareResults from "@/components/compare/CompareResults.vue";
+import BestMarketPriceBreakdown from "@/components/compare/BestMarketPriceBreakdown.vue";
 import CostAxisLinks from "@/components/compare/CostAxisLinks.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
@@ -140,6 +141,8 @@ const jsonLd = computed(() => ({
       :include-own-store="calc.includeOwnStore.value"
       @share="openShareFromSummary"
     />
+
+    <BestMarketPriceBreakdown :result="calc.bestMarket.value" />
 
     <SellerFeeResultCharts :results="calc.results.value" />
 
