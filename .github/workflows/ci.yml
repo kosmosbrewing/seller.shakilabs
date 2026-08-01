@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -35,6 +39,12 @@ jobs:
 
       - name: Generate production SBOM
         run: npm run sbom:prod
+
+      # sbom:prod 직후에 둔다 — 이 저장소는 SBOM을 커밋하지 않으므로(.gitignore) 방금 생성한
+      # 산출물의 신원(component.name/version/vcs)을 여기서 검사해야 실제 검증이 된다.
+      # 두 스크립트 모두 대상 파일이 없으면 no-op이라 12개 앱에 그대로 복사할 수 있다.
+      - name: Verify vendored artifacts
+        run: npm run verify:supply-chain
 
       - name: Upload SBOM artifacts
         uses: actions/upload-artifact@v4

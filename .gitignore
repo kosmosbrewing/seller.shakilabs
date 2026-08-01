@@ -32,6 +32,9 @@ npm-debug.log*
 # OS
 Thumbs.db
 
+# SBOM 등 생성 산출물은 커밋하지 않는다 — timestamp·documentNamespace(UUID)가 매번 달라져
+# 저장소를 오염시키고, 스캐폴딩 복사 시 남의 앱 SBOM이 따라붙는 사고의 원인이 된다.
+# 릴리스별 SBOM은 CI가 생성해 upload-artifact로 보관한다.
 client/artifacts/
 .vercel/
 client/.vercel/
