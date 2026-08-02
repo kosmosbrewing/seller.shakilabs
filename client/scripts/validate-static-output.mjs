@@ -90,6 +90,53 @@ function validateSitemap() {
     "Sitemap routes do not match the expected public routes");
 }
 
+// Collect every JSON-LD node of a rendered document, flattening arrays and @graph.
+function collectJsonLdNodes(html, route) {
+  const blocks = [
+    ...html.matchAll(
+      /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi
+    ),
+  ].map(([, body]) => body.trim());
+
+  const nodes = [];
+  for (const [index, block] of blocks.entries()) {
+    assert(block.length > 0,
+      `Empty JSON-LD block #${index + 1} for ${route}`);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(block);
+    } catch (error) {
+      throw new Error(
+        `Invalid JSON-LD block #${index + 1} for ${route}: ${error.message}`
+      );
+    }
+
+    const queue = Array.isArray(parsed) ? [...parsed] : [parsed];
+    while (queue.length > 0) {
+      const node = queue.shift();
+      if (!node || typeof node !== "object") continue;
+      if (Array.isArray(node["@graph"])) queue.push(...node["@graph"]);
+      nodes.push(node);
+    }
+  }
+
+  return nodes;
+}
+
+// One url must map to one entity: the shell owns the single WebApplication node,
+// so a view re-declaring it would split the page into two competing entities.
+function validateJsonLd(html, route) {
+  const nodes = collectJsonLdNodes(html, route);
+  assert(nodes.length > 0, `Missing JSON-LD for ${route}`);
+
+  const webApplications = nodes.filter((node) => node["@type"] === "WebApplication");
+  assert(webApplications.length === 1,
+    `Expected exactly one WebApplication node for ${route}, found ${webApplications.length}`);
+  assert(typeof webApplications[0]["@id"] === "string",
+    `WebApplication node must carry an @id for ${route}`);
+}
+
 function validatePublicRoutes() {
   const titles = new Set();
   const rawDocuments = new Set();
@@ -120,6 +167,7 @@ function validatePublicRoutes() {
     assert(!/<noscript>/i.test(html),
       `Rendered route must not retain the shell noscript for ${route}`);
     assert(!rawDocuments.has(html), `Duplicate raw HTML for ${route}`);
+    validateJsonLd(html, route);
 
     titles.add(actualTitle);
     rawDocuments.add(html);
@@ -146,5 +194,6 @@ validateNotFound();
 
 console.log(
   "Validated " + SEO_ROUTES.length + " sitemap routes, "
-  + PUBLIC_ROUTES.length + " public routes, both Vercel configs, and custom HTTP 404 output."
+  + PUBLIC_ROUTES.length + " public routes (JSON-LD included), both Vercel configs, "
+  + "and custom HTTP 404 output."
 );

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { SELLER_HOME_GUIDE } from "@/data/seoGuides";
@@ -96,25 +96,15 @@ onUnmounted(() => {
   resultsObserver = null;
 });
 
-// SEO JSON-LD
-const jsonLd = computed(() => ({
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "오픈마켓 수수료 비교 계산기",
-  "description": "스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교",
-  "url": "https://shakilabs.com/seller",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
-  "inLanguage": "ko",
-}));
+// WebApplication JSON-LD는 index.html 셸이 전역으로 1개만 내보낸다.
+// 여기서 다시 선언하면 홈에서만 노드가 2개가 되므로 선언하지 않는다.
+// 홈의 페이지 단위 구조화 데이터는 CompareFAQ의 FAQPage가 담당한다.
 </script>
 
 <template>
   <SEOHead
     title="스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 수수료 비교"
     description="같은 상품인데 마켓마다 수수료가 이렇게 다릅니다. 스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교하세요."
-    :json-ld="jsonLd"
   />
 
   <div class="text-resize-layout container space-y-5 py-5">
