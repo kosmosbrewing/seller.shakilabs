@@ -439,6 +439,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
       :intro="SELLER_MARKET_COMPARE_GUIDE.intro"
       :sections="SELLER_MARKET_COMPARE_GUIDE.sections"
       :faqs="SELLER_MARKET_COMPARE_GUIDE.faqs"
+      :sources="SELLER_MARKET_COMPARE_GUIDE.sources"
       :disclaimer="SELLER_MARKET_COMPARE_GUIDE.disclaimer"
     />
   </div>

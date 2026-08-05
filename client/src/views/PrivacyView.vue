@@ -26,7 +26,8 @@ const constantsStore = useConstantsStore();
         <h2 class="text-heading font-bold">1. 수집하는 개인정보</h2>
         <p class="text-body text-muted-foreground">
           본 서비스는 회원가입, 로그인 기능이 없으며 별도의 개인정보를 수집하지 않습니다.
-          계산 결과는 브라우저에서만 처리되며 서버에 저장되지 않습니다.
+          판매가·상품 원가·카테고리 등 수수료 계산에 입력한 값과 계산 결과는 이용자의
+          브라우저 안에서만 처리되며, 서버로 전송되거나 저장되지 않습니다.
         </p>
 
         <h2 class="text-heading font-bold">2. 쿠키 및 분석 도구</h2>
@@ -39,11 +40,17 @@ const constantsStore = useConstantsStore();
 
         <h2 class="text-heading font-bold">3. 광고 및 제3자 제공</h2>
         <p class="text-body text-muted-foreground">
-          본 서비스는 Google AdSense를 통해 광고를 게재할 수 있으며,
-          이 과정에서 쿠키가 사용될 수 있습니다.
-          Google AdSense는 맞춤 광고 제공을 위해 쿠키를 사용하며,
-          이용자는 <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" class="retro-link">Google 광고 설정</a>에서
-          맞춤 광고를 비활성화할 수 있습니다.
+          본 서비스는 Google AdSense를 통해 광고를 게재합니다.
+          Google을 포함한 제3자 광고 사업자는 광고 쿠키를 사용하여 이용자가 본 서비스 또는
+          다른 웹사이트를 방문한 기록을 기반으로 광고를 게재하며,
+          Google은 광고 쿠키를 통해 이용자의 이전 방문 기록에 기반한 맞춤 광고를 제공할 수 있습니다.
+        </p>
+        <p class="text-body text-muted-foreground">
+          이용자는
+          <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" class="retro-link">Google 광고 설정</a>에서
+          맞춤 광고를 비활성화할 수 있으며,
+          <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener noreferrer" class="retro-link">www.aboutads.info</a>를
+          방문하여 제3자 광고 사업자의 맞춤 광고 쿠키 사용을 일괄 거부할 수 있습니다.
         </p>
         <p class="text-body text-muted-foreground">
           본 서비스는 위 분석·광고 목적 외에 이용자의 데이터를 제3자에게 제공하지 않습니다.
@@ -80,7 +87,7 @@ const constantsStore = useConstantsStore();
         </p>
 
         <p class="text-tiny text-muted-foreground mt-6">
-          시행일: 2026년 3월 10일
+          시행일: 2026년 3월 10일 · 최종 수정일: 2026년 8월 5일
         </p>
       </div>
     </div>

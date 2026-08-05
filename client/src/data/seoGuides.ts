@@ -2,12 +2,15 @@
 export interface GuideSection { h2: string; body: string; }
 export interface GuideFaq { q: string; a: string; }
 export interface GuideChecklist { title: string; items: string[]; }
+// 공공기관 공식 출처 링크 — 콘텐츠 신뢰도(E-E-A-T) 근거로 가이드 하단에 노출한다
+export interface GuideSource { label: string; url: string; }
 export interface GuideData {
   title: string;
   intro: string;
   sections?: GuideSection[];
   faqs?: GuideFaq[];
   checklist?: GuideChecklist;
+  sources?: GuideSource[];
   disclaimer?: string;
 }
 
@@ -113,6 +116,16 @@ export const SELLER_MARKET_COMPARE_GUIDE: GuideData = {
       a: "플랫폼이 수수료를 일방적으로 인상하면 가격 전가(판매가 인상), 카테고리 변경, 다른 플랫폼으로 이전 등을 고려할 수 있습니다. 단기적으로는 수수료 우대 프로모션(신규 셀러 할인)을 적극 활용하세요.",
     },
   ],
+  sources: [
+    {
+      label: "국세청 (사업자등록·간이과세 기준 안내)",
+      url: "https://www.nts.go.kr",
+    },
+    {
+      label: "국세청 홈택스 (부가가치세 신고·사업자등록 신청)",
+      url: "https://www.hometax.go.kr",
+    },
+  ],
   disclaimer: COMMON_DISCLAIMER,
 };
 
@@ -213,6 +226,16 @@ export const SELLER_SHIPPING_GUIDE: GuideData = {
     {
       q: "로켓배송은 일반 배송보다 유리한가요?",
       a: "쿠팡 로켓배송은 고객 구매 전환율이 일반 대비 30~50% 높지만 수수료가 15~20%로 일반(10~13%)보다 비쌉니다. 매출 규모가 클수록 로켓배송이 유리하며, 소량·소규모는 일반 마켓플레이스가 나을 수 있습니다.",
+    },
+  ],
+  sources: [
+    {
+      label: "국세청 (부가가치세 제도·매입세액공제 안내)",
+      url: "https://www.nts.go.kr",
+    },
+    {
+      label: "국세청 홈택스 (택배비 등 매입 세금계산서 조회·부가세 신고)",
+      url: "https://www.hometax.go.kr",
     },
   ],
   disclaimer: COMMON_DISCLAIMER,

@@ -942,6 +942,7 @@ function formatPostalRanges(ranges: string[]): string {
       :intro="SELLER_SHIPPING_GUIDE.intro"
       :sections="SELLER_SHIPPING_GUIDE.sections"
       :faqs="SELLER_SHIPPING_GUIDE.faqs"
+      :sources="SELLER_SHIPPING_GUIDE.sources"
       :disclaimer="SELLER_SHIPPING_GUIDE.disclaimer"
     />
   </div>

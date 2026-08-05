@@ -61,6 +61,16 @@ const jsonLd = buildFaqPageJsonLd(SELLER_HOME_GUIDE.faqs);
           <a :href="`mailto:${constantsStore.supportEmail}`" class="retro-link">{{ constantsStore.supportEmail }}</a>으로
           보내주세요.
         </p>
+
+        <!-- 운영 주체 신원 블록 — 애드센스 심사에서 요구하는 운영자·연락처 명시 -->
+        <div class="retro-panel-muted space-y-2 p-4">
+          <p class="text-body font-bold text-foreground">운영: ShakiLabs · 문의: skdba1313@gmail.com</p>
+          <p class="text-caption leading-relaxed text-muted-foreground">
+            모든 수수료율과 계산 기준은 각 오픈마켓 판매자센터·PG사·택배사의 공식 고시 자료,
+            국세청 부가가치세·간이과세 고시와 대조해 검증하며, 요율이 바뀌면 확인일을 명시해 갱신합니다.
+            오류 제보를 보내주시면 확인 후 신속히 반영합니다.
+          </p>
+        </div>
       </div>
     </div>
 
