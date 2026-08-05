@@ -28,6 +28,8 @@ const constantsStore = useConstantsStore();
           본 서비스는 오픈마켓 셀러를 위한 무료 수수료 비교 도구입니다.
           회원가입 없이 누구나 이용할 수 있으며, 마켓별 수수료·결제 수수료·택배비를
           비교하는 기능을 제공합니다.
+          판매가·원가 등 계산에 입력하는 값은 이용자의 브라우저 안에서만 처리되며,
+          서버로 전송되거나 저장되지 않습니다.
         </p>
 
         <h2 class="text-heading font-bold">2. 면책 조항</h2>
@@ -56,7 +58,13 @@ const constantsStore = useConstantsStore();
 
         <h2 class="text-heading font-bold">4. 광고</h2>
         <p class="text-body text-muted-foreground">
-          본 서비스는 Google AdSense 등을 통해 광고를 게재할 수 있습니다.
+          본 서비스는 Google AdSense를 통해 광고를 게재합니다.
+          Google을 포함한 제3자 광고 사업자는 쿠키를 사용해 이용자의 이전 방문 기록에 기반한
+          맞춤 광고를 표시할 수 있으며, 이용자는
+          <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" class="retro-link">Google 광고 설정</a>
+          또는
+          <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener noreferrer" class="retro-link">www.aboutads.info</a>에서
+          맞춤 광고를 거부할 수 있습니다.
           광고 콘텐츠는 서비스 운영자가 보증하는 것이 아닙니다.
         </p>
 
@@ -80,7 +88,7 @@ const constantsStore = useConstantsStore();
         </p>
 
         <p class="text-tiny text-muted-foreground mt-6">
-          시행일: 2026년 3월 10일
+          시행일: 2026년 3월 10일 · 최종 수정일: 2026년 8월 5일
         </p>
       </div>
     </div>
