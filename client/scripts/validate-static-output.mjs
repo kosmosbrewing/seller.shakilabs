@@ -137,6 +137,21 @@ function validateJsonLd(html, route) {
     `WebApplication node must carry an @id for ${route}`);
 }
 
+// 셸의 정적 애드센스 태그. AdSlot.vue의 중복 주입 방지 셀렉터와 같은 속성을 본다.
+const ADSENSE_LOADER_PATTERN = /<script[^>]*\bdata-adsense="true"[^>]*>\s*<\/script>/i;
+const ADSENSE_ANY_PATTERN = /adsbygoogle/i;
+
+// vite-ssg는 정적 HTML이 곧 화면이므로 태그를 걷어낸 본문 길이가 렌더 후 자수와 같다.
+function visibleTextLength(html) {
+  const withoutHead = html.replace(/<head\b[\s\S]*?<\/head>/i, " ");
+  const withoutInert = withoutHead
+    .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<(nav|header|footer)\b[^>]*>[\s\S]*?<\/\1>/gi, " ");
+  return withoutInert.replace(/<[^>]+>/g, " ").replace(/\s+/g, "").length;
+}
+
+const MIN_PUBLIC_ROUTE_CHARS = 1500;
+
 function validatePublicRoutes() {
   const titles = new Set();
   const rawDocuments = new Set();
@@ -167,6 +182,12 @@ function validatePublicRoutes() {
     assert(!/<noscript>/i.test(html),
       `Rendered route must not retain the shell noscript for ${route}`);
     assert(!rawDocuments.has(html), `Duplicate raw HTML for ${route}`);
+    // 404 로더 제거가 정상 라우트까지 번지면 광고가 통째로 죽는다 — 역방향으로 고정한다.
+    assert(ADSENSE_LOADER_PATTERN.test(html),
+      `Public route must keep the AdSense loader: ${route}`);
+    const chars = visibleTextLength(html);
+    assert(chars >= MIN_PUBLIC_ROUTE_CHARS,
+      `Thin content for ${route}: ${chars} chars (minimum ${MIN_PUBLIC_ROUTE_CHARS})`);
     validateJsonLd(html, route);
 
     titles.add(actualTitle);
@@ -184,6 +205,9 @@ function validateNotFound() {
   assert(html.includes(">404<"), "404.html must render the recovery page");
   assert(html.includes('href="/seller"'),
     "404.html must link back to an existing seller page");
+  // Valuable Inventory: 게시자 콘텐츠가 없는 화면(404 본문 50자 미만)에는 광고를 두지 않는다.
+  assert(!ADSENSE_ANY_PATTERN.test(html),
+    "404.html must not carry any AdSense loader or slot (Valuable Inventory)");
 }
 
 validateVercelConfig(resolve(repositoryRoot, "vercel.json"), "client/dist");
