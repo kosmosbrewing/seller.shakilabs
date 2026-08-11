@@ -120,10 +120,6 @@ const share = usePageShare({
   buttonLabel: "비교하러 가기",
 });
 
-function getReadableBadgeTextClass(marketKey: OpenMarketKey): string {
-  void marketKey;
-  return "text-white";
-}
 
 function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: OpenMarketKey): string {
   if (columnKey === "salesFeeRange" && marketKey === lowestFeeMarket.value) {
@@ -182,8 +178,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
             <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
               <span
                 class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                :class="getReadableBadgeTextClass(market.key)"
-                :style="{ backgroundColor: market.color }"
+                :style="{ backgroundColor: market.color, color: market.foreground }"
               >
                 {{ market.shortName }}
               </span>
@@ -302,8 +297,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                   <div class="flex items-center gap-2.5">
                     <span
                       class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                      :class="getReadableBadgeTextClass(market.key)"
-                      :style="{ backgroundColor: market.color }"
+                      :style="{ backgroundColor: market.color, color: market.foreground }"
                     >
                       {{ market.shortName }}
                     </span>
@@ -312,7 +306,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <span class="text-body font-semibold">{{ market.name }}</span>
                         <span
                           v-if="market.key === lowestFeeMarket"
-                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저

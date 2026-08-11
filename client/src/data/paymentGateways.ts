@@ -25,6 +25,8 @@ export interface PaymentGatewayMeta {
   shortName: string;
   badge: string;
   color: string;
+  /** 브랜드 배경 위에서 4.5:1 이상을 보장하는 배지 글자색. 흰색 하드코딩 금지. */
+  foreground: string;
   sourceName: string;
   sourceUrl: string;
   microBusinessRate: number;
@@ -63,6 +65,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "토스PG",
     badge: "PG 인프라",
     color: "#0064FF",
+    foreground: "#FFFFFF",
     sourceName: "토스페이먼츠 수수료 안내",
     sourceUrl: "https://www.tosspayments.com/about/fee",
     microBusinessRate: 3.4,
@@ -101,6 +104,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "N주문",
     badge: "네이버쇼핑 연동",
     color: "#03C75A",
+    foreground: "#102A1B",
     sourceName: "주문형 가맹점 Npay 수수료 FAQ",
     sourceUrl: "https://help.admin.pay.naver.com/faq/content.help?faqId=1782",
     microBusinessRate: 1.947,
@@ -143,6 +147,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "N결제",
     badge: "자사몰 결제 연동",
     color: "#03C75A",
+    foreground: "#102A1B",
     sourceName: "결제형 Npay 수수료 FAQ",
     sourceUrl: "https://help.admin.pay.naver.com/faq/content.help?faqId=6522",
     microBusinessRate: 0.99,
@@ -185,6 +190,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "카카오",
     badge: "간편결제 중심",
     color: "#FFCD00",
+    foreground: "#3B1E00",
     sourceName: "카카오페이 독립몰 가맹점 안내",
     sourceUrl: "https://partner.kakaopay.com/partner/online/application-information?mall_type=standalone",
     microBusinessRate: 0.9,
@@ -229,6 +235,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     shortName: "PAYCO",
     badge: "포인트 결제 특화",
     color: "#FA2828",
+    foreground: "#1F0A0A",
     sourceName: "PAYCO 파트너센터",
     sourceUrl: "https://partner.payco.com/",
     microBusinessRate: 1.8,

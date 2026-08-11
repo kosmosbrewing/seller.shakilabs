@@ -526,7 +526,6 @@ const ownStoreHintGroups = computed(() =>
               v-for="key in OWN_STORE_ORDER"
               :key="key"
               class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
-              :class="key === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
               :style="{ backgroundColor: OWN_STORE_META[key].color, color: OWN_STORE_META[key].foreground }"
             >
               {{ OWN_STORE_META[key].shortName }}

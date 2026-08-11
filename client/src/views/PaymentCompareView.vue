@@ -149,13 +149,6 @@ const paymentCopyRows = computed(() =>
   ])
 );
 
-function getGatewayBadgeTextClass(gatewayKey: PaymentGatewayKey): string {
-  if (gatewayKey === "kakaopay") {
-    return "text-[#3B1E00]";
-  }
-  return "text-white";
-}
-
 function isLowestCardFeeGateway(gatewayKey: PaymentGatewayKey): boolean {
   return lowestCardFeeGateways.value.includes(gatewayKey);
 }
@@ -231,8 +224,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
             <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
               <span
                 class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                :class="getGatewayBadgeTextClass(gateway.key)"
-                :style="{ backgroundColor: gateway.color }"
+                :style="{ backgroundColor: gateway.color, color: gateway.foreground }"
               >
                 {{ gateway.shortName }}
               </span>
@@ -349,8 +341,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                   <div class="flex items-center gap-2.5">
                     <span
                       class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                      :class="getGatewayBadgeTextClass(gateway.key)"
-                      :style="{ backgroundColor: gateway.color }"
+                      :style="{ backgroundColor: gateway.color, color: gateway.foreground }"
                     >
                       {{ gateway.shortName }}
                     </span>
@@ -359,7 +350,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <span class="text-body font-semibold">{{ gateway.name }}</span>
                         <span
                           v-if="isLowestCardFeeGateway(gateway.key)"
-                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저

@@ -31,6 +31,8 @@ export interface OpenMarketCompareMeta {
   name: string;
   shortName: string;
   color: string;
+  /** 브랜드 배경 위에서 4.5:1 이상을 보장하는 배지 글자색. 흰색 하드코딩 금지. */
+  foreground: string;
   sourceName: string;
   sourceUrl: string;
   microBusinessRate: number;
@@ -53,6 +55,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "스마트스토어",
     shortName: "네쇼",
     color: "#03C75A",
+    foreground: "#102A1B",
     sourceName: "정산 기준 수수료율",
     sourceUrl: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=3558",
     microBusinessRate: 2.95,
@@ -108,6 +111,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "쿠팡",
     shortName: "쿠팡",
     color: "#E31937",
+    foreground: "#FFFFFF",
     sourceName: "쿠팡 Wing 홈 (판매수수료 상세는 내부 확인)",
     sourceUrl: "https://wing.coupang.com/",
     microBusinessRate: 7.8,
@@ -170,6 +174,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "11번가",
     shortName: "11번",
     color: "#FF6B00",
+    foreground: "#2B1600",
     sourceName: "11번가 셀러오피스 홈 (수수료 상세는 내부 확인)",
     sourceUrl: "https://soffice.11st.co.kr/",
     microBusinessRate: 10,
@@ -215,6 +220,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     name: "G마켓/옥션",
     shortName: "G마켓",
     color: "#00B050",
+    foreground: "#102A1B",
     sourceName: "G마켓 서비스 이용료",
     sourceUrl: "https://item.esmplus.com/gmarket-service-fee.html",
     microBusinessRate: 9,

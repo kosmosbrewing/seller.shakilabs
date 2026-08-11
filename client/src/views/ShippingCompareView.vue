@@ -241,10 +241,6 @@ function formatWeightSurcharge(result: ShippingEstimateResult): string {
   return `+${formatWon(result.weightSurcharge)}`;
 }
 
-function getReadableBadgeTextClass(): string {
-  return "text-white";
-}
-
 function getShippingCellBg(
   columnKey: ShippingCompareColumnKey,
   result: ShippingEstimateResult,
@@ -496,8 +492,8 @@ function formatPostalRanges(ranges: string[]): string {
               <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
                 <span
                   class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                  :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
-                  :style="{ backgroundColor: result.carrier.color }"
+                  :class="result.isAvailable ? '' : 'grayscale opacity-55'"
+                  :style="{ backgroundColor: result.carrier.color, color: result.carrier.foreground }"
                 >
                   {{ result.carrier.shortName }}
                 </span>
@@ -577,8 +573,8 @@ function formatPostalRanges(ranges: string[]): string {
                     <div class="flex items-center gap-2.5">
                       <span
                         class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                        :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
-                        :style="{ backgroundColor: result.carrier.color }"
+                        :class="result.isAvailable ? '' : 'grayscale opacity-55'"
+                        :style="{ backgroundColor: result.carrier.color, color: result.carrier.foreground }"
                       >
                         {{ result.carrier.shortName }}
                       </span>
@@ -589,7 +585,7 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestGeneral?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
@@ -676,8 +672,8 @@ function formatPostalRanges(ranges: string[]): string {
               <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
                 <span
                   class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                  :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
-                  :style="{ backgroundColor: result.carrier.color }"
+                  :class="result.isAvailable ? '' : 'grayscale opacity-55'"
+                  :style="{ backgroundColor: result.carrier.color, color: result.carrier.foreground }"
                 >
                   {{ result.carrier.shortName }}
                 </span>
@@ -757,8 +753,8 @@ function formatPostalRanges(ranges: string[]): string {
                     <div class="flex items-center gap-2.5">
                       <span
                         class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                        :class="[getReadableBadgeTextClass(), result.isAvailable ? '' : 'grayscale opacity-55']"
-                        :style="{ backgroundColor: result.carrier.color }"
+                        :class="result.isAvailable ? '' : 'grayscale opacity-55'"
+                        :style="{ backgroundColor: result.carrier.color, color: result.carrier.foreground }"
                       >
                         {{ result.carrier.shortName }}
                       </span>
@@ -769,7 +765,7 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestConvenience?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
