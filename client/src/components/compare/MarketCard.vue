@@ -52,7 +52,7 @@ watch(() => props.result.totalFee, () => {
   >
     <div
       v-if="isBest"
-      class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-[11px] font-bold text-white shadow-sm"
+      class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-[11px] font-bold text-profit-foreground shadow-sm"
     >
       <BadgeCheck class="h-3.5 w-3.5" />
       추천

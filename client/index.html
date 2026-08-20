@@ -131,15 +131,20 @@
         --accent-foreground: 28 68% 82%;
         --popover: 217 33% 17%;
         --popover-foreground: 210 40% 96%;
-        --destructive: 0 72% 58%;
-        --destructive-foreground: 0 0% 100%;
+        /* 다크에서 --destructive는 카드 위 글자색(text-destructive)이자 토스트 배경이다.
+           0 72% 58%는 글자로 3.66:1, 흰 글자를 얹으면 4.05:1로 양쪽 다 미달이었다.
+           밝은 적색 면 + 어두운 적색 잉크 조합으로 바꿔 두 방향 모두 통과시킨다. */
+        --destructive: 0 75% 72%;
+        --destructive-foreground: 0 72% 12%;
         --border: 214 16% 26%;
         --input: 214 16% 30%;
         --ring: 24 82% 56%;
         --profit: 160 56% 50%;
-        --profit-foreground: 0 0% 100%;
-        --fee: 0 62% 58%;
-        --fee-foreground: 0 0% 100%;
+        /* 밝은 초록 위의 흰 글자는 2.15:1이었다. 앱 hue를 유지한 채 어둡게 해서 배지 글자를 살린다. */
+        --profit-foreground: 160 72% 10%;
+        /* 표의 수수료 셀(14px w600)이 카드 위에서 3.64:1로 렌더됐다(라이브 실측). 밝기를 올려 5.74:1로. */
+        --fee: 0 75% 72%;
+        --fee-foreground: 0 72% 12%;
       }
 
       html {

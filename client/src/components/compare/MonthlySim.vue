@@ -89,14 +89,13 @@ const monthlySpread = computed(() => {
         <div class="seller-result-header flex items-center gap-2.5 px-3.5 py-3">
           <span
             class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-caption font-semibold"
-            :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
+            :class="idx === 0 ? 'bg-profit text-profit-foreground' : 'bg-muted text-muted-foreground'"
           >
             <Medal class="h-3.5 w-3.5" />
             {{ idx + 1 }}위
           </span>
           <span
             class="seller-market-badge inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-xs font-bold whitespace-nowrap"
-            :class="sim.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
             :style="{ backgroundColor: ALL_CHANNEL_META[sim.marketKey].color, color: ALL_CHANNEL_META[sim.marketKey].foreground }"
           >
             {{ ALL_CHANNEL_META[sim.marketKey].shortName }}
@@ -104,7 +103,7 @@ const monthlySpread = computed(() => {
           <span class="min-w-0 flex-1 truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[sim.marketKey].name }}</span>
           <span
             v-if="idx === 0"
-            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-xs font-semibold text-white"
+            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-xs font-semibold text-profit-foreground"
           >
             <BadgeCheck class="h-3.5 w-3.5" />
             추천
@@ -158,7 +157,7 @@ const monthlySpread = computed(() => {
             <td class="whitespace-nowrap px-4 py-3">
               <span
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-                :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
+                :class="idx === 0 ? 'bg-profit text-profit-foreground' : 'bg-muted text-muted-foreground'"
               >
                 <Medal class="h-3.5 w-3.5" />
                 {{ idx + 1 }}위
@@ -168,7 +167,6 @@ const monthlySpread = computed(() => {
               <div class="flex items-center gap-2.5">
                 <span
                   class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                  :class="sim.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
                   :style="{ backgroundColor: ALL_CHANNEL_META[sim.marketKey].color, color: ALL_CHANNEL_META[sim.marketKey].foreground }"
                 >
                   {{ ALL_CHANNEL_META[sim.marketKey].shortName }}
@@ -177,7 +175,7 @@ const monthlySpread = computed(() => {
                   <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[sim.marketKey].name }}</span>
                   <span
                     v-if="idx === 0"
-                    class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-white"
+                    class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
                   >
                     <BadgeCheck class="h-3.5 w-3.5" />
                     추천

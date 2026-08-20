@@ -34,6 +34,8 @@ export interface ShippingCarrierMeta {
   category: ShippingCarrierCategory;
   pricingMode: ShippingPricingMode;
   color: string;
+  /** 브랜드 배경 위에서 4.5:1 이상을 보장하는 배지 글자색. 흰색 하드코딩 금지. */
+  foreground: string;
   sourceUrl: string;
   maxWeightKg: number;
   maxSumCm: number;
@@ -223,6 +225,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "profile",
     color: "#F58220",
+    foreground: "#2B1600",
     sourceUrl: "https://www.cjlogistics.com/ko/utility/parcel-price",
     maxWeightKg: 25,
     maxSumCm: 160,
@@ -239,6 +242,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#004B8D",
+    foreground: "#FFFFFF",
     sourceUrl: "https://www.hanjin.com/kor/CMS/Contents/Contents.do?mCode=MN130",
     maxWeightKg: 20,
     maxSumCm: 160,
@@ -259,6 +263,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#D9392E",
+    foreground: "#FFFFFF",
     sourceUrl: "https://www.ilogen.com/web/personal/chargeInfo",
     maxWeightKg: 25,
     maxSumCm: 160,
@@ -279,6 +284,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#E85C2A",
+    foreground: "#2B1600",
     sourceUrl: "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
     maxWeightKg: 30,
     maxSumCm: 160,
@@ -303,6 +309,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#009B4E",
+    foreground: "#04160D",
     sourceUrl: "https://kdexp.com/service/charge/package_standard.do",
     maxWeightKg: 30,
     maxSumCm: 200,
@@ -344,6 +351,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "general",
     pricingMode: "band",
     color: "#E0002A",
+    foreground: "#FFFFFF",
     sourceUrl: "https://lotteglogis.com/home/customs/faq?tab=0",
     maxWeightKg: 20,
     maxSumCm: 160,
@@ -363,6 +371,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "convenience",
     pricingMode: "band",
     color: "#7A38D8",
+    foreground: "#FFFFFF",
     sourceUrl: "https://www.cupost.co.kr/postbox/today/general/guidePrice.cupost",
     maxWeightKg: 30,
     maxSumCm: 160,
@@ -396,6 +405,7 @@ export const SHIPPING_CARRIERS: ShippingCarrierMeta[] = [
     category: "convenience",
     pricingMode: "band",
     color: "#0085CA",
+    foreground: "#001019",
     sourceUrl: "https://www.cvsnet.co.kr/service/national-delivery/use/contentsid/205/index.do",
     maxWeightKg: 20,
     maxSumCm: 160,

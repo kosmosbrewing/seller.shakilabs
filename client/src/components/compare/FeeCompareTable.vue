@@ -62,14 +62,13 @@ const copyRows = computed(() =>
           <div class="flex items-center gap-2.5 px-3.5 py-3">
             <span
               class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-              :class="idx === 0 ? 'bg-profit text-white' : 'bg-muted text-muted-foreground'"
+              :class="idx === 0 ? 'bg-profit text-profit-foreground' : 'bg-muted text-muted-foreground'"
             >
               <Medal class="h-3.5 w-3.5" />
               {{ idx + 1 }}위
             </span>
             <span
               class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-              :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
               :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
             >
               {{ ALL_CHANNEL_META[result.marketKey].shortName }}
@@ -140,7 +139,6 @@ const copyRows = computed(() =>
                 <div class="flex items-center gap-2.5">
                   <span
                     class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
-                    :class="result.marketKey === 'own_kakaopay' ? 'text-[#3B1E00]' : 'text-white'"
                     :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
                   >
                     {{ ALL_CHANNEL_META[result.marketKey].shortName }}
