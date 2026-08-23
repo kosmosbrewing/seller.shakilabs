@@ -104,7 +104,12 @@
         --accent-foreground: 25 80% 35%;
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
-        --destructive: 0 72% 52%;
+        /* 에러 토스트(bg-destructive + destructive-foreground)를 픽셀로 재니 4.49:1로
+           AA 미달이었다. 0 72% 52%는 --fee가 틴트 행에서 4.05:1로 걸렸던 바로 그 값이라,
+           같은 함대 통일값(0 74% 42%)으로 내려 hue를 유지한 채 명도만 낮춘다.
+           픽셀 실측: 토스트 4.49 → 6.14:1 / 흰 카드 위 글자 4.70 → 6.42:1 /
+           1위 틴트 행 4.05 → 5.53:1. */
+        --destructive: 0 74% 42%;
         --destructive-foreground: 210 40% 98%;
         --border: 214 16% 85%;
         --input: 214 16% 85%;

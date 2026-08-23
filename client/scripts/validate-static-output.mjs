@@ -31,6 +31,12 @@ function routeOutputPath(route) {
     : resolve(distRoot, `${route.slice(1)}.html`);
 }
 
+// cleanUrls가 "/seller/"를 "/seller"로 보내므로 홈은 어디서나 슬래시 없이 주소를 잡는다:
+// canonical·og:url·사이트맵 loc이 전부 같은 규칙을 써야 대조가 성립한다.
+function canonicalUrlFor(route) {
+  return route === "/" ? canonicalBase : `${canonicalBase}${route}`;
+}
+
 function validateVercelConfig(configPath, expectedOutputDirectory) {
   const config = JSON.parse(readFileSync(configPath, "utf8"));
   const rewrites = config.rewrites ?? [];
@@ -78,9 +84,7 @@ function validateSitemap() {
   const actualUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
     ([, url]) => url
   );
-  const expectedUrls = SEO_ROUTES.map((route) =>
-    route === "/" ? canonicalBase : `${canonicalBase}${route}`
-  );
+  const expectedUrls = SEO_ROUTES.map(canonicalUrlFor);
 
   assert(actualUrls.length === SEO_ROUTES.length,
     `Sitemap must contain exactly ${SEO_ROUTES.length} public routes`);
@@ -88,6 +92,69 @@ function validateSitemap() {
     "Sitemap contains duplicate routes");
   assert(JSON.stringify(actualUrls) === JSON.stringify(expectedUrls),
     "Sitemap routes do not match the expected public routes");
+
+  return new Set(actualUrls);
+}
+
+// 라우터에 선언된 경로를 뜯어 { path, redirect } 목록으로 돌려준다.
+// 라우터 파일이 진실의 원천이라 소스를 직접 읽는다 — seo-routes.mjs는 사람이 손으로
+// 맞추는 사본이고, 사본이 원본과 어긋나도 여태 아무 게이트도 울지 않았다.
+// 추출에 실패하면 폴백 없이 즉시 실패한다: 조용히 0건을 검사하는 게이트는
+// 게이트가 없는 것보다 나쁘다(통과 로그가 안전하다는 착각을 준다).
+function parseRouterRoutes(source) {
+  const start = source.indexOf("export const routes");
+  assert(start !== -1,
+    "router/index.ts: could not find `export const routes` — route extraction failed");
+
+  const body = source.slice(start);
+  const marks = [...body.matchAll(/path:\s*"([^"]+)"/g)].map((match) => ({
+    path: match[1],
+    index: match.index,
+  }));
+  assert(marks.length > 0,
+    "router/index.ts: no `path:` declarations parsed — route extraction failed");
+
+  return marks.map((mark, i) => ({
+    path: mark.path,
+    // 다음 path: 선언 전까지가 이 라우트의 본문이다
+    redirect: /redirect:/.test(body.slice(mark.index, marks[i + 1]?.index ?? body.length)),
+  }));
+}
+
+// 회귀 게이트: 라우터에 등록된 정적 라우트가 사이트맵에 있는가(그리고 리다이렉트
+// 라우트는 없는가). SEO_ROUTES는 손으로 유지하는 사본이라, 라우트를 추가하고 열거를
+// 빼먹어도 빌드·프리렌더·라이브가 전부 200을 돌려준다. 사이트맵에서만 조용히 사라져
+// 색인 후보 밖으로 나가는데, 사람이 XML을 세는 것 말고는 잡을 길이 없었다.
+// (실제로 /terms가 이 상태였다 — 라이브 사이트맵 6 URL, 라우터 정적 라우트 7개.)
+//
+// 양방향인 이유: 리다이렉트 라우트는 자기 화면이 없어 다른 페이지로 canonical이 모이므로
+// 사이트맵에 실으면 안 된다. "등록된 건 다 넣어라"만 검사하면 홈을 리다이렉트로 바꾼 뒤
+// 사이트맵에는 URL을 남기는, 더 나쁜 모순 상태를 그대로 통과시킨다.
+function validateRouterRoutesAreListed(sitemapUrls) {
+  const routerSource = readFileSync(
+    resolve(projectRoot, "src", "router", "index.ts"),
+    "utf8"
+  );
+  const routerRoutes = parseRouterRoutes(routerSource);
+  const indexRoute = routerRoutes.find((route) => route.path === "/");
+
+  assert(indexRoute, "router/index.ts must register an index route");
+  assert(!indexRoute.redirect,
+    "Index route must render its own view: a redirect home canonicalizes to the "
+      + "target page, and a page that points its canonical elsewhere cannot be listed");
+
+  for (const route of routerRoutes) {
+    // 파라미터·캐치올 라우트는 정적 URL이 아니고, 리다이렉트는 아래 규칙에서 따로 본다
+    if (route.redirect || route.path.includes(":")) continue;
+    assert(sitemapUrls.has(canonicalUrlFor(route.path)),
+      `Router route is missing from the sitemap: ${canonicalUrlFor(route.path)}`);
+  }
+
+  for (const route of routerRoutes) {
+    if (!route.redirect) continue;
+    assert(!sitemapUrls.has(canonicalUrlFor(route.path)),
+      `Redirect route must not be listed in the sitemap: ${canonicalUrlFor(route.path)}`);
+  }
 }
 
 // Collect every JSON-LD node of a rendered document, flattening arrays and @graph.
@@ -212,12 +279,13 @@ function validateNotFound() {
 
 validateVercelConfig(resolve(repositoryRoot, "vercel.json"), "client/dist");
 validateVercelConfig(resolve(projectRoot, "vercel.json"), "dist");
-validateSitemap();
+const sitemapUrls = validateSitemap();
+validateRouterRoutesAreListed(sitemapUrls);
 validatePublicRoutes();
 validateNotFound();
 
 console.log(
-  "Validated " + SEO_ROUTES.length + " sitemap routes, "
-  + PUBLIC_ROUTES.length + " public routes (JSON-LD included), both Vercel configs, "
-  + "and custom HTTP 404 output."
+  "Validated " + SEO_ROUTES.length + " sitemap routes (router↔sitemap parity checked "
+  + "both ways), " + PUBLIC_ROUTES.length + " public routes (JSON-LD included), "
+  + "both Vercel configs, and custom HTTP 404 output."
 );
