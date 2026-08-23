@@ -32,7 +32,7 @@ const emit = defineEmits<{
                   토스페이먼츠, 네이버페이 등 PG사별 카드 수수료 비교
                 </p>
               </div>
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/[12%] text-primary">
                 <CreditCard class="h-5 w-5" />
               </span>
             </div>
@@ -54,7 +54,7 @@ const emit = defineEmits<{
                   일반 택배 6사 · 편의점 택배 2사 운임 계산
                 </p>
               </div>
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary/[12%] text-primary">
                 <PackageCheck class="h-5 w-5" />
               </span>
             </div>
