@@ -74,7 +74,7 @@ watch(() => props.result.totalFee, () => {
             <div class="mt-1 flex items-center gap-1.5 text-[11px] font-semibold">
               <span
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
-                :class="isBest ? 'bg-profit/12 text-profit' : 'bg-muted text-muted-foreground'"
+                :class="isBest ? 'bg-profit/[12%] text-profit' : 'bg-muted text-muted-foreground'"
               >
                 <Medal class="h-3.5 w-3.5" />
                 {{ rankLabel }}
@@ -88,7 +88,7 @@ watch(() => props.result.totalFee, () => {
     <div class="px-4 pb-4">
       <div
         class="rounded-[1.35rem] px-3.5 py-3.5"
-        :class="isBest ? 'bg-profit/8' : 'bg-white'"
+        :class="isBest ? 'bg-profit/[8%]' : 'bg-white'"
       >
         <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           건당 순이익

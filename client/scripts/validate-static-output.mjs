@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLIC_ROUTES, SEO_ROUTES } from "./seo-routes.mjs";
+import { validateUtilitiesAreGenerated } from "./validate-tailwind-utilities.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -283,9 +284,11 @@ const sitemapUrls = validateSitemap();
 validateRouterRoutesAreListed(sitemapUrls);
 validatePublicRoutes();
 validateNotFound();
+const utilityCount = validateUtilitiesAreGenerated({ projectRoot, distRoot });
 
 console.log(
   "Validated " + SEO_ROUTES.length + " sitemap routes (router↔sitemap parity checked "
   + "both ways), " + PUBLIC_ROUTES.length + " public routes (JSON-LD included), "
-  + "both Vercel configs, and custom HTTP 404 output."
+  + "both Vercel configs, " + utilityCount + " generated colour utilities, "
+  + "and custom HTTP 404 output."
 );
