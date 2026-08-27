@@ -227,7 +227,7 @@ export const GMARKET = {
 export const MONTHLY_FEES: Partial<Record<MarketKey, { amount: number; threshold: string }>> = {
   coupang: { amount: 55_000, threshold: "월 판매 100만원 초과" },
   elevenst: { amount: 77_000, threshold: "월 구매확정 500만원 초과" },
-  gmarket: { amount: 55_000, threshold: "월 판매 500만원 초과" },
+  gmarket: { amount: 55_000, threshold: "전월 상품 판매대금 500만원 이상" },
 };
 
 // 수수료 데이터 최종 업데이트 날짜 (2025.10 인하 반영, 2026.07 재검증 — 변동 없음)

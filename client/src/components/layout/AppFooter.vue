@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { RouterLink } from "vue-router";
 import { ShSiteFooter } from "@shakilabs/ui";
 import { FOOTER_ALL_LINK, FOOTER_SECTIONS } from "@/data/footerNav";
+import { SETTLEMENT_VERIFIED } from "@/data/settlementCycles";
 import { useConstantsStore } from "@/stores/constants";
 
 const constantsStore = useConstantsStore();
@@ -20,7 +21,9 @@ const policyLinks = [
   { to: "", href: `mailto:${SUPPORT_EMAIL}`, label: "문의" },
 ];
 
-const note = computed(() => `수수료 데이터 기준: ${constantsStore.feeDataUpdated} | 본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.`);
+// 요율이 마지막으로 바뀐 날과 그 요율을 다시 확인한 날은 다른 사실이다.
+// 하나로 묶으면 표 배지(확인일)와 어긋나 보이고, 둘 중 하나는 반드시 거짓이 된다.
+const note = computed(() => `수수료 요율 ${constantsStore.feeDataUpdated} 개정 · ${constantsStore.feeDataVerified} 확인 · 정산주기 ${SETTLEMENT_VERIFIED} 확인 | 본 계산 결과는 참고용이며, 실제 정산 금액과 차이가 있을 수 있습니다.`);
 </script>
 
 <template>

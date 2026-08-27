@@ -1,5 +1,15 @@
 // 오픈마켓 4개 정적 비교 데이터 (PaymentCompareView 패턴)
 // 수치 계산용 marketFees.ts와 별개 — 이 파일은 문자열 기반 레퍼런스 비교표
+//
+// 정산주기 셀은 settlementCycles.ts에서 파생시킨다. 여기에 문자열을 다시 적으면
+// 가이드 산문과 갈라져 같은 화면에서 서로 다른 값을 말하게 된다(실제로 그런 상태였다).
+
+import {
+  SETTLEMENT_CYCLES,
+  SETTLEMENT_ORDER,
+  settlementTooltip,
+  type SettlementMarketKey,
+} from "./settlementCycles";
 
 export type OpenMarketKey = "smartstore" | "coupang" | "elevenst" | "gmarket";
 
@@ -46,6 +56,14 @@ export interface OpenMarketCompareMeta {
   noteFeatures?: { label: string; value: string }[];
 }
 
+/** 표의 정산주기 셀은 전부 이 함수를 거친다 — 리터럴 재기입 금지. */
+function settlementCell(key: SettlementMarketKey): CompareCell {
+  return {
+    core: SETTLEMENT_CYCLES[key].summary,
+    tooltip: settlementTooltip(key),
+  };
+}
+
 export const MARKET_COMPARE_UPDATED: string = "2025.10";
 export const MARKET_COMPARE_VERIFIED: string = "2026.07";
 
@@ -64,6 +82,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     },
     salesFeeRange: {
       core: "영세 2.95%~",
+      condition: "영세 등급 주문관리 1.947% + 마케팅링크 판매 0.91%×1.1(VAT)",
     },
     salesFeeBreakdown: {
       sections: [
@@ -93,9 +112,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "주문관리만 과금",
       tooltip: "유료배송에만 주문관리 수수료가 부과됩니다. 판매 수수료는 미적용.",
     },
-    settlementCycle: {
-      core: "확정 후 1~2영업일",
-    },
+    settlementCycle: settlementCell("smartstore"),
     note: {
       core: "등급+유입경로 분리형",
     },
@@ -119,7 +136,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "무료",
     },
     salesFeeRange: {
-      core: "영세 7.8%~",
+      core: "카테고리 최저 7.8%~",
     },
     salesFeeBreakdown: {
       sections: [
@@ -139,10 +156,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shippingFeeRate: {
       core: "유료배송 3.3%",
     },
-    settlementCycle: {
-      core: "D+1~D+2 영업일",
-      tooltip: "요일/정산 캘린더에 따라 실제 입금일이 달라질 수 있습니다.",
-    },
+    settlementCycle: settlementCell("coupang"),
     note: {
       core: "로켓그로스 물류비 별도",
     },
@@ -182,7 +196,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "무료",
     },
     salesFeeRange: {
-      core: "영세 10%~",
+      core: "카테고리 최저 10%~",
     },
     salesFeeBreakdown: {
       sections: [
@@ -202,9 +216,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
     shippingFeeRate: {
       core: "유료배송 3.3%",
     },
-    settlementCycle: {
-      core: "확정 후 익영업일",
-    },
+    settlementCycle: settlementCell("elevenst"),
     note: {
       core: "카테고리 단일형 구조",
     },
@@ -228,7 +240,7 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
       core: "무료",
     },
     salesFeeRange: {
-      core: "영세 9%~",
+      core: "카테고리 최저 9%~",
     },
     salesFeeBreakdown: {
       sections: [
@@ -243,20 +255,18 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
           ],
         },
       ],
-      footnote: "월 판매 500만원 초과 시 서버이용료 55,000원/월 · G마켓·옥션 세부 카테고리는 다를 수 있음",
+      footnote: "전월 상품 판매대금 500만원 이상 시 서버이용료 55,000원/월 · G마켓·옥션 세부 카테고리는 다를 수 있음",
     },
     shippingFeeRate: {
       core: "유료배송 3.3%",
     },
-    settlementCycle: {
-      core: "확정 후 익영업일",
-    },
+    settlementCycle: settlementCell("gmarket"),
     note: {
       core: "대표값 기준 표기",
     },
     noteFeatures: [
       { label: "수수료 구조", value: "카테고리별 단일 수수료" },
-      { label: "월정액", value: "월 판매 500만원 초과 시 55,000원/월" },
+      { label: "월정액", value: "전월 상품 판매대금 500만원 이상 시 55,000원/월" },
       { label: "배송비 과금", value: "유료배송 3.3%" },
       { label: "주의", value: "G마켓·옥션 세부 카테고리 정책이 다를 수 있음" },
     ],
@@ -264,6 +274,11 @@ export const OPEN_MARKETS: OpenMarketCompareMeta[] = [
 ];
 
 export const OPEN_MARKET_SOURCES: Array<{ name: string; url: string; basis: string }> = [
+  ...SETTLEMENT_ORDER.map((key) => ({
+    name: SETTLEMENT_CYCLES[key].marketName,
+    url: SETTLEMENT_CYCLES[key].sourceUrl,
+    basis: SETTLEMENT_CYCLES[key].sourceName,
+  })),
   {
     name: "스마트스토어",
     url: "https://help.sell.smartstore.naver.com/faq/content.help?faqId=3558",

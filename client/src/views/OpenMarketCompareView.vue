@@ -18,7 +18,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { usePageShare } from "@/composables/usePageShare";
 import { BUILD_DATE } from "@/lib/buildMeta";
 import { DEFAULT_SITE_URL } from "@/lib/site";
+import { SETTLEMENT_VERIFIED } from "@/data/settlementCycles";
 import {
+  MARKET_COMPARE_UPDATED,
   MARKET_COMPARE_VERIFIED,
   OPEN_MARKET_SOURCES,
   OPEN_MARKETS,
@@ -145,7 +147,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
       <div class="retro-titlebar rounded-t-2xl">
         <div class="flex items-center gap-2">
           <h2 class="retro-title">마켓별 비교 기준</h2>
-          <FreshBadge :message="`${MARKET_COMPARE_VERIFIED} 기준`" />
+          <FreshBadge :message="`요율 ${MARKET_COMPARE_UPDATED} · 확인 ${MARKET_COMPARE_VERIFIED}`" />
         </div>
         <SectionShareButton @click="share.openShare" />
       </div>
@@ -161,7 +163,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
               class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
             >
               <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              영세 기준 최저 수수료 {{ lowestFeeLabel }}
+              표기 최저 수수료 {{ lowestFeeLabel }}
             </span>
             <span class="md:hidden"><CopyTableButton :headers="marketCopyHeaders" :rows="marketCopyRows" /></span>
           </div>
@@ -394,6 +396,15 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
           <BadgeAlert class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
           <div class="space-y-1">
             <p>수수료율은 카테고리, 매출 등급, 계약 조건에 따라 달라질 수 있습니다.</p>
+            <p>
+              판매 수수료는 {{ MARKET_COMPARE_UPDATED }} 개정 요율을 {{ MARKET_COMPARE_VERIFIED }}에 다시 확인한 값이고,
+              정산주기는 각 마켓 공식 안내·약관 원문을 {{ SETTLEMENT_VERIFIED }}에 확인한 값입니다. 확인 대상이 달라 날짜를 따로 적습니다.
+            </p>
+            <p>
+              스마트스토어만 매출등급(영세~일반) 구분이 있고, 쿠팡·11번가·G마켓은 카테고리별 단일 수수료라
+              표의 최저값도 영세 우대율이 아니라 카테고리 최저 요율입니다.
+            </p>
+            <p>정산주기는 마켓당 하나가 아닙니다. 표의 값은 기본 정산 방식 기준이며, 각 셀의 물음표에서 주정산·월정산·빠른정산 조건을 함께 확인하세요.</p>
             <p>실제 입점 전에는 각 마켓의 최신 수수료 정책을 반드시 다시 확인하세요.</p>
           </div>
         </div>
