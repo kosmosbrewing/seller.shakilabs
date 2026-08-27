@@ -6,6 +6,7 @@ import { SELLER_ABOUT_GUIDE, SELLER_HOME_GUIDE } from "@/data/seoGuides";
 import { buttonVariants } from "@/components/ui/button";
 import { useConstantsStore } from "@/stores/constants";
 import { FEE_DATA_UPDATED, FEE_DATA_VERIFIED } from "@/data/marketFees";
+import { SETTLEMENT_VERIFIED } from "@/data/settlementCycles";
 import { PAYMENT_DATA_UPDATED, PAYMENT_DATA_VERIFIED } from "@/data/paymentGateways";
 import { SHIPPING_DATA_UPDATED, SHIPPING_DATA_VERIFIED } from "@/data/shippingRates";
 
@@ -49,6 +50,7 @@ const jsonLd = buildFaqPageJsonLd(SELLER_HOME_GUIDE.faqs);
           <li>마켓 수수료: {{ FEE_DATA_UPDATED }} 변경 · {{ FEE_DATA_VERIFIED }} 공식 문서 재검증</li>
           <li>결제 수수료: {{ PAYMENT_DATA_UPDATED }} 변경 · {{ PAYMENT_DATA_VERIFIED }} 공식 문서 재검증</li>
           <li>택배비: {{ SHIPPING_DATA_UPDATED }} 변경 · {{ SHIPPING_DATA_VERIFIED }} 공식 문서 재검증</li>
+          <li>정산주기: {{ SETTLEMENT_VERIFIED }} 각 마켓 공식 안내·약관 원문 확인</li>
         </ul>
         <p class="text-body text-muted-foreground">
           각 마켓·서비스 공식 수수료율을 기반으로 하며, 수수료 변경 시 업데이트됩니다.

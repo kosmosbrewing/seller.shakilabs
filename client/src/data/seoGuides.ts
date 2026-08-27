@@ -1,4 +1,53 @@
 // SEO 리치 가이드 데이터 (seller 앱)
+//
+// 수수료·정산주기 수치는 여기에 직접 적지 않는다. 비교표가 쓰는 데이터(marketFees.ts,
+// settlementCycles.ts)에서 파생시킨다 — 같은 화면의 표와 산문이 다른 값을 말하던 원인이
+// 양쪽 하드코딩이었다. 새 수치가 필요하면 데이터 파일을 먼저 고쳐라.
+
+import {
+  COUPANG,
+  ELEVENST,
+  FEE_DATA_UPDATED,
+  FEE_DATA_VERIFIED,
+  GMARKET,
+  SMARTSTORE,
+  VAT_MULTIPLIER,
+  type CategoryKey,
+} from "./marketFees";
+import {
+  SETTLEMENT_ORDER,
+  SETTLEMENT_VERIFIED,
+  settlementProse,
+} from "./settlementCycles";
+
+/** 0.078 → "7.8" (불필요한 0 제거) */
+function pct(rate: number): string {
+  return Number((rate * 100).toFixed(3)).toString();
+}
+
+/** 카테고리별 요율 맵에서 실제 최저~최고 구간을 뽑는다. */
+function pctRange(map: Record<CategoryKey, number>): string {
+  const values = Object.values(map);
+  return `${pct(Math.min(...values))}~${pct(Math.max(...values))}%`;
+}
+
+const COUPANG_RANGE = pctRange(COUPANG.categoryFee);
+const ELEVENST_RANGE = pctRange(ELEVENST.categoryFee);
+const GMARKET_RANGE = pctRange(GMARKET.categoryFee);
+const SMARTSTORE_ORDER_RANGE = `${pct(SMARTSTORE.orderFee.micro)}~${pct(SMARTSTORE.orderFee.normal)}%`;
+const SMARTSTORE_SALE_SHOPPING = `${pct(SMARTSTORE.saleFee.naverShopping)}%`;
+const SMARTSTORE_SALE_LINK = `${pct(SMARTSTORE.saleFee.marketingLink)}%`;
+const SMARTSTORE_MICRO_TOTAL = `${pct(SMARTSTORE.orderFee.micro + SMARTSTORE.saleFee.marketingLink * VAT_MULTIPLIER)}%`;
+const FULFILLMENT_RANGE = `${COUPANG.fulfillmentFee.xs.toLocaleString("ko-KR")}~${COUPANG.fulfillmentFee.xxl.toLocaleString("ko-KR")}원`;
+
+/** 계산기가 쓰는 요율 그대로를 한 문단으로 편다 — 표와 숫자가 어긋날 수 없다. */
+const MARKET_FEE_PROSE =
+  `스마트스토어는 주문관리 수수료 ${SMARTSTORE_ORDER_RANGE}(매출등급별, VAT 포함)와 ` +
+  `판매 수수료 ${SMARTSTORE_SALE_SHOPPING}(네이버쇼핑 유입)·${SMARTSTORE_SALE_LINK}(마케팅링크 유입, VAT 별도)가 ` +
+  `따로 붙는 이중 구조입니다. 쿠팡 ${COUPANG_RANGE}, 11번가 ${ELEVENST_RANGE}, G마켓·옥션 ${GMARKET_RANGE}는 ` +
+  `카테고리별 단일 수수료입니다(이 계산기가 다루는 5개 대표 카테고리 기준).`;
+
+const SETTLEMENT_PROSE = SETTLEMENT_ORDER.map(settlementProse).join(" ");
 export interface GuideSection { h2: string; body: string; }
 export interface GuideFaq { q: string; a: string; }
 export interface GuideChecklist { title: string; items: string[]; }
@@ -24,7 +73,7 @@ export const SELLER_HOME_GUIDE: GuideData = {
   sections: [
     {
       h2: "오픈마켓 수수료 구조",
-      body: "대부분의 오픈마켓은 '판매가 × 카테고리별 수수료율'로 수수료를 부과합니다. 2026년 기준 주요 오픈마켓 수수료율은 쿠팡 3~15%, 네이버스마트스토어 2~5%, 11번가 6~13%, G마켓·옥션 8~15% 수준입니다. 카테고리에 따라 큰 차이가 있어 같은 상품이라도 플랫폼별로 실수령 마진이 10~20% 차이날 수 있습니다. 전자제품·패션은 수수료가 낮고, 뷰티·건강식품은 높은 편입니다.",
+      body: `대부분의 오픈마켓은 '판매가 × 카테고리별 수수료율'로 수수료를 부과하지만, 스마트스토어만 구조가 다릅니다. ${MARKET_FEE_PROSE} 요율 기준은 ${FEE_DATA_UPDATED} 개정분이며 ${FEE_DATA_VERIFIED}에 공식 문서로 다시 확인했습니다. 같은 상품이라도 카테고리 배정과 유입 경로에 따라 실부담이 달라지므로, 마켓 이름만 보고 고르면 안 됩니다.`,
     },
     {
       h2: "PG 결제 수수료",
@@ -46,11 +95,11 @@ export const SELLER_HOME_GUIDE: GuideData = {
   faqs: [
     {
       q: "어느 오픈마켓이 가장 수수료가 저렴한가요?",
-      a: "네이버스마트스토어(2~5%)가 가장 저렴한 편이며, 네이버페이 결제 수수료와 배송비만 추가됩니다. 단, 플랫폼별로 유입 트래픽과 고객층이 달라 단순 수수료만으로 판단할 수 없습니다. 쿠팡은 수수료가 높지만 로켓배송으로 경쟁력이 있고, G마켓·옥션은 종합 쇼핑몰 효과가 있습니다.",
+      a: `이 계산기가 쓰는 값 기준으로는 스마트스토어가 가장 낮습니다. 영세 등급이 마케팅링크로 유입되면 주문관리 ${pct(SMARTSTORE.orderFee.micro)}%에 판매 수수료 ${SMARTSTORE_SALE_LINK}(VAT 포함 환산)를 더해 약 ${SMARTSTORE_MICRO_TOTAL} 수준입니다. 다만 이는 매출등급과 유입 경로가 모두 맞아떨어졌을 때의 하한이고, 네이버쇼핑으로 유입되면 판매 수수료가 ${SMARTSTORE_SALE_SHOPPING}로 올라갑니다. 쿠팡·11번가·G마켓에는 영세 등급 구분이 없어 카테고리 요율이 그대로 적용됩니다.`,
     },
     {
       q: "쿠팡 로켓배송과 일반 배송 중 어느 게 유리한가요?",
-      a: "로켓배송은 수수료(약 15~20%)가 일반보다 높지만 쿠팡이 재고 관리·배송을 대행해 운영 부담이 적고 고객 회전율이 높습니다. 일반 마켓플레이스(Open Marketplace)는 수수료 10~13%로 낮지만 판매자가 직접 배송해야 합니다. 매출 규모와 운영 능력에 따라 선택하세요.",
+      a: `로켓그로스에 별도의 높은 단일 수수료율이 붙는 것이 아닙니다. 판매 수수료는 마켓플레이스와 같은 카테고리 요율(${COUPANG_RANGE})이고, 여기에 건당 물류비 ${FULFILLMENT_RANGE}(입고+출고 합산, 크기 구간별)가 더해지는 구조입니다. 그래서 단가가 낮고 부피가 큰 상품일수록 물류비 비중이 커져 불리해집니다. 재고 관리·배송 대행과 노출 이점을 물류비와 견줘 판단하세요.`,
     },
     {
       q: "간이과세자와 일반과세자 중 뭐가 유리한가요?",
@@ -71,19 +120,19 @@ export const SELLER_HOME_GUIDE: GuideData = {
 export const SELLER_MARKET_COMPARE_GUIDE: GuideData = {
   title: "오픈마켓 수수료 비교 (2026년)",
   intro:
-    "쿠팡·네이버스마트스토어·11번가·G마켓·옥션·인터파크 등 주요 오픈마켓의 수수료를 한 번에 비교해 최적의 판매 채널을 선택하세요. 카테고리별 수수료 차이, 정산 주기, 부가 혜택을 종합 고려해야 합니다.",
+    "스마트스토어·쿠팡·11번가·G마켓/옥션 4개 오픈마켓의 판매 수수료·배송비 수수료·정산주기를 한 화면에서 비교합니다. 비교표와 아래 설명은 같은 데이터를 쓰므로 숫자가 서로 어긋나지 않습니다. 카테고리별 수수료 차이와 정산 기산점을 함께 보고 판매 채널을 고르세요.",
   sections: [
     {
       h2: "주요 오픈마켓 수수료율",
-      body: "2026년 기준 주요 오픈마켓 평균 수수료율은 다음과 같습니다. 쿠팡: 일반 3~12%, 로켓배송 15~20% (카테고리별 차등). 네이버스마트스토어: 2~5% (가장 저렴) + 네이버페이 결제수수료 2%. 11번가: 6~13%. G마켓·옥션: 8~15%. 인터파크: 6~12%. 티몬·위메프: 3~10%. 같은 상품이라도 플랫폼별로 실수령 마진이 10~20% 차이납니다.",
+      body: `이 페이지 비교표와 계산기는 같은 데이터를 씁니다. ${MARKET_FEE_PROSE} 스마트스토어에 '결제 수수료'가 따로 붙는다는 설명이 돌아다니지만, 주문관리 수수료가 그 역할을 하므로 이중으로 더하면 안 됩니다. 쿠팡 로켓그로스는 위 카테고리 요율에 건당 물류비 ${FULFILLMENT_RANGE}가 추가되는 방식입니다. 요율 기준은 ${FEE_DATA_UPDATED} 개정분, 재확인은 ${FEE_DATA_VERIFIED}입니다.`,
     },
     {
       h2: "카테고리별 수수료 차이",
-      body: "전자제품·가전은 수수료가 낮은 편(3~8%)이고, 뷰티·건강식품·패션은 높은 편(10~15%)입니다. 식품·생활용품은 중간(7~12%)이며, 플랫폼별로 특정 카테고리 수수료 우대 이벤트를 진행하기도 합니다. 판매 품목에 맞는 플랫폼을 선택해야 마진이 최적화됩니다.",
+      body: `같은 마켓 안에서도 카테고리 차이가 마켓 간 차이보다 큰 경우가 많습니다. 계산기 값으로 보면 가전·디지털이 쿠팡 ${pct(COUPANG.categoryFee.electronics)}%, 11번가 ${pct(ELEVENST.categoryFee.electronics)}%, G마켓 ${pct(GMARKET.categoryFee.electronics)}%로 가장 낮고, 의류·패션은 각각 ${pct(COUPANG.categoryFee.clothing)}%, ${pct(ELEVENST.categoryFee.clothing)}%, ${pct(GMARKET.categoryFee.clothing)}%까지 올라갑니다. 상품이 어느 카테고리로 등록되는지가 요율을 결정하므로, 입점 전에 등록 예정 카테고리의 실제 요율을 각 마켓 요율표에서 확인하세요.`,
     },
     {
       h2: "정산 주기 및 유보율",
-      body: "정산 주기는 플랫폼별로 다릅니다. 쿠팡 주 1~2회 (판매일로부터 7~14일 후), 네이버스마트스토어 주 1회 (배송완료 후 7~14일), 11번가·G마켓 월 1~2회. 쿠팡은 정산 유보율(미수금) 제도가 있어 초반 1~2개월은 매출의 20~30%가 보류될 수 있습니다. 자금 흐름 관리에 주의해야 합니다.",
+      body: `정산 주기는 마켓별로 다를 뿐 아니라, 같은 마켓 안에서도 어떤 정산 방식을 선택했는지에 따라 달라집니다. 아래는 위 비교표와 같은 데이터이며, 각 마켓 공식 안내·약관 원문을 ${SETTLEMENT_VERIFIED}에 확인한 값입니다. ${SETTLEMENT_PROSE} 특히 쿠팡 주정산은 마감 후 15영업일에 70%만 먼저 들어오고 나머지 30%가 다음 달로 넘어가므로, 매출이 늘어날수록 운전자금이 먼저 마릅니다. 판매 시점이 아니라 구매확정 시점이 기산점이라는 점도 함께 감안해야 합니다.`,
     },
     {
       h2: "멀티 채널 전략",
@@ -105,7 +154,7 @@ export const SELLER_MARKET_COMPARE_GUIDE: GuideData = {
     },
     {
       q: "정산일이 늦으면 어떻게 대응하나요?",
-      a: "정산이 늦으면 자금 흐름에 문제가 생길 수 있으므로, 매출 대비 2~3개월치 운영자금을 비상금으로 확보하는 것이 좋습니다. 일부 플랫폼은 '빠른정산' 서비스로 수수료 약간 추가 부담 후 1~2일 내 정산 가능합니다.",
+      a: `먼저 지연인지 원래 그런 주기인지부터 구분해야 합니다. 쿠팡은 지연이 아니어도 주정산 기준 마감 후 15영업일이 걸립니다. 선지급 서비스로는 스마트스토어 빠른정산(집화처리 +1영업일, 대상 판매자 한정)과 쿠팡 셀러 월렛(다음 날 90%, 별도 신청·수수료 부담)이 있습니다. 이용료가 붙는 선지급을 상시로 쓰면 사실상 자금 조달 비용이므로, 운전자금을 먼저 확보해 두는 편이 낫습니다.`,
     },
     {
       q: "동일 상품을 여러 마켓에 등록해도 되나요?",
@@ -225,7 +274,7 @@ export const SELLER_SHIPPING_GUIDE: GuideData = {
     },
     {
       q: "로켓배송은 일반 배송보다 유리한가요?",
-      a: "쿠팡 로켓배송은 고객 구매 전환율이 일반 대비 30~50% 높지만 수수료가 15~20%로 일반(10~13%)보다 비쌉니다. 매출 규모가 클수록 로켓배송이 유리하며, 소량·소규모는 일반 마켓플레이스가 나을 수 있습니다.",
+      a: `비용만 놓고 보면 로켓그로스는 판매 수수료(카테고리별 ${COUPANG_RANGE})가 마켓플레이스와 같고, 건당 물류비 ${FULFILLMENT_RANGE}이 추가됩니다. 즉 '수수료율이 몇 % 더 비싸다'가 아니라 '건당 정액이 더 붙는다'가 정확한 표현이라, 판매 단가가 낮을수록 불리합니다. 전환율이 얼마나 오르는지는 상품·카테고리마다 달라 일반화된 수치를 제시하지 않습니다. 직접 배송 원가와 물류비를 상품 단위로 비교해 판단하세요.`,
     },
   ],
   sources: [
