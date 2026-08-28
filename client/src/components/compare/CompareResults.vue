@@ -38,6 +38,18 @@ const summaryDelta = computed(() => {
       <SectionShareButton @click="emit('share')" />
     </div>
 
+    <!-- 결과 히어로 — 전 앱 공통 문법(라벨 위 muted → 금액 text-display 브랜드색 → 보조 muted).
+         기본 입력값으로도 항상 계산되므로 첫 화면부터 노출된다. -->
+    <div v-if="bestResult" class="border-b border-border/40 px-4 py-4 text-center">
+      <p class="text-caption text-muted-foreground">
+        1위 {{ ALL_CHANNEL_META[bestResult.marketKey].name }} 건당 순이익
+      </p>
+      <p class="mt-1 text-display font-bold text-primary tabular-nums">{{ formatWon(bestResult.netProfit) }}</p>
+      <p v-if="runnerUp" class="mt-1 text-caption text-muted-foreground">
+        {{ ALL_CHANNEL_META[runnerUp.marketKey].name }}보다 건당 {{ formatWon(summaryDelta) }} 더 남습니다
+      </p>
+    </div>
+
     <div class="seller-mobile-list space-y-3 px-3.5 py-3 md:hidden">
       <div
         v-for="(result, idx) in sortedResults"
@@ -157,14 +169,7 @@ const summaryDelta = computed(() => {
       </ShTable>
     </div>
 
-    <div v-if="bestResult && runnerUp" class="border-t border-border/40 px-4 py-3">
-      <p class="text-caption text-muted-foreground">
-        <span class="font-semibold text-profit">{{ ALL_CHANNEL_META[bestResult.marketKey].name }}</span>이
-        {{ ALL_CHANNEL_META[runnerUp.marketKey].name }}보다 건당
-        <span class="font-semibold text-profit">{{ formatWon(summaryDelta) }}</span> 더 남습니다.
-      </p>
-    </div>
-    <p v-if="includeOwnStore" class="px-4 pb-3 text-tiny text-muted-foreground">
+    <p v-if="includeOwnStore" class="px-4 pb-3 pt-3 text-tiny text-muted-foreground">
       * 자사몰(PG) 비교는 카드 결제 수수료 중심이며, VAT 별도 PG는 VAT 포함 실부담으로 계산합니다.
       <br class="hidden sm:block" />
       트래픽 확보·호스팅 비용은 제외되며, 토스페이먼츠는 설정비 22만원과 연 이용료 11만원이 추가됩니다.
