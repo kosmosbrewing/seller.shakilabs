@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
 import {
   ShBadge,
@@ -29,6 +29,75 @@ const summaryDelta = computed(() => {
   if (!bestResult.value || !runnerUp.value) return 0;
   return Math.max(0, runnerUp.value.totalFee - bestResult.value.totalFee);
 });
+
+// 카운트업 정책(2026-08 복원): 히어로 금액(1위 건당 순이익)만 애니메이션한다.
+// 보조문·표는 정적 유지. SSR/SSG 산출물에는 항상 최종값이 정적으로 남는다
+// (초기 ref = 최종 포맷값, 애니메이션은 onMounted 이후에만 → 하이드레이션 불일치 없음).
+// 마운트 시 0→값, 값 변경 시 현재 표시값→새 값 보간, prefers-reduced-motion 즉시 최종값.
+const DURATION_MS = 750;
+const NUM_RE = /-?\d[\d,]*(?:\.\d+)?/;
+
+const heroTarget = computed(() =>
+  bestResult.value ? formatWon(bestResult.value.netProfit) : "",
+);
+const displayHero = ref(heroTarget.value);
+let rafId = 0;
+
+function parseNum(text: string): { num: number; decimals: number } | null {
+  const m = text.match(NUM_RE);
+  if (!m) return null;
+  const raw = m[0].replace(/,/g, "");
+  const num = Number(raw);
+  if (!Number.isFinite(num)) return null;
+  const decimals = raw.includes(".") ? raw.split(".")[1].length : 0;
+  return { num, decimals };
+}
+
+function formatLike(template: string, n: number, decimals: number): string {
+  const grouped = template.match(NUM_RE)?.[0].includes(",") ?? false;
+  const formatted = n.toLocaleString("ko-KR", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    useGrouping: grouped,
+  });
+  return template.replace(NUM_RE, formatted);
+}
+
+function animateTo(from: number, target: string) {
+  cancelAnimationFrame(rafId);
+  const parsed = parseNum(target);
+  if (
+    !parsed ||
+    parsed.num === from ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    displayHero.value = target;
+    return;
+  }
+  const start = performance.now();
+  const delta = parsed.num - from;
+  const tick = (now: number) => {
+    const t = Math.min((now - start) / DURATION_MS, 1);
+    if (t >= 1) {
+      displayHero.value = target;
+      return;
+    }
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    displayHero.value = formatLike(target, from + delta * eased, parsed.decimals);
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+}
+
+onMounted(() => {
+  animateTo(0, heroTarget.value);
+  watch(heroTarget, (next) => {
+    const current = parseNum(displayHero.value)?.num ?? 0;
+    animateTo(current, next);
+  });
+});
+
+onBeforeUnmount(() => cancelAnimationFrame(rafId));
 </script>
 
 <template>
@@ -44,7 +113,7 @@ const summaryDelta = computed(() => {
       <p class="text-caption text-muted-foreground">
         1위 {{ ALL_CHANNEL_META[bestResult.marketKey].name }} 건당 순이익
       </p>
-      <p class="mt-1 text-display font-bold text-primary tabular-nums">{{ formatWon(bestResult.netProfit) }}</p>
+      <p class="mt-1 text-display font-bold text-primary tabular-nums">{{ displayHero }}</p>
       <p v-if="runnerUp" class="mt-1 text-caption text-muted-foreground">
         {{ ALL_CHANNEL_META[runnerUp.marketKey].name }}보다 건당 {{ formatWon(summaryDelta) }} 더 남습니다
       </p>
