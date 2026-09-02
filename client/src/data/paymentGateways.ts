@@ -32,6 +32,8 @@ export interface PaymentGatewayMeta {
   microBusinessRate: number;
   setupFee: CompareCell;
   annualFee: CompareCell;
+  /** 고정비의 수치판(원) — 다이제스트가 요율로 환산할 때 쓴다. 표 문구와 테스트로 대조한다. */
+  fixedFees?: { setup: number; annual: number };
   cardFee: CompareCell;
   cardFeeTiers?: { tiers: CardFeeTier[]; vatNote: string };
   settlementCycle: CompareCell;
@@ -75,6 +77,7 @@ export const PAYMENT_GATEWAYS: PaymentGatewayMeta[] = [
     annualFee: {
       core: "11만원(매년)",
     },
+    fixedFees: { setup: 220_000, annual: 110_000 },
     cardFee: {
       core: "공개 일반 3.4%",
     },

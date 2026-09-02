@@ -223,12 +223,33 @@ export const GMARKET = {
   shippingFeeRate: 0.033,
 } as const;
 
-// 마켓별 월정액(서버 이용료) — FAQ·비교표에서 참조
-export const MONTHLY_FEES: Partial<Record<MarketKey, { amount: number; threshold: string }>> = {
-  coupang: { amount: 55_000, threshold: "월 판매 100만원 초과" },
-  elevenst: { amount: 77_000, threshold: "월 구매확정 500만원 초과" },
-  gmarket: { amount: 55_000, threshold: "전월 상품 판매대금 500만원 이상" },
+// 마켓별 월정액(서버 이용료) — FAQ·비교표·파생 다이제스트에서 참조
+// thresholdRevenue/inclusive는 threshold 문구의 수치판: 다이제스트가 월정액 발동 구간을
+// 엔진으로 훑을 때 쓴다. 문구와 숫자가 갈리지 않도록 테스트가 둘을 대조한다.
+export interface MonthlyFee {
+  amount: number;
+  threshold: string;
+  /** 발동 기준 월 매출(원) */
+  thresholdRevenue: number;
+  /** true면 "이상", false면 "초과" */
+  inclusive: boolean;
+}
+
+export const MONTHLY_FEES: Partial<Record<MarketKey, MonthlyFee>> = {
+  coupang: { amount: 55_000, threshold: "월 판매 100만원 초과", thresholdRevenue: 1_000_000, inclusive: false },
+  elevenst: { amount: 77_000, threshold: "월 구매확정 500만원 초과", thresholdRevenue: 5_000_000, inclusive: false },
+  gmarket: { amount: 55_000, threshold: "전월 상품 판매대금 500만원 이상", thresholdRevenue: 5_000_000, inclusive: true },
 };
+
+/** 월 매출이 월정액 발동선을 넘는가 (매달 같은 수량을 파는 정상 상태 가정). */
+export function monthlyFeeFor(market: MarketKey, monthlyRevenue: number): number {
+  const fee = MONTHLY_FEES[market];
+  if (!fee) return 0;
+  const triggered = fee.inclusive
+    ? monthlyRevenue >= fee.thresholdRevenue
+    : monthlyRevenue > fee.thresholdRevenue;
+  return triggered ? fee.amount : 0;
+}
 
 // 수수료 데이터 최종 업데이트 날짜 (2025.10 인하 반영, 2026.07 재검증 — 변동 없음)
 export const FEE_DATA_UPDATED = "2025.10";
