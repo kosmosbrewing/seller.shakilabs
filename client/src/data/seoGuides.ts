@@ -19,6 +19,12 @@ import {
   SETTLEMENT_VERIFIED,
   settlementProse,
 } from "./settlementCycles";
+// 파생 다이제스트 — 엔진을 전 구간 돌려 "여러 조건을 한 페이지에서 조망"할 때만 보이는 발견.
+// 일반 안내 섹션보다 앞에 둔다: 페이지 고유 내용이 먼저, 어디에나 있는 설명은 뒤에.
+import { HOME_DIGEST } from "./digests/homeDigest";
+import { MARKET_COMPARE_DIGEST } from "./digests/marketDigest";
+import { PAYMENT_DIGEST } from "./digests/paymentDigest";
+import { SHIPPING_DIGEST } from "./digests/shippingDigest";
 
 /** 0.078 → "7.8" (불필요한 0 제거) */
 function pct(rate: number): string {
@@ -71,6 +77,7 @@ export const SELLER_HOME_GUIDE: GuideData = {
   intro:
     "온라인 판매에서 가장 중요한 것은 수수료 계산과 순이익 관리입니다. 쿠팡·네이버스마트스토어·11번가·G마켓·옥션 등 오픈마켓 수수료, PG사 결제 수수료, 택배 배송비, 부가세·소득세까지 모든 비용을 반영한 실제 마진을 정확히 계산해야 합니다. 본 서비스는 판매 가격만 입력하면 주요 플랫폼별 수수료와 순이익을 즉시 비교할 수 있는 무료 계산기입니다.",
   sections: [
+    ...HOME_DIGEST,
     {
       h2: "오픈마켓 수수료 구조",
       body: `대부분의 오픈마켓은 '판매가 × 카테고리별 수수료율'로 수수료를 부과하지만, 스마트스토어만 구조가 다릅니다. ${MARKET_FEE_PROSE} 요율 기준은 ${FEE_DATA_UPDATED} 개정분이며 ${FEE_DATA_VERIFIED}에 공식 문서로 다시 확인했습니다. 같은 상품이라도 카테고리 배정과 유입 경로에 따라 실부담이 달라지므로, 마켓 이름만 보고 고르면 안 됩니다.`,
@@ -122,6 +129,7 @@ export const SELLER_MARKET_COMPARE_GUIDE: GuideData = {
   intro:
     "스마트스토어·쿠팡·11번가·G마켓/옥션 4개 오픈마켓의 판매 수수료·배송비 수수료·정산주기를 한 화면에서 비교합니다. 비교표와 아래 설명은 같은 데이터를 쓰므로 숫자가 서로 어긋나지 않습니다. 카테고리별 수수료 차이와 정산 기산점을 함께 보고 판매 채널을 고르세요.",
   sections: [
+    ...MARKET_COMPARE_DIGEST,
     {
       h2: "주요 오픈마켓 수수료율",
       body: `이 페이지 비교표와 계산기는 같은 데이터를 씁니다. ${MARKET_FEE_PROSE} 스마트스토어에 '결제 수수료'가 따로 붙는다는 설명이 돌아다니지만, 주문관리 수수료가 그 역할을 하므로 이중으로 더하면 안 됩니다. 쿠팡 로켓그로스는 위 카테고리 요율에 건당 물류비 ${FULFILLMENT_RANGE}가 추가되는 방식입니다. 요율 기준은 ${FEE_DATA_UPDATED} 개정분, 재확인은 ${FEE_DATA_VERIFIED}입니다.`,
@@ -183,6 +191,7 @@ export const SELLER_PAYMENT_GUIDE: GuideData = {
   intro:
     "온라인 판매자가 직접 PG사(Payment Gateway)를 연동할 때 결제 수단별 수수료가 다릅니다. 신용카드·계좌이체·가상계좌·간편결제·해외결제 각각의 수수료를 비교해 결제 구성 전략을 수립할 수 있습니다.",
   sections: [
+    ...PAYMENT_DIGEST,
     {
       h2: "PG 수수료 구조",
       body: "PG 수수료는 '거래 수수료 + 월 이용료'로 구성됩니다. 거래 수수료는 결제 수단별 차등 부과되며, 신용카드 2.5~3.5%, 계좌이체·가상계좌 1.5~2.5%, 간편결제 2.0~3.0%, 해외카드 3.5~5.0% 수준입니다. 월 이용료는 일반적으로 2~5만원입니다. 거래량이 많을수록 수수료 할인을 받을 수 있습니다.",
@@ -234,6 +243,7 @@ export const SELLER_SHIPPING_GUIDE: GuideData = {
   intro:
     "온라인 판매에서 배송비는 순이익에 직접 영향을 미치는 중요한 비용입니다. 주요 택배사별 계약 단가, 구간별 요금, 부가 서비스(당일배송·새벽배송·지정일 배송) 비용을 비교해 최적 배송 전략을 수립하세요.",
   sections: [
+    ...SHIPPING_DIGEST,
     {
       h2: "주요 택배사 계약 단가",
       body: "2026년 기준 주요 택배사 B2C 판매자 계약가(월 200건 기준)는 CJ대한통운 1,800~2,200원, 한진택배 1,700~2,100원, 우체국택배 1,900~2,300원, 롯데택배 1,700~2,100원, 로젠택배 1,600~2,000원입니다. 월 1,000건 이상이면 1,500원 이하로도 가능합니다. 신규 판매자는 대행 택배(쿠팡위탁·네이버쇼핑라이브 등)을 이용하는 것이 유리합니다.",
