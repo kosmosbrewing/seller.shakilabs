@@ -117,16 +117,16 @@ function sourceVsTier(): Finding {
 }
 
 // 월정액이 켜지면서 G마켓이 쿠팡을 앞서는 월매출 창 — 카테고리별로 훑는다
-interface Window { cat: CategoryKey; open: number; close: number }
+export interface Window { cat: CategoryKey; open: number; close: number }
 
-function monthlyCost(market: MarketKey, unitFee: number, revenue: number): number {
+export function monthlyCost(market: MarketKey, unitFee: number, revenue: number): number {
   return unitFee * (revenue / SCAN_PRICE) + monthlyFeeFor(market, revenue);
 }
 
 const SCAN_PRICE = 10_000; // 1만원 단위 매출 해상도
 const SCAN_MAX_REVENUE = 10_000_000;
 
-function feeWindow(cat: CategoryKey, a: MarketKey, b: MarketKey): Window | null {
+export function feeWindow(cat: CategoryKey, a: MarketKey, b: MarketKey): Window | null {
   const fees = calcAllMarkets({
     price: SCAN_PRICE, shippingFee: 0, category: cat,
     smartstoreTier: "micro", smartstoreSource: "naverShopping",
@@ -148,7 +148,8 @@ function monthlyFeeWindows(): Finding {
   const narrowest = byWidth[0];
   const widest = byWidth[byWidth.length - 1];
   const coupangFee = MONTHLY_FEES.coupang!;
-  const desc = windows.map((w) => `${categoryLabel(w.cat)} ${manwon(w.open)}~${manwon(w.close)}`);
+  // close는 스캔에서 G마켓이 다시 비싸지는 첫 매출(배타)이다 — "~230만원"으로 쓰면 230만원에서도 싼 것처럼 읽히므로 "미만"을 붙인다.
+  const desc = windows.map((w) => `${categoryLabel(w.cat)} ${manwon(w.open)} 이상 ${manwon(w.close)} 미만`);
   return {
     h2: "13% G마켓이 10.5% 쿠팡보다 싼 월매출 구간이 카테고리마다 다르게 열린다",
     body:

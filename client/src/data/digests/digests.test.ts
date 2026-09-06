@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { CATEGORIES } from "../categories";
 import { MONTHLY_FEES } from "../marketFees";
+import { calcAllMarkets } from "@/utils/calculator";
 import { PAYMENT_GATEWAYS } from "../paymentGateways";
 import {
   SELLER_HOME_GUIDE,
@@ -10,7 +12,7 @@ import {
 } from "../seoGuides";
 import { type Finding } from "./format";
 import { HOME_DIGEST } from "./homeDigest";
-import { MARKET_COMPARE_DIGEST } from "./marketDigest";
+import { MARKET_COMPARE_DIGEST, feeWindow, monthlyCost } from "./marketDigest";
 import { PAYMENT_DIGEST } from "./paymentDigest";
 import { SHIPPING_DIGEST } from "./shippingDigest";
 
@@ -122,6 +124,27 @@ describe("파생 다이제스트 — 수치판 데이터와 문구의 일치", (
       expect(fee.threshold).toContain(`${fee.thresholdRevenue / 10_000}만원`);
       expect(fee.threshold.endsWith(fee.inclusive ? "이상" : "초과")).toBe(true);
     }
+  });
+
+  it("쿠팡↔G마켓 월정액 창 문구의 상한은 배타(미만)이고 실제 비용 역전 경계와 일치한다", () => {
+    // 창의 close는 G마켓이 다시 비싸지는 첫 매출이다. "~230만원"으로 쓰면 230만원에서도 싸다고 읽히므로
+    // 문구가 "이상 … 미만"을 쓰는지, 그리고 close에서는 비싸고 close 직전(1만원 전)에는 싼지를 함께 잠근다.
+    const finding = MARKET_COMPARE_DIGEST.find((f) => f.body.includes("월 비용이 적어지는 구간"))!;
+    for (const cat of CATEGORIES.map((c) => c.key)) {
+      const w = feeWindow(cat, "coupang", "gmarket")!;
+      expect(finding.body).toContain(`${w.open / 10_000}만원 이상 ${w.close / 10_000}만원 미만`);
+      const fees = calcAllMarkets({
+        price: 10_000, shippingFee: 0, category: cat,
+        smartstoreTier: "micro", smartstoreSource: "naverShopping",
+        coupangMode: "marketplace", fulfillmentSize: "small",
+      });
+      const unit = (k: "coupang" | "gmarket") => fees.find((f) => f.marketKey === k)!.totalFee;
+      const cheaper = (rev: number) => monthlyCost("gmarket", unit("gmarket"), rev) < monthlyCost("coupang", unit("coupang"), rev);
+      expect(cheaper(w.open), `${cat} open`).toBe(true);
+      expect(cheaper(w.close - 10_000), `${cat} close-1`).toBe(true);
+      expect(cheaper(w.close), `${cat} close`).toBe(false);
+    }
+    expect(finding.body).not.toMatch(/\d만원~\d/);
   });
 
   it("토스페이먼츠 고정비 수치판이 비교표 문구와 일치한다", () => {
