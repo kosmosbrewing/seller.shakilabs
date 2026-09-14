@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { BadgeCheck, Medal } from "lucide-vue-next";
 import {
   ShBadge,
@@ -30,10 +30,12 @@ const summaryDelta = computed(() => {
   return Math.max(0, runnerUp.value.totalFee - bestResult.value.totalFee);
 });
 
-// 카운트업 정책(2026-08 복원): 히어로 금액(1위 건당 순이익)만 애니메이션한다.
-// 보조문·표는 정적 유지. SSR/SSG 산출물에는 항상 최종값이 정적으로 남는다
-// (초기 ref = 최종 포맷값, 애니메이션은 onMounted 이후에만 → 하이드레이션 불일치 없음).
-// 마운트 시 0→값, 값 변경 시 현재 표시값→새 값 보간, prefers-reduced-motion 즉시 최종값.
+// 카운트업 계약(BL-020, finance ResultHero.vue 참조 구현과 동일): 히어로 금액
+// (1위 건당 순이익)만 애니메이션한다. 보조문·표는 정적 유지.
+// 트리거는 "포맷된 문자열이 실제로 바뀔 때"뿐이다 — 로드·하이드레이션에는
+// 재실행하지 않는다(마운트 애니메이션은 재애니 버그의 원인이라 제거했다).
+// 초기 ref = 최종 포맷값이라 SSR/SSG 산출물과 첫 페인트 모두 항상 최종값이다.
+// 중단 시 0이 아니라 현재 표시값에서 이어가고, prefers-reduced-motion이면 즉시 최종값.
 const DURATION_MS = 750;
 const NUM_RE = /-?\d[\d,]*(?:\.\d+)?/;
 
@@ -89,12 +91,10 @@ function animateTo(from: number, target: string) {
   rafId = requestAnimationFrame(tick);
 }
 
-onMounted(() => {
-  animateTo(0, heroTarget.value);
-  watch(heroTarget, (next) => {
-    const current = parseNum(displayHero.value)?.num ?? 0;
-    animateTo(current, next);
-  });
+watch(heroTarget, (next, previous) => {
+  if (next === previous) return;
+  const current = parseNum(displayHero.value)?.num ?? 0;
+  animateTo(current, next);
 });
 
 onBeforeUnmount(() => cancelAnimationFrame(rafId));
@@ -113,7 +113,7 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
       <p class="text-caption text-muted-foreground">
         1위 {{ ALL_CHANNEL_META[bestResult.marketKey].name }} 건당 순이익
       </p>
-      <p class="mt-1 text-display font-bold text-primary tabular-nums">{{ displayHero }}</p>
+      <p class="mt-1 text-display font-bold font-brand text-primary tabular-nums">{{ displayHero }}</p>
       <p v-if="runnerUp" class="mt-1 text-caption text-muted-foreground">
         {{ ALL_CHANNEL_META[runnerUp.marketKey].name }}보다 건당 {{ formatWon(summaryDelta) }} 더 남습니다
       </p>

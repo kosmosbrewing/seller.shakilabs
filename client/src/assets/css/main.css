@@ -28,9 +28,12 @@
   font-display: swap;
 }
 
+/* 강조 숫자 전용(font-brand). 결과 히어로 금액에서만 쓰이므로 숫자·통화 단위
+   서브셋(14.5KB)이면 충분하다 — 전체 문자셋 .woff(944KB)는 받아가지 않는다.
+   커버 밖 글자(페이지 타이틀의 한글 등)는 font-brand 스택의 다음 폰트로 자동 대체된다. */
 @font-face {
   font-family: "GmarketSans";
-  src: url("/fonts/GmarketSansBold.woff") format("woff");
+  src: url("/fonts/GmarketSansBold-num-v1.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
