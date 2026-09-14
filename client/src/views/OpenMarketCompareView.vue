@@ -178,9 +178,10 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
             :class="market.key === lowestFeeMarket ? 'border-profit/40' : 'border-border/70'"
           >
             <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
+              <!-- v3 §5.6/BL-060 — 마켓별 다색 배지(market.color/foreground)는 셀 다색 로고
+                   드리프트로 지목됨. 단색 마크로 통일하고 라벨 텍스트로만 구분한다 -->
               <span
-                class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                :style="{ backgroundColor: market.color, color: market.foreground }"
+                class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl border border-border px-1.5 text-tiny font-bold whitespace-nowrap bg-muted text-foreground"
               >
                 {{ market.shortName }}
               </span>
@@ -298,8 +299,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                 >
                   <div class="flex items-center gap-2.5">
                     <span
-                      class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                      :style="{ backgroundColor: market.color, color: market.foreground }"
+                      class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl border border-border px-1.5 text-tiny font-bold bg-muted text-foreground"
                     >
                       {{ market.shortName }}
                     </span>

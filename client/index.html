@@ -90,12 +90,13 @@
     <!-- Critical CSS: seller 테마 — 오렌지 커머스 톤 -->
     <style>
       :root {
-        --background: 210 40% 98%;
-        --foreground: 222 47% 11%;
+        /* v3 §2.1 역할 토큰 — canvas/card/ink/ink-muted/line/focus는 hex에서 역산(반올림 왕복 검증 완료) */
+        --background: 60 11.11% 96.47%; /* color.canvas #F7F7F5 */
+        --foreground: 0 0% 3.92%; /* color.ink #0A0A0A */
         --muted: 210 40% 96%;
-        --muted-foreground: 215 16% 37%;
-        --card: 0 0% 100%;
-        --card-foreground: 222 47% 11%;
+        --muted-foreground: 60 3.37% 34.9%; /* color.ink-muted #5C5C56 */
+        --card: 0 0% 100%; /* color.card #FFFFFF */
+        --card-foreground: 0 0% 3.92%;
         --primary: 25 85% 27%;
         --primary-foreground: 0 0% 100%;
         --secondary: 25 20% 93%;
@@ -104,6 +105,10 @@
         --accent-foreground: 25 80% 35%;
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
+        /* v3 §4.1 카테고리 액센트 API — @shakilabs/ui 0.3.15가 읽는 계약: --accent-hsl / --accent-muted-hsl.
+           브랜드색(오렌지 브라운)은 지우지 않고 그대로 주입 — SecondaryNav underline·ResultAmount 전용 */
+        --accent-hsl: 25 85% 27%;
+        --accent-muted-hsl: 25 85% 27%;
         /* 에러 토스트(bg-destructive + destructive-foreground)를 픽셀로 재니 4.49:1로
            AA 미달이었다. 0 72% 52%는 --fee가 틴트 행에서 4.05:1로 걸렸던 바로 그 값이라,
            같은 함대 통일값(0 74% 42%)으로 내려 hue를 유지한 채 명도만 낮춘다.
@@ -111,9 +116,9 @@
            1위 틴트 행 4.05 → 5.53:1. */
         --destructive: 0 74% 42%;
         --destructive-foreground: 210 40% 98%;
-        --border: 214 16% 85%;
+        --border: 60 8% 90.2%; /* color.line #E8E8E4 */
         --input: 214 16% 85%;
-        --ring: 25 85% 27%;
+        --ring: 0 0% 3.92%; /* color.focus #0A0A0A (v3 §2.1 — 포커스는 브랜드색이 아니라 ink) */
         --radius: 0.4rem;
         --profit: 160 65% 25%;
         --profit-foreground: 0 0% 100%;
@@ -124,28 +129,30 @@
       }
 
       .dark {
-        --background: 222 47% 11%;
-        --foreground: 210 40% 96%;
+        --background: 0 0% 7.06%; /* color.canvas dark #121212 */
+        --foreground: 0 0% 96.08%; /* color.ink dark #F5F5F5 */
         --muted: 217 33% 17%;
-        --muted-foreground: 215 20% 72%;
-        --card: 217 33% 17%;
-        --card-foreground: 210 40% 96%;
+        --muted-foreground: 60 3.33% 64.71%; /* color.ink-muted dark #A8A8A2 */
+        --card: 0 0% 10.98%; /* color.card dark #1C1C1C */
+        --card-foreground: 0 0% 96.08%;
         --primary: 24 82% 56%;
         --primary-foreground: 24 72% 12%;
         --secondary: 24 12% 19%;
         --secondary-foreground: 210 40% 96%;
         --accent: 24 16% 23%;
         --accent-foreground: 28 68% 82%;
-        --popover: 217 33% 17%;
-        --popover-foreground: 210 40% 96%;
+        --popover: 0 0% 10.98%;
+        --popover-foreground: 0 0% 96.08%;
+        --accent-hsl: 24 82% 56%;
+        --accent-muted-hsl: 24 82% 56%;
         /* 다크에서 --destructive는 카드 위 글자색(text-destructive)이자 토스트 배경이다.
            0 72% 58%는 글자로 3.66:1, 흰 글자를 얹으면 4.05:1로 양쪽 다 미달이었다.
            밝은 적색 면 + 어두운 적색 잉크 조합으로 바꿔 두 방향 모두 통과시킨다. */
         --destructive: 0 75% 72%;
         --destructive-foreground: 0 72% 12%;
-        --border: 214 16% 26%;
+        --border: 0 0% 16.47%; /* color.line dark #2A2A2A */
         --input: 214 16% 30%;
-        --ring: 24 82% 56%;
+        --ring: 0 0% 96.08%; /* color.focus dark #F5F5F5 */
         --profit: 160 56% 50%;
         /* 밝은 초록 위의 흰 글자는 2.15:1이었다. 앱 hue를 유지한 채 어둡게 해서 배지 글자를 살린다. */
         --profit-foreground: 160 72% 10%;
@@ -157,6 +164,10 @@
       html {
         scroll-behavior: auto;
         font-size: 16px;
+        /* v3 §3.1 BL-061 — 앵커·H2가 고정 헤더/2차 내비에 가리지 않게 스크롤 오프셋 확보 */
+        --header-h: 56px;
+        --secondary-nav-h: 49px;
+        scroll-padding-top: calc(var(--header-h) + var(--secondary-nav-h, 0px) + 8px);
       }
 
       body {

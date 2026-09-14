@@ -26,6 +26,5 @@ const activeItem = computed(() => tabs.find(isActive));
     :items="tabs"
     :active-key="activeItem?.key"
     :link-component="RouterLink"
-    :mobile-columns="2"
   />
 </template>
