@@ -104,6 +104,23 @@ if (result.status !== 0) {
 removeRenderedNoscriptFallbacks();
 removeAdsenseLoaderFromNotFound();
 
+// GmarketSans 서브셋 게이트 — 이번 빌드 산출물이 실제로 새 폰트 파일을 참조하고,
+// 그 파일이 매니페스트와 일치하는지 매번 확인한다. 직전 커밋(BL-020)의 사고가
+// "서브셋만 좁게 바꾸고 아무도 검증하지 않아 h1 글자가 조용히 빠졌다"였다 —
+// 이 게이트가 빠지면 같은 사고가 조용히 재발한다.
+const fontsVerifyResult = spawnSync(
+  process.execPath,
+  [resolve(projectRoot, "scripts", "verify-fonts.mjs")],
+  {
+    cwd: projectRoot,
+    stdio: "inherit",
+  }
+);
+
+if (fontsVerifyResult.status !== 0) {
+  process.exit(fontsVerifyResult.status ?? 1);
+}
+
 const validationResult = spawnSync(
   process.execPath,
   [resolve(projectRoot, "scripts", "validate-static-output.mjs")],

@@ -28,12 +28,13 @@
   font-display: swap;
 }
 
-/* 강조 숫자 전용(font-brand). 결과 히어로 금액에서만 쓰이므로 숫자·통화 단위
-   서브셋(14.5KB)이면 충분하다 — 전체 문자셋 .woff(944KB)는 받아가지 않는다.
-   커버 밖 글자(페이지 타이틀의 한글 등)는 font-brand 스택의 다음 폰트로 자동 대체된다. */
+/* 제목+숫자 통합 서브셋(BL-020 개정, docs/BRAND_FONT_SUBSET.md). 숫자만 자르면
+   "오픈마켓 수수료 계산기"의 한 글자만 Gmarket이 되는 식으로 단어 안에서 서체가
+   갈렸다 — h1(font-brand)·섹션 타이틀(.retro-title)·결과 히어로 금액까지 렌더
+   스캔으로 실제 쓰이는 문자만 모아 담아 944KB → 7.5KB. */
 @font-face {
   font-family: "GmarketSans";
-  src: url("/fonts/GmarketSansBold-num-v1.woff2") format("woff2");
+  src: url("/fonts/GmarketSansBold-brand-v1.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
