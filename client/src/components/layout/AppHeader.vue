@@ -11,6 +11,8 @@ import {
   type PrimaryNavigationItem,
 } from "@shakilabs/ui";
 import { SELLER_TOOLS } from "@/data/sellerNavigation";
+import TickerBar from "@/components/common/TickerBar.vue";
+import { tickerMessages } from "@/data/tickerMessages";
 
 const THEME_STORAGE_KEY = "seller-fee:theme:v1";
 type ThemeMode = "light" | "dark";
@@ -64,6 +66,15 @@ const links: GlobalHeaderLink[] = [{ href: "/blog", label: "블로그" }];
     nav-title="수수료 도구"
     :link-component="RouterLink"
   >
+    <!-- 헤더 가운데 회전 안내. 패키지가 흐름 밖에 절대 배치하므로 문구 길이가
+         56px 헤더 높이를 바꾸지 못한다(v3 §3.2 BL-005 재발 방지, 0.3.24). -->
+    <template #tip>
+      <span data-tip-eyebrow class="inline-flex items-center gap-2 whitespace-nowrap">
+        <span class="shrink-0 font-semibold tracking-wide opacity-80">참고</span>
+        <TickerBar :messages="tickerMessages" />
+      </span>
+    </template>
+
     <template #utility>
       <ShButton
         type="button"
