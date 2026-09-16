@@ -70,7 +70,6 @@ const links: GlobalHeaderLink[] = [{ href: "/blog", label: "블로그" }];
          56px 헤더 높이를 바꾸지 못한다(v3 §3.2 BL-005 재발 방지, 0.3.24). -->
     <template #tip>
       <span data-tip-eyebrow class="inline-flex items-center gap-2 whitespace-nowrap">
-        <span class="shrink-0 font-semibold tracking-wide opacity-80">참고</span>
         <TickerBar :messages="tickerMessages" />
       </span>
     </template>
