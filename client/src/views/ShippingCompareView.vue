@@ -260,7 +260,7 @@ function getShippingRowTone(
   cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
 ): string {
   if (!result.isAvailable) return "compare-hover-row-muted bg-muted/25";
-  if (result.carrier.key === cheapestKey) return "compare-hover-row-best bg-emerald-50/70 dark:bg-emerald-950/15";
+  if (result.carrier.key === cheapestKey) return "compare-hover-row-best bg-status-success/10 dark:bg-status-success/15";
   return "";
 }
 
@@ -269,7 +269,7 @@ function getShippingStickyCellTone(
   cheapestKey: ShippingEstimateResult["carrier"]["key"] | undefined
 ): string {
   if (!result.isAvailable) return "bg-muted";
-  if (result.carrier.key === cheapestKey) return "bg-emerald-50/70 dark:bg-emerald-950/15";
+  if (result.carrier.key === cheapestKey) return "bg-status-success/10 dark:bg-status-success/15";
   return "bg-card";
 }
 
@@ -470,9 +470,9 @@ function formatPostalRanges(ranges: string[]): string {
             <div class="ml-auto flex flex-wrap items-center gap-2">
               <span
                 v-if="cheapestGeneralLabel"
-                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
               >
-                <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
                 현재 최저 예상 운임 {{ cheapestGeneralLabel }}
               </span>
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="generalCopyRows" /></span>
@@ -486,7 +486,7 @@ function formatPostalRanges(ranges: string[]): string {
               :key="`m-general-${result.carrier.key}`"
               class="overflow-hidden rounded-2xl border bg-card"
               :class="[
-                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestGeneral?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
+                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestGeneral?.carrier.key === result.carrier.key ? 'border-status-success/40' : 'border-border/70',
               ]"
             >
               <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
@@ -513,8 +513,8 @@ function formatPostalRanges(ranges: string[]): string {
                     class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
                     :class="[
                       result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
-                      col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? '!text-profit' : '',
-                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-fee' : '',
+                      col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? '!text-status-success' : '',
+                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-status-danger' : '',
                     ]"
                   >
                     <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
@@ -585,14 +585,14 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestGeneral?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
+                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
                           </span>
                           <span
                             v-else-if="!result.isAvailable"
-                            class="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-700 dark:border-orange-400/35 dark:bg-orange-950/20 dark:text-orange-200"
+                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-[11px] font-semibold text-status-warning"
                           >
                             접수 불가
                           </span>
@@ -615,8 +615,8 @@ function formatPostalRanges(ranges: string[]): string {
                         :class="[
                           result.isAvailable ? '' : 'text-muted-foreground',
                           col.nowrap ? 'whitespace-nowrap' : '',
-                          col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? 'text-profit' : '',
-                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-fee' : '',
+                          col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? 'text-status-success' : '',
+                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-status-danger' : '',
                         ]"
                       >
                         {{ getShippingCellValue(col.key, result) }}
@@ -650,9 +650,9 @@ function formatPostalRanges(ranges: string[]): string {
             <div class="ml-auto flex flex-wrap items-center gap-2">
               <span
                 v-if="cheapestConvenienceLabel"
-                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
               >
-                <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
                 현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
               </span>
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="convenienceCopyRows" /></span>
@@ -666,7 +666,7 @@ function formatPostalRanges(ranges: string[]): string {
               :key="`m-conv-${result.carrier.key}`"
               class="overflow-hidden rounded-2xl border bg-card"
               :class="[
-                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestConvenience?.carrier.key === result.carrier.key ? 'border-profit/40' : 'border-border/70',
+                !result.isAvailable ? 'border-border/50 opacity-75' : cheapestConvenience?.carrier.key === result.carrier.key ? 'border-status-success/40' : 'border-border/70',
               ]"
             >
               <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
@@ -693,8 +693,8 @@ function formatPostalRanges(ranges: string[]): string {
                     class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
                     :class="[
                       result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
-                      col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? '!text-profit' : '',
-                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-fee' : '',
+                      col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? '!text-status-success' : '',
+                      col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? '!text-status-danger' : '',
                     ]"
                   >
                     <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
@@ -765,14 +765,14 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestConvenience?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
+                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
                           </span>
                           <span
                             v-else-if="!result.isAvailable"
-                            class="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-700 dark:border-orange-400/35 dark:bg-orange-950/20 dark:text-orange-200"
+                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-[11px] font-semibold text-status-warning"
                           >
                             접수 불가
                           </span>
@@ -795,8 +795,8 @@ function formatPostalRanges(ranges: string[]): string {
                         :class="[
                           result.isAvailable ? '' : 'text-muted-foreground',
                           col.nowrap ? 'whitespace-nowrap' : '',
-                          col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? 'text-profit' : '',
-                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-fee' : '',
+                          col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? 'text-status-success' : '',
+                          col.key === 'weightSurcharge' && result.weightSurcharge > 0 ? 'text-status-danger' : '',
                         ]"
                       >
                         {{ getShippingCellValue(col.key, result) }}

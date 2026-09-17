@@ -124,19 +124,17 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
         v-for="(result, idx) in sortedResults"
         :key="`m-${result.marketKey}`"
         class="overflow-hidden rounded-2xl border bg-card"
-        :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
+        :class="idx === 0 ? 'border-status-success/40' : 'border-border/70'"
       >
         <div class="seller-result-header flex items-center gap-2.5 px-3.5 py-3">
-          <span
-            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption font-semibold"
-            :class="idx === 0 ? 'bg-profit text-profit-foreground' : 'bg-muted text-muted-foreground'"
-          >
+          <ShBadge :tone="idx === 0 ? 'success' : 'neutral'">
             <Medal class="h-3.5 w-3.5" />
             {{ idx + 1 }}위
-          </span>
+          </ShBadge>
+          <!-- v3 §5.6/BL-060 — 채널 배지 다색은 셀 다색 로고 드리프트로 지목됨. 데스크톱 표와
+               동일하게 중성 마크 + 라벨 텍스트로 통일한다(OpenMarketCompareView 선례) -->
           <span
-            class="seller-market-badge inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-xs font-bold"
-            :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
+            class="seller-market-badge inline-flex h-8 min-w-10 items-center justify-center rounded-xl border border-border bg-muted px-1.5 text-xs font-bold text-foreground"
           >
             {{ ALL_CHANNEL_META[result.marketKey].shortName }}
           </span>
@@ -146,18 +144,15 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
             </span>
             <span v-if="result.marketKey.startsWith('own_')" class="text-xs text-muted-foreground">등급 연동</span>
           </div>
-          <span
-            v-if="idx === 0"
-            class="inline-flex shrink-0 items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-xs font-semibold text-profit-foreground"
-          >
+          <ShBadge v-if="idx === 0" tone="success">
             <BadgeCheck class="h-3.5 w-3.5" />
             추천
-          </span>
+          </ShBadge>
         </div>
         <div class="seller-result-metrics space-y-0 border-t border-border/60">
           <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
             <span class="shrink-0 text-caption font-semibold text-muted-foreground">총 수수료</span>
-            <span class="text-caption font-semibold tabular-nums text-fee">{{ formatWon(result.totalFee) }}</span>
+            <span class="text-caption font-semibold tabular-nums text-status-danger">{{ formatWon(result.totalFee) }}</span>
           </div>
           <div class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5">
             <span class="shrink-0 text-caption font-semibold text-muted-foreground">수수료율(VAT 포함)</span>
@@ -169,7 +164,7 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
             <span class="shrink-0 text-caption font-semibold text-muted-foreground">건당 순이익</span>
             <span
               class="text-caption font-bold tabular-nums"
-              :class="idx === 0 ? 'text-profit' : 'text-foreground'"
+              :class="idx === 0 ? 'text-status-success' : 'text-foreground'"
             >
               {{ formatWon(result.netProfit) }}
             </span>
@@ -209,8 +204,7 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
               <ShTableCell>
                 <div class="flex items-center gap-2.5">
                   <span
-                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
-                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
+                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm border border-border bg-muted px-1.5 text-tiny font-bold text-foreground"
                   >
                     {{ ALL_CHANNEL_META[result.marketKey].shortName }}
                   </span>
@@ -224,13 +218,13 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
                   </div>
                 </div>
               </ShTableCell>
-              <ShTableCell numeric class="font-semibold text-fee">
+              <ShTableCell numeric class="font-semibold text-status-danger">
                 {{ formatWon(result.totalFee) }}
               </ShTableCell>
               <ShTableCell numeric class="text-muted-foreground">
                 {{ formatPercent(result.totalFeeRate, 2) }}
               </ShTableCell>
-              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
+              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">
                 {{ formatWon(result.netProfit) }}
               </ShTableCell>
             </ShTableRow>

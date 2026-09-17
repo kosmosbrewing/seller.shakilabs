@@ -59,7 +59,7 @@ const totalFeeSpread = computed(() => {
               <span class="text-muted-foreground">vs</span>
               {{ runnerUpMarket ? ALL_CHANNEL_META[runnerUpMarket.marketKey].name : "-" }}
             </p>
-            <p class="mt-1 text-body font-bold tabular-nums text-profit">
+            <p class="mt-1 text-body font-bold tabular-nums text-status-success">
               {{ formatWon(bestGap) }}
             </p>
           </div>
@@ -71,7 +71,7 @@ const totalFeeSpread = computed(() => {
             <p class="mt-1 text-caption text-muted-foreground">
               같은 조건 기준 총 수수료 차이
             </p>
-            <p class="mt-1 text-body font-bold tabular-nums text-fee">
+            <p class="mt-1 text-body font-bold tabular-nums text-status-danger">
               {{ formatWon(totalFeeSpread) }}
             </p>
           </div>

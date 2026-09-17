@@ -198,9 +198,9 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
           <div class="ml-auto flex flex-wrap items-center gap-2">
             <span
               v-if="lowestCardFeeLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
             >
-              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
               영세 기준 최저 실부담 {{ lowestCardFeeLabel }}
               <CompareHint
                 v-if="lowestCardFeeHint"
@@ -219,12 +219,13 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
             v-for="gateway in PAYMENT_GATEWAYS"
             :key="`m-${gateway.key}`"
             class="overflow-hidden rounded-2xl border bg-card"
-            :class="isLowestCardFeeGateway(gateway.key) ? 'border-profit/40' : 'border-border/70'"
+            :class="isLowestCardFeeGateway(gateway.key) ? 'border-status-success/40' : 'border-border/70'"
           >
             <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
+              <!-- v3 §5.6/BL-060 — PG 로고 배지 다색은 셀 다색 로고 드리프트로 지목됨.
+                   중성 마크 + 라벨 텍스트로 통일한다(OpenMarketCompareView 선례) -->
               <span
-                class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-                :style="{ backgroundColor: gateway.color, color: gateway.foreground }"
+                class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted px-1.5 text-tiny font-bold text-foreground whitespace-nowrap"
               >
                 {{ gateway.shortName }}
               </span>
@@ -332,16 +333,15 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                 v-for="gateway in PAYMENT_GATEWAYS"
                 :key="gateway.key"
                 class="compare-hover-row border-b border-border/40 transition-colors"
-                :class="isLowestCardFeeGateway(gateway.key) ? 'compare-hover-row-best bg-emerald-50/70 dark:bg-emerald-950/15' : ''"
+                :class="isLowestCardFeeGateway(gateway.key) ? 'compare-hover-row-best bg-status-success/10 dark:bg-status-success/15' : ''"
               >
                 <td
                   class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 transition-colors sm:px-4"
-                  :class="isLowestCardFeeGateway(gateway.key) ? 'bg-emerald-50/70 dark:bg-emerald-950/15' : 'bg-card'"
+                  :class="isLowestCardFeeGateway(gateway.key) ? 'bg-status-success/10 dark:bg-status-success/15' : 'bg-card'"
                 >
                   <div class="flex items-center gap-2.5">
                     <span
-                      class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl px-1.5 text-tiny font-bold"
-                      :style="{ backgroundColor: gateway.color, color: gateway.foreground }"
+                      class="inline-flex h-8 min-w-10 items-center justify-center rounded-xl border border-border bg-muted px-1.5 text-tiny font-bold text-foreground"
                     >
                       {{ gateway.shortName }}
                     </span>
@@ -350,7 +350,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <span class="text-body font-semibold">{{ gateway.name }}</span>
                         <span
                           v-if="isLowestCardFeeGateway(gateway.key)"
-                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
+                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저

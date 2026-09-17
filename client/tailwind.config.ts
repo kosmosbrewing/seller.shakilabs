@@ -80,28 +80,15 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // 셀러 수수료 비교 전용 색상
-        profit: {
-          DEFAULT: "hsl(var(--profit))",
-          foreground: "hsl(var(--profit-foreground))",
-        },
-        fee: {
-          DEFAULT: "hsl(var(--fee))",
-          foreground: "hsl(var(--fee-foreground))",
-        },
+        // v3 §5.6/DESIGN_CLEANUP_PLAN §2.2 — profit/fee 로컬 별칭·market 브랜드 hex 팔레트를 폐기하고
+        // status 의미 토큰으로 통일한다(profit→success "이득", fee→danger "비용").
+        // 채널 배지는 중성(bg-muted/text-foreground)으로 그레이스케일화해 마켓별 hex도 더 쓰지 않는다.
         status: {
           success: "hsl(var(--status-success))",
           warning: "hsl(var(--status-warning))",
           caution: "hsl(var(--status-caution))",
           danger: "hsl(var(--status-danger))",
           info: "hsl(var(--status-info))",
-        },
-        // 마켓 브랜드 컬러
-        market: {
-          smartstore: "#03C75A",
-          coupang: "#E31937",
-          elevenst: "#FF6B00",
-          gmarket: "#00B050",
         },
       },
 

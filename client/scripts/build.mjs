@@ -121,6 +121,21 @@ if (fontsVerifyResult.status !== 0) {
   process.exit(fontsVerifyResult.status ?? 1);
 }
 
+// 액센트 토큰 게이트 (DESIGN_CLEANUP_PLAN_2026-09-17.md §4.2) — index.html 브랜드 토큰·
+// main.css 의미색·빌드 CSS의 로컬 별칭 잔존 여부를 dist가 나온 뒤에 검증한다.
+const accentTokensResult = spawnSync(
+  process.execPath,
+  [resolve(projectRoot, "scripts", "verify-accent-tokens.mjs")],
+  {
+    cwd: projectRoot,
+    stdio: "inherit",
+  }
+);
+
+if (accentTokensResult.status !== 0) {
+  process.exit(accentTokensResult.status ?? 1);
+}
+
 const validationResult = spawnSync(
   process.execPath,
   [resolve(projectRoot, "scripts", "validate-static-output.mjs")],

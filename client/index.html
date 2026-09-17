@@ -99,10 +99,11 @@
         --card-foreground: 0 0% 3.92%;
         --primary: 25 85% 27%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 25 20% 93%;
+        /* DESIGN_CLEANUP_PLAN_2026-09-17.md §2.2 사업·여행(주황) 그룹 확정 표 — 재계산 없이 그대로 적용 */
+        --secondary: 25 15% 91%;
         --secondary-foreground: 222 47% 11%;
-        --accent: 25 80% 96%;
-        --accent-foreground: 25 80% 35%;
+        --accent: 25 83% 95%;
+        --accent-foreground: 25 85% 30%;
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
         /* v3 §4.1 카테고리 액센트 API — @shakilabs/ui 0.3.15가 읽는 계약: --accent-hsl / --accent-muted-hsl.
@@ -110,22 +111,21 @@
         --accent-hsl: 25 85% 27%;
         --accent-muted-hsl: 25 85% 27%;
         /* 에러 토스트(bg-destructive + destructive-foreground)를 픽셀로 재니 4.49:1로
-           AA 미달이었다. 0 72% 52%는 --fee가 틴트 행에서 4.05:1로 걸렸던 바로 그 값이라,
-           같은 함대 통일값(0 74% 42%)으로 내려 hue를 유지한 채 명도만 낮춘다.
+           AA 미달이었다. hue를 유지한 채 명도만 낮춰 함대 통일값(0 74% 42%)으로 내린다
+           (2026-09-17 기준 --status-danger·--profit/--fee 폐기 전 로컬 --fee와 같은 값이었던
+           값을 그대로 재사용 — --destructive는 여기서 별도 스코프이므로 손대지 않았다).
            픽셀 실측: 토스트 4.49 → 6.14:1 / 흰 카드 위 글자 4.70 → 6.42:1 /
            1위 틴트 행 4.05 → 5.53:1. */
         --destructive: 0 74% 42%;
         --destructive-foreground: 210 40% 98%;
         --border: 60 8% 90.2%; /* color.line #E8E8E4 */
         --input: 214 16% 85%;
+        /* --ring은 위 DESIGN_CLEANUP_PLAN §2.2 표(=primary)를 의도적으로 따르지 않는다.
+           d85a39c(#55, v3 AppShell 0.3.17)가 v3 §2.1 color.focus 역할대로 ink로 이미 교정했고
+           그 결정이 7/11 앱(seller·travel·car·house·loan·invest·baby)에 이미 반영돼 있다.
+           브랜드 hue를 primary로 되돌리면 그 접근성 수정을 역행시키므로 유지한다. */
         --ring: 0 0% 3.92%; /* color.focus #0A0A0A (v3 §2.1 — 포커스는 브랜드색이 아니라 ink) */
         --radius: 0.4rem;
-        --profit: 160 65% 25%;
-        --profit-foreground: 0 0% 100%;
-        /* 0 72% 52%는 홈 수수료 표의 1위 하이라이트 행(primary 9% 틴트) 위에서 4.05:1로
-           실측 미달이었다. 함대 통일값 0 74% 42%로 내려 민무늬·틴트·다크 전 조합 4.5+를 확보한다. */
-        --fee: 0 74% 42%;
-        --fee-foreground: 0 0% 100%;
       }
 
       .dark {
@@ -136,11 +136,11 @@
         --card: 0 0% 10.98%; /* color.card dark #1C1C1C */
         --card-foreground: 0 0% 96.08%;
         --primary: 24 82% 56%;
-        --primary-foreground: 24 72% 12%;
-        --secondary: 24 12% 19%;
+        --primary-foreground: 24 82% 10%;
+        --secondary: 24 15% 20%;
         --secondary-foreground: 210 40% 96%;
-        --accent: 24 16% 23%;
-        --accent-foreground: 28 68% 82%;
+        --accent: 24 62% 22%;
+        --accent-foreground: 24 82% 78%;
         --popover: 0 0% 10.98%;
         --popover-foreground: 0 0% 96.08%;
         --accent-hsl: 24 82% 56%;
@@ -152,13 +152,7 @@
         --destructive-foreground: 0 72% 12%;
         --border: 0 0% 16.47%; /* color.line dark #2A2A2A */
         --input: 214 16% 30%;
-        --ring: 0 0% 96.08%; /* color.focus dark #F5F5F5 */
-        --profit: 160 56% 50%;
-        /* 밝은 초록 위의 흰 글자는 2.15:1이었다. 앱 hue를 유지한 채 어둡게 해서 배지 글자를 살린다. */
-        --profit-foreground: 160 72% 10%;
-        /* 표의 수수료 셀(14px w600)이 카드 위에서 3.64:1로 렌더됐다(라이브 실측). 밝기를 올려 5.74:1로. */
-        --fee: 0 75% 72%;
-        --fee-foreground: 0 72% 12%;
+        --ring: 0 0% 96.08%; /* color.focus dark #F5F5F5 — 라이트와 동일 사유(위 :root 주석 참조) */
       }
 
       html {

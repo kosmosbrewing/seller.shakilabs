@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { BadgeCheck, ChevronDown, Medal } from "lucide-vue-next";
+import { ShBadge } from "@shakilabs/ui";
 import { Button } from "@/components/ui/button";
 import { formatWon, formatWonShort, formatPercent } from "@/lib/utils";
 import { ALL_CHANNEL_META } from "@/data/marketFees";
@@ -27,13 +28,6 @@ const gapLabel = computed(() => {
   return `1위보다 ${formatWonShort(props.netGap)} 덜 남음`;
 });
 
-function toBrandTint(color: string, alpha = 0.12): string {
-  const normalized = color.replace("#", "");
-  if (normalized.length !== 6) return `rgba(0, 0, 0, ${alpha})`;
-  const channels = [0, 2, 4].map((index) => Number.parseInt(normalized.slice(index, index + 2), 16));
-  return `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${alpha})`;
-}
-
 // 결과 변경 시 짧은 하이라이트 애니메이션
 const highlight = ref(false);
 watch(() => props.result.totalFee, () => {
@@ -46,26 +40,23 @@ watch(() => props.result.totalFee, () => {
   <div
     :class="[
       'retro-panel relative overflow-hidden rounded-2xl transition-all duration-200',
-      isBest ? 'ring-2 ring-profit shadow-[0_12px_30px_rgba(20,130,90,0.16)]' : 'hover:-translate-y-0.5',
+      isBest ? 'ring-2 ring-status-success shadow-[0_12px_30px_rgba(27,122,74,0.16)]' : 'hover:-translate-y-0.5',
       highlight ? 'card-highlight' : '',
     ]"
   >
-    <div
-      v-if="isBest"
-      class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-profit px-2.5 py-1 text-[11px] font-bold text-profit-foreground shadow-sm"
-    >
+    <ShBadge v-if="isBest" tone="success" class="absolute right-3 top-3">
       <BadgeCheck class="h-3.5 w-3.5" />
       추천
-    </div>
+    </ShBadge>
 
     <div class="px-4 pt-4 pb-3">
       <div class="flex items-start justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
+          <!-- v3 §5.6/BL-060 — 채널 배지 다색은 중성 마크 + 라벨 텍스트로 통일한다 -->
           <div
-            class="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl px-2"
-            :style="{ backgroundColor: toBrandTint(meta.color) }"
+            class="inline-flex h-11 min-w-11 items-center justify-center rounded-2xl border border-border bg-muted px-2"
           >
-            <span class="text-caption font-bold" :style="{ color: meta.color }">
+            <span class="text-caption font-bold text-foreground">
               {{ meta.shortName }}
             </span>
           </div>
@@ -74,7 +65,7 @@ watch(() => props.result.totalFee, () => {
             <div class="mt-1 flex items-center gap-1.5 text-[11px] font-semibold">
               <span
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
-                :class="isBest ? 'bg-profit/[12%] text-profit' : 'bg-muted text-muted-foreground'"
+                :class="isBest ? 'bg-status-success/10 text-status-success' : 'bg-muted text-muted-foreground'"
               >
                 <Medal class="h-3.5 w-3.5" />
                 {{ rankLabel }}
@@ -88,16 +79,16 @@ watch(() => props.result.totalFee, () => {
     <div class="px-4 pb-4">
       <div
         class="rounded-[1.35rem] px-3.5 py-3.5"
-        :class="isBest ? 'bg-profit/[8%]' : 'bg-white'"
+        :class="isBest ? 'bg-status-success/10' : 'bg-white'"
       >
         <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           건당 순이익
         </p>
-        <p class="mt-2 text-[30px] font-bold leading-none tabular-nums whitespace-nowrap" :class="isBest ? 'text-profit' : 'text-foreground'">
+        <p class="mt-2 text-[30px] font-bold leading-none tabular-nums whitespace-nowrap" :class="isBest ? 'text-status-success' : 'text-foreground'">
           <span class="hidden sm:inline">{{ formatWon(result.netProfit) }}</span>
           <span class="sm:hidden">{{ formatWonShort(result.netProfit) }}</span>
         </p>
-        <p class="mt-2 text-caption font-semibold" :class="isBest ? 'text-profit/85' : 'text-muted-foreground'">
+        <p class="mt-2 text-caption font-semibold" :class="isBest ? 'text-status-success/85' : 'text-muted-foreground'">
           {{ gapLabel }}
         </p>
       </div>
@@ -107,7 +98,7 @@ watch(() => props.result.totalFee, () => {
           <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
             총 수수료
           </p>
-          <p class="mt-1.5 text-body font-bold tabular-nums text-fee">
+          <p class="mt-1.5 text-body font-bold tabular-nums text-status-danger">
             -{{ formatWon(result.totalFee) }}
           </p>
         </div>
@@ -143,7 +134,7 @@ watch(() => props.result.totalFee, () => {
           class="flex items-center justify-between text-caption"
         >
           <span class="text-muted-foreground">{{ item.label }}</span>
-          <span class="font-semibold tabular-nums text-fee">
+          <span class="font-semibold tabular-nums text-status-danger">
             -{{ formatWon(item.amount) }}
           </span>
         </div>
