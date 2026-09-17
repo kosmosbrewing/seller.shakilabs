@@ -160,9 +160,9 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
           <div class="ml-auto flex flex-wrap items-center gap-2">
             <span
               v-if="lowestFeeLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-emerald-400/35 dark:bg-emerald-950/20 dark:text-emerald-300 sm:text-caption"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
             >
-              <BadgeCheck class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
               표기 최저 수수료 {{ lowestFeeLabel }}
             </span>
             <span class="md:hidden"><CopyTableButton :headers="marketCopyHeaders" :rows="marketCopyRows" /></span>
@@ -175,7 +175,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
             v-for="market in OPEN_MARKETS"
             :key="`m-${market.key}`"
             class="overflow-hidden rounded-2xl border bg-card"
-            :class="market.key === lowestFeeMarket ? 'border-profit/40' : 'border-border/70'"
+            :class="market.key === lowestFeeMarket ? 'border-status-success/40' : 'border-border/70'"
           >
             <div class="compare-mobile-entity-header flex items-center gap-2.5 px-3.5 py-3">
               <!-- v3 §5.6/BL-060 — 마켓별 다색 배지(market.color/foreground)는 셀 다색 로고
@@ -291,11 +291,11 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                 v-for="market in OPEN_MARKETS"
                 :key="market.key"
                 class="compare-hover-row border-b border-border/40 transition-colors"
-                :class="market.key === lowestFeeMarket ? 'compare-hover-row-best bg-emerald-50/70 dark:bg-emerald-950/15' : ''"
+                :class="market.key === lowestFeeMarket ? 'compare-hover-row-best bg-status-success/10 dark:bg-status-success/15' : ''"
               >
                 <td
                   class="sticky left-0 z-10 whitespace-nowrap px-3 py-3 transition-colors sm:px-4"
-                  :class="market.key === lowestFeeMarket ? 'bg-emerald-50/70 dark:bg-emerald-950/15' : 'bg-card'"
+                  :class="market.key === lowestFeeMarket ? 'bg-status-success/10 dark:bg-status-success/15' : 'bg-card'"
                 >
                   <div class="flex items-center gap-2.5">
                     <span
@@ -308,7 +308,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <span class="text-body font-semibold">{{ market.name }}</span>
                         <span
                           v-if="market.key === lowestFeeMarket"
-                          class="inline-flex items-center gap-1 rounded-full bg-profit px-2 py-0.5 text-[11px] font-semibold text-profit-foreground"
+                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저

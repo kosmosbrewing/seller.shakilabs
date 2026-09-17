@@ -522,11 +522,12 @@ const ownStoreHintGroups = computed(() =>
           </span>
           <span class="text-tiny text-muted-foreground">&middot; 선택한 매출등급 · VAT 포함 실부담 기준으로 비교합니다</span>
           <div class="mt-1.5 flex flex-wrap gap-1">
+            <!-- v3 §5.6/BL-060 — PG 로고 배지 다색(파랑·초록×2·노랑·빨강)은 셀 다색 로고 드리프트로
+                 지목됨. OpenMarketCompareView 마켓 배지와 동일하게 중성 마크 + 라벨 텍스트로 통일한다 -->
             <span
               v-for="key in OWN_STORE_ORDER"
               :key="key"
-              class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold"
-              :style="{ backgroundColor: OWN_STORE_META[key].color, color: OWN_STORE_META[key].foreground }"
+              class="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-bold text-foreground"
             >
               {{ OWN_STORE_META[key].shortName }}
             </span>

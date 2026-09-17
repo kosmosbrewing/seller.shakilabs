@@ -57,19 +57,15 @@ const copyRows = computed(() =>
           v-for="(result, idx) in sortedResults"
           :key="`m-${result.marketKey}`"
           class="overflow-hidden rounded-2xl border bg-card"
-          :class="idx === 0 ? 'border-profit/40' : 'border-border/70'"
+          :class="idx === 0 ? 'border-status-success/40' : 'border-border/70'"
         >
           <div class="flex items-center gap-2.5 px-3.5 py-3">
-            <span
-              class="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
-              :class="idx === 0 ? 'bg-profit text-profit-foreground' : 'bg-muted text-muted-foreground'"
-            >
+            <ShBadge :tone="idx === 0 ? 'success' : 'neutral'">
               <Medal class="h-3.5 w-3.5" />
               {{ idx + 1 }}위
-            </span>
+            </ShBadge>
             <span
-              class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl px-1.5 text-tiny font-bold whitespace-nowrap"
-              :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
+              class="inline-flex h-8 min-w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted px-1.5 text-tiny font-bold text-foreground whitespace-nowrap"
             >
               {{ ALL_CHANNEL_META[result.marketKey].shortName }}
             </span>
@@ -81,15 +77,15 @@ const copyRows = computed(() =>
           <div class="space-y-0 border-t border-border/60">
             <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
               <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
-              <span class="text-right text-[11px] font-semibold tabular-nums text-fee sm:text-caption">{{ formatWon(result.totalFee) }}</span>
+              <span class="text-right text-[11px] font-semibold tabular-nums text-status-danger sm:text-caption">{{ formatWon(result.totalFee) }}</span>
             </div>
             <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
               <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
-              <span class="text-right text-body font-bold tabular-nums" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatPercent(result.totalFeeRate, 2) }}</span>
+              <span class="text-right text-body font-bold tabular-nums" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">{{ formatPercent(result.totalFeeRate, 2) }}</span>
             </div>
             <div class="grid grid-cols-[4.5rem_1fr] items-center px-3.5 py-2.5">
               <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
-              <span class="text-right text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-profit' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
+              <span class="text-right text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
             </div>
           </div>
         </div>
@@ -138,8 +134,7 @@ const copyRows = computed(() =>
               <ShTableCell>
                 <div class="flex items-center gap-2.5">
                   <span
-                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm px-1.5 text-tiny font-bold"
-                    :style="{ backgroundColor: ALL_CHANNEL_META[result.marketKey].color, color: ALL_CHANNEL_META[result.marketKey].foreground }"
+                    class="inline-flex h-8 min-w-10 items-center justify-center rounded-sm border border-border bg-muted px-1.5 text-tiny font-bold text-foreground"
                   >
                     {{ ALL_CHANNEL_META[result.marketKey].shortName }}
                   </span>
@@ -153,13 +148,13 @@ const copyRows = computed(() =>
                   </div>
                 </div>
               </ShTableCell>
-              <ShTableCell numeric class="font-semibold text-fee">
+              <ShTableCell numeric class="font-semibold text-status-danger">
                 {{ formatWon(result.totalFee) }}
               </ShTableCell>
-              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
+              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">
                 {{ formatPercent(result.totalFeeRate, 2) }}
               </ShTableCell>
-              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-profit' : 'text-foreground'">
+              <ShTableCell numeric class="font-bold" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">
                 {{ formatWon(result.netProfit) }}
               </ShTableCell>
             </ShTableRow>
