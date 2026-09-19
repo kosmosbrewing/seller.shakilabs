@@ -35,7 +35,7 @@ const CALCULATOR_INPUTS = [
     description="오픈마켓 수수료 비교 계산기가 어떤 입력값을 받고 어디서 처리하는지, 공유 링크에 무엇이 담기는지 밝히는 개인정보 처리방침입니다."
   />
 
-  <div class="container py-5">
+  <div class="sh-container sh-container--prose py-5">
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">개인정보 처리방침</h1>

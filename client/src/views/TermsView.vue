@@ -14,7 +14,7 @@ const constantsStore = useConstantsStore();
     description="오픈마켓 수수료·결제 수수료·택배비 비교 계산기의 이용 조건과 계산 결과의 한계를 밝히는 이용약관입니다."
   />
 
-  <div class="container py-5">
+  <div class="sh-container sh-container--prose py-5">
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">이용약관</h1>

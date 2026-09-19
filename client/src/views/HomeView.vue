@@ -107,7 +107,7 @@ onUnmounted(() => {
     description="같은 상품인데 마켓마다 수수료가 이렇게 다릅니다. 스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교하세요."
   />
 
-  <div class="text-resize-layout container space-y-5 py-5">
+  <div class="text-resize-layout sh-container sh-container--page space-y-5 py-5">
     <CalculatorPageHeader title="오픈마켓 수수료 계산기" />
 
     <CompareIntro />
