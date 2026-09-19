@@ -23,7 +23,7 @@ const jsonLd = buildFaqPageJsonLd(SELLER_HOME_GUIDE.faqs);
     :json-ld="jsonLd"
   />
 
-  <div class="container py-5 space-y-5">
+  <div class="sh-container sh-container--prose py-5 space-y-5">
     <div class="retro-panel">
       <div class="retro-titlebar rounded-t-2xl">
         <h1 class="retro-title">서비스 안내</h1>

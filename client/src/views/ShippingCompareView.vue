@@ -330,7 +330,7 @@ function formatPostalRanges(ranges: string[]): string {
 <template>
   <SEOHead :title="seoTitle" :description="seoDescription" :json-ld="jsonLd" />
 
-  <div class="container space-y-5 py-5">
+  <div class="sh-container sh-container--tool space-y-5 py-5">
     <CalculatorPageHeader title="택배비 비교" />
 
     <div class="retro-panel overflow-hidden">
