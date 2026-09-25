@@ -226,7 +226,8 @@ const ownStoreHintGroups = computed(() =>
     </div>
 
     <div class="retro-panel-content space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <!-- lg(64rem)+에서는 1×2 틀의 반폭 왼쪽 칸에 들어가므로 3열이면 카드가 눌린다 — 그 구간만 1열로 되돌린다 -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
         <!-- 판매가 카드 -->
         <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
