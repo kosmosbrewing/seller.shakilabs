@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { ShCalculatorSplit } from "@shakilabs/ui";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { SELLER_HOME_GUIDE } from "@/data/seoGuides";
@@ -112,25 +113,37 @@ onUnmounted(() => {
 
     <CompareIntro />
 
-    <section id="input">
-      <CompareInput
-        v-model:price="calc.price.value"
-        v-model:shipping-fee="calc.shippingFee.value"
-        v-model:category="calc.category.value"
-        v-model:smartstore-tier="calc.smartstoreTier.value"
-        v-model:smartstore-source="calc.smartstoreSource.value"
-        v-model:coupang-mode="calc.coupangMode.value"
-        v-model:fulfillment-size="calc.fulfillmentSize.value"
-        v-model:include-own-store="calc.includeOwnStore.value"
-        :monthly-qty="calc.monthlyQty.value"
-      />
-    </section>
+    <ShCalculatorSplit>
+      <template #input>
+        <section id="input">
+          <CompareInput
+            v-model:price="calc.price.value"
+            v-model:shipping-fee="calc.shippingFee.value"
+            v-model:category="calc.category.value"
+            v-model:smartstore-tier="calc.smartstoreTier.value"
+            v-model:smartstore-source="calc.smartstoreSource.value"
+            v-model:coupang-mode="calc.coupangMode.value"
+            v-model:fulfillment-size="calc.fulfillmentSize.value"
+            v-model:include-own-store="calc.includeOwnStore.value"
+            :monthly-qty="calc.monthlyQty.value"
+          />
+        </section>
+      </template>
 
-    <CompareResults
-      :results="calc.results.value"
-      :include-own-store="calc.includeOwnStore.value"
-      @share="openShareFromSummary"
-    />
+      <template #result>
+        <CompareResults
+          :results="calc.results.value"
+          :include-own-store="calc.includeOwnStore.value"
+          @share="openShareFromSummary"
+        />
+      </template>
+
+      <!-- 다른 비용 비교 링크는 입력(판매가·카테고리·배송비)과 함께 다음에 무엇을 볼지 보여주는
+           블록이라 왼쪽 아래에 둔다 — 결과 칸에 두면 결과가 길어지고 왼쪽이 짧게 남는다. -->
+      <template #below-input>
+        <CostAxisLinks @select="trackCostAxisClick" />
+      </template>
+    </ShCalculatorSplit>
 
     <BestMarketPriceBreakdown :result="calc.bestMarket.value" />
 
@@ -149,8 +162,6 @@ onUnmounted(() => {
     </section>
 
     <MonthlySimulationChart :results="calc.monthlySimResults.value" />
-
-    <CostAxisLinks @select="trackCostAxisClick" />
 
     <section>
       <CompareFAQ :extra="SELLER_HOME_GUIDE.faqs" />

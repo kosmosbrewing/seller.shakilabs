@@ -119,7 +119,10 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
       </p>
     </div>
 
-    <div class="seller-mobile-list space-y-3 px-3.5 py-3 md:hidden">
+    <!-- 카드 목록은 좁은 폭용이다: 모바일, 그리고 lg+에서 1×2 틀의 반폭 결과 칸(약 480~540px).
+         표(min-width 42rem)를 반폭에 두면 "건당 순이익" 열이 130~194px 가려져 가로로 밀어야 보인다.
+         표는 결과가 전폭인 md~lg 구간에서만 쓴다. -->
+    <div class="seller-mobile-list space-y-3 px-3.5 py-3 md:hidden lg:block">
       <div
         v-for="(result, idx) in sortedResults"
         :key="`m-${result.marketKey}`"
@@ -173,7 +176,7 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
       </div>
     </div>
 
-    <div class="hidden md:block">
+    <div class="hidden md:block lg:hidden">
       <ShTable
         aria-label="판매 채널별 수수료와 순이익 비교 결과"
         density="compact"
