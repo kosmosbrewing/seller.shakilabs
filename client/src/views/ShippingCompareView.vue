@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ShPresetGroup } from "@shakilabs/ui";
+import { ShPairRow, ShPresetGroup } from "@shakilabs/ui";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -451,6 +451,9 @@ function formatPostalRanges(ranges: string[]): string {
       </div>
     </section>
 
+    <!-- 일반/편의점 택배 비교표는 table-fixed 고정폭(24+8+6.5+8+9rem=888px, 5열이라 finance식
+         lg:min-w-0 예외 대상도 아님)이라 반폭(544/480px)에서 마지막 열이 retro-panel의 overflow-hidden에
+         가려 화면 밖으로 잘린다(실측 확인, 규칙 3) — 그래프도 짝 상대(표)가 전폭이 되어 함께 전폭으로 둔다. -->
     <ShippingFareChart
       :general-results="generalResults"
       :convenience-results="convenienceResults"
@@ -816,8 +819,13 @@ function formatPostalRanges(ranges: string[]): string {
       </div>
     </section>
 
+    <!-- 계산기 아래 데이터 블록 2열(ShPairRow, 사용자 결정 2026-09-25). 순서 유지, 짧은 블록은 한 칸에 쌓는다.
+         광고는 짝 사이에 못 들어가 원래 자리(제주 표 뒤)에서 이 묶음 뒤(가이드 앞)로 옮겼다. -->
+    <ShPairRow>
+    <template #start>
     <CompareSourceFooter :sources="SHIPPING_SOURCES" :updated-at="SHIPPING_DATA_VERIFIED" />
-
+    </template>
+    <template #end>
     <section>
       <details class="retro-panel overflow-hidden" :open="showRemoteAreaReference || undefined">
         <summary class="retro-titlebar rounded-t-2xl list-none cursor-pointer" @click.prevent="showRemoteAreaReference = !showRemoteAreaReference">
@@ -909,8 +917,6 @@ function formatPostalRanges(ranges: string[]): string {
       </details>
     </section>
 
-    <AdSlot slot="shipping-compare" label="택배비 비교 페이지 광고" />
-
     <section class="retro-panel overflow-hidden">
       <div class="retro-panel-content text-center space-y-2">
         <p class="text-caption text-muted-foreground">
@@ -923,6 +929,10 @@ function formatPostalRanges(ranges: string[]): string {
         </a>
       </div>
     </section>
+    </template>
+    </ShPairRow>
+
+    <AdSlot slot="shipping-compare" label="택배비 비교 페이지 광고" />
 
     <ShareModal
       :show="share.showShareModal.value"
