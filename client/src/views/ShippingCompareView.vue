@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { ShPairRow, ShPresetGroup } from "@shakilabs/ui";
+import { ShCalculatorSplit, ShPairRow, ShPresetGroup } from "@shakilabs/ui";
 import { BadgeCheck, Package2, Truck } from "lucide-vue-next";
 import SEOHead from "@/components/common/SEOHead.vue";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
@@ -13,6 +13,7 @@ import CompareSourceFooter from "@/components/common/CompareSourceFooter.vue";
 import CopyTableButton from "@/components/common/CopyTableButton.vue";
 import SectionShareButton from "@/components/common/SectionShareButton.vue";
 import CalculatorPageHeader from "@/components/seller/CalculatorPageHeader.vue";
+import ShippingCheapestSummary from "@/components/seller/ShippingCheapestSummary.vue";
 import ShippingFareChart from "@/components/seller/ShippingFareChart.vue";
 import ShareModal from "@/components/share/ShareModal.vue";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -333,25 +334,11 @@ function formatPostalRanges(ranges: string[]): string {
   <div class="sh-container sh-container--tool space-y-5 py-5">
     <CalculatorPageHeader title="택배비 비교" />
 
-    <div class="retro-panel overflow-hidden">
-      <div class="retro-titlebar rounded-t-2xl">
-        <div class="flex items-center gap-2">
-          <h2 class="retro-title">비교 기준 안내</h2>
-          <FreshBadge :message="`${SHIPPING_DATA_VERIFIED} 기준`" />
-        </div>
-        <SectionShareButton @click="share.openShare" />
-      </div>
-
-      <div class="retro-panel-content space-y-1.5">
-        <p class="text-[11px] text-muted-foreground sm:text-body">
-          상품 무게와 크기에 따라 택배사별 예상 운임을 비교합니다.
-        </p>
-        <p class="text-caption text-muted-foreground">
-          동일권 공개 운임 기준의 추정값이며, 계약 단가와 지역·특수 할증은 제외했습니다.
-        </p>
-      </div>
-    </div>
-
+    <!-- 입력 | 결과 1×2(lg+). 결과 칸은 최저 운임 요약 + 예상 운임 그래프이고, 택배사 표 두 개는
+         table-fixed 고정폭(24+8+6.5+8+9rem=888px)이라 반폭(544/480px)에 넣으면 마지막 열이
+         retro-panel의 overflow-hidden에 가려 잘리므로(실측 확인) 틀 아래 전폭에 둔다. -->
+    <ShCalculatorSplit>
+    <template #input>
     <section>
       <div class="retro-panel overflow-hidden">
         <div class="retro-titlebar rounded-t-2xl">
@@ -359,7 +346,8 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
         <div class="retro-panel-content">
           <div class="space-y-3">
-            <div class="grid gap-3 sm:grid-cols-2">
+            <!-- 크기 칸은 선택 묶음 + 안내문이 붙은 칸이라 반폭 입력 칸(lg+)에서는 1열로 쌓는다 -->
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               <div class="rounded-xl border border-border/60 p-3">
                 <div class="space-y-1.5">
                   <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
@@ -450,14 +438,43 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
       </div>
     </section>
+    </template>
 
-    <!-- 일반/편의점 택배 비교표는 table-fixed 고정폭(24+8+6.5+8+9rem=888px, 5열이라 finance식
-         lg:min-w-0 예외 대상도 아님)이라 반폭(544/480px)에서 마지막 열이 retro-panel의 overflow-hidden에
-         가려 화면 밖으로 잘린다(실측 확인, 규칙 3) — 그래프도 짝 상대(표)가 전폭이 되어 함께 전폭으로 둔다. -->
+    <template #result>
+    <ShippingCheapestSummary
+      :general-label="cheapestGeneralLabel"
+      :convenience-label="cheapestConvenienceLabel"
+    />
     <ShippingFareChart
       :general-results="generalResults"
       :convenience-results="convenienceResults"
     />
+    </template>
+
+    <!-- 결과(898px, 그래프가 750px)가 입력(529px)보다 369px 길어(1440×900 실측) CLAUDE.md 레이아웃
+         규칙 2의 300px를 넘는다 — 무게·크기가 무엇을 바꾸는지와 추정 기준을 적은 안내를 입력 아래로 옮겨
+         왼쪽을 채운다. 모바일은 DOM 순서대로 입력 → 결과 → 이 안내 순이다. -->
+    <template #below-input>
+    <div class="retro-panel overflow-hidden">
+      <div class="retro-titlebar rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <h2 class="retro-title">비교 기준 안내</h2>
+          <FreshBadge :message="`${SHIPPING_DATA_VERIFIED} 기준`" />
+        </div>
+        <SectionShareButton @click="share.openShare" />
+      </div>
+
+      <div class="retro-panel-content space-y-1.5">
+        <p class="text-[11px] text-muted-foreground sm:text-body">
+          상품 무게와 크기에 따라 택배사별 예상 운임을 비교합니다.
+        </p>
+        <p class="text-caption text-muted-foreground">
+          동일권 공개 운임 기준의 추정값이며, 계약 단가와 지역·특수 할증은 제외했습니다.
+        </p>
+      </div>
+    </div>
+    </template>
+    </ShCalculatorSplit>
 
     <section id="shipping-general-results">
       <div class="retro-panel overflow-hidden">
@@ -470,14 +487,8 @@ function formatPostalRanges(ranges: string[]): string {
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-[11px] text-muted-foreground sm:text-body">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
+            <!-- 최저 예상 운임 배지는 결과 칸 요약(ShippingCheapestSummary)으로 옮겼다 -->
             <div class="ml-auto flex flex-wrap items-center gap-2">
-              <span
-                v-if="cheapestGeneralLabel"
-                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
-              >
-                <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
-                현재 최저 예상 운임 {{ cheapestGeneralLabel }}
-              </span>
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="generalCopyRows" /></span>
             </div>
           </div>
@@ -650,14 +661,8 @@ function formatPostalRanges(ranges: string[]): string {
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <p class="text-[11px] text-muted-foreground sm:text-body">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
+            <!-- 최저 예상 운임 배지는 결과 칸 요약(ShippingCheapestSummary)으로 옮겼다 -->
             <div class="ml-auto flex flex-wrap items-center gap-2">
-              <span
-                v-if="cheapestConvenienceLabel"
-                class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
-              >
-                <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
-                현재 최저 예상 운임 {{ cheapestConvenienceLabel }}
-              </span>
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="convenienceCopyRows" /></span>
             </div>
           </div>
