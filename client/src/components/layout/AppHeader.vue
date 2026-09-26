@@ -1,44 +1,22 @@
 <script setup lang="ts">
 // v3 §3.2 BL-003/004 — 전역 헤더는 패키지 ShGlobalHeader가 소유한다(검정 #0A0A0A, 56px).
 // 앱은 링크·테마 토글만 utility 슬롯에 채우고 자체 헤더 마크업을 갖지 않는다.
-import { computed, onMounted, ref } from "vue";
-import { Moon, Sun } from "lucide-vue-next";
+// 0.3.38 "순수 내비게이션"(2026-09-25): 헤더는 위치(로고 / 앱 이름)와 이동(블로그·소개·☰)만 싣는다.
+import { computed } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import {
-  ShButton,
   ShGlobalHeader,
+  ShThemeToggle,
   type GlobalHeaderLink,
   type PrimaryNavigationItem,
 } from "@shakilabs/ui";
 import { SELLER_TOOLS } from "@/data/sellerNavigation";
-import TickerBar from "@/components/common/TickerBar.vue";
-import { tickerMessages } from "@/data/tickerMessages";
 
-const THEME_STORAGE_KEY = "seller-fee:theme:v1";
-type ThemeMode = "light" | "dark";
-
-const theme = ref<ThemeMode>("light");
-
-function applyTheme(next: ThemeMode): void {
-  theme.value = next;
-  document.documentElement.classList.toggle("dark", next === "dark");
-  localStorage.setItem(THEME_STORAGE_KEY, next);
-}
-
-function toggleTheme(): void {
-  applyTheme(theme.value === "dark" ? "light" : "dark");
-}
-
-onMounted(() => {
-  theme.value = document.documentElement.classList.contains("dark")
-    ? "dark"
-    : "light";
-});
-
-// 모바일 드로어(v3 §3.3-1)에 실을 도구 목록 — 2차 내비와 같은 출처를 쓴다
+// 모바일 전체 메뉴(☰)에 실을 도구 목록 — 2차 내비와 같은 출처를 쓴다
 const route = useRoute();
+// 홈은 href를 따로 준다 — RouterLink "/"는 "/seller/"(끝 슬래시, 308 경유)가 된다. 탭 줄과 같은 규칙.
 const navItems: readonly PrimaryNavigationItem[] = [
-  { key: "home", label: "수수료 계산", to: "/" },
+  { key: "home", label: "수수료 계산", to: "/", href: "/seller" },
   ...SELLER_TOOLS.map((tool) => ({
     key: tool.key,
     label: tool.label,
@@ -52,39 +30,25 @@ const navActiveKey = computed(
     )?.key ?? "",
 );
 
-// 사이트 링크는 최소한만 — 블로그는 이 앱 라우터 밖(포털 소유)이라 href
-const links: GlobalHeaderLink[] = [{ href: "/blog", label: "블로그" }];
+// 사이트 링크 — 블로그는 포털 소유라 href, 소개는 이 앱 라우트라 RouterLink(to). 모바일에서는 ☰ 안으로 들어간다.
+const links: GlobalHeaderLink[] = [
+  { href: "/blog", label: "블로그" },
+  { to: "/about", label: "소개" },
+];
 </script>
 
 <template>
   <ShGlobalHeader
+    app="seller"
     home-href="/"
     brand="ShakiLabs"
     :links="links"
     :nav-items="navItems"
     :nav-active-key="navActiveKey"
-    nav-title="수수료 도구"
     :link-component="RouterLink"
   >
-    <!-- 헤더 가운데 회전 안내. 패키지가 흐름 밖에 절대 배치하므로 문구 길이가
-         56px 헤더 높이를 바꾸지 못한다(v3 §3.2 BL-005 재발 방지, 0.3.24). -->
-    <template #tip>
-      <span data-tip-eyebrow class="inline-flex items-center gap-2 whitespace-nowrap">
-        <TickerBar :messages="tickerMessages" />
-      </span>
-    </template>
-
     <template #utility>
-      <ShButton
-        type="button"
-        variant="ghost"
-        size="sm"
-        :aria-label="theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'"
-        @click="toggleTheme"
-      >
-        <Moon v-if="theme === 'dark'" class="h-4 w-4" />
-        <Sun v-else class="h-4 w-4" />
-      </ShButton>
+      <ShThemeToggle storage-key="seller-fee:theme:v1" />
     </template>
   </ShGlobalHeader>
 </template>
