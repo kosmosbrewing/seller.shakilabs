@@ -10,7 +10,6 @@ import CompareIntro from "@/components/compare/CompareIntro.vue";
 import CompareInput from "@/components/compare/CompareInput.vue";
 import CompareResults from "@/components/compare/CompareResults.vue";
 import BestMarketPriceBreakdown from "@/components/compare/BestMarketPriceBreakdown.vue";
-import CostAxisLinks from "@/components/compare/CostAxisLinks.vue";
 import MonthlySim from "@/components/compare/MonthlySim.vue";
 import CompareFAQ from "@/components/compare/CompareFAQ.vue";
 import SellerRelatedServices from "@/components/seller/SellerRelatedServices.vue";
@@ -41,13 +40,6 @@ function trackUxEvent(eventName: string, params?: Record<string, unknown>): void
 function openShareFromSummary(): void {
   trackUxEvent("ux_summary_cta_click", { cta: "share" });
   share.openShare();
-}
-
-function trackCostAxisClick(target: "market" | "payment" | "shipping"): void {
-  trackUxEvent("related_tool_click", {
-    to_tool: `seller_${target}`,
-    placement: "cost_axis",
-  });
 }
 
 watch(
@@ -138,18 +130,16 @@ onUnmounted(() => {
         />
       </template>
 
-      <!-- 다른 비용 비교 링크는 입력(판매가·카테고리·배송비)과 함께 다음에 무엇을 볼지 보여주는
-           블록이라 왼쪽 아래에 둔다 — 결과 칸에 두면 결과가 길어지고 왼쪽이 짧게 남는다. -->
+      <!-- 다음 계산(결제 수수료·택배비·부가세)은 이 한 블록뿐이다 — 결과 아래에 따로 있던 카드와 합쳤다.
+           왼쪽 아래에 두는 이유: 결과 칸에 두면 결과가 길어지고 왼쪽이 짧게 남는다(모바일은 결과 바로 뒤). -->
       <template #below-input>
-        <CostAxisLinks @select="trackCostAxisClick" />
+        <SellerRelatedActions />
       </template>
     </ShCalculatorSplit>
 
     <BestMarketPriceBreakdown :result="calc.bestMarket.value" />
 
     <SellerFeeResultCharts :results="calc.results.value" />
-
-    <SellerRelatedActions />
 
     <AdSlot slot="top" label="광고" />
 
