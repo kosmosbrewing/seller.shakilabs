@@ -309,9 +309,13 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                     <div class="min-w-0">
                       <div class="flex items-center gap-1.5">
                         <span class="text-body font-semibold">{{ market.name }}</span>
+                        <!-- v8 감사: 이 배지가 11px·rgb(27,122,74) on rgb(193,219,206)=3.64:1이었다
+                             (행 틴트 + sticky 셀 틴트 + 배지 자체 틴트가 3중으로 겹쳐 녹색이 흐려진 결과).
+                             13px로 올리고 글자색을 기존 --foreground 토큰(흑색)으로 바꿔
+                             배경이 몇 겹 겹치든 4.5:1 이상을 보장한다 — 녹색 톤은 테두리·배경에 남긴다. -->
                         <span
                           v-if="market.key === lowestFeeMarket"
-                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
+                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-caption font-semibold text-foreground"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저
