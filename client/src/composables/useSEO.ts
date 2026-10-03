@@ -3,11 +3,26 @@ import { toValue, type MaybeRefOrGetter } from "vue";
 import { useRoute } from "vue-router";
 import { getSiteUrl } from "@/lib/site";
 
-const TITLE_SUFFIX = " | 오픈마켓 수수료 계산기 | ShakiLabs";
+// 함대 제목 레시피(2026-10-03 개정) — 페이지 종류에 따라 두 모양:
+// - "tool"(계산기·비교 도구): `<페이지 제목> | ShakiLabs`
+//   유입의 거의 전부인 네이버 검색 결과는 제목을 약 35자에서 자르는데, 예전 접미사
+//   " | 오픈마켓 수수료 계산기 | ShakiLabs"(27자)가 그 자리를 먹어 핵심 구절과 브랜드가 잘려 보였다.
+// - "site"(소개·이용약관·개인정보처리방침·404): `<페이지 제목> · <앱 이름> | ShakiLabs`
+//   앱 이름까지 빼면 "이용약관 | ShakiLabs"가 shakilabs.com 아래 12개 앱에서 똑같아져 도메인 안
+//   중복 제목이 된다. 정책 페이지는 검색 유입이 목적이 아니라 35자 절단이 문제되지 않는다.
+// 홈은 어느 쪽이든 `<앱 이름> | ShakiLabs`(빈 제목 또는 앱 이름 그대로).
+export const APP_NAME = "오픈마켓 수수료 계산기";
+const TITLE_SUFFIX = " | ShakiLabs";
+const SITE_APP_SUFFIX = ` · ${APP_NAME}`;
+export type TitleKind = "tool" | "site";
+// 호출부가 옛·현행 접미사를 붙여 넘겨도 두 번 붙지 않게 벗겨 낸다.
+// 긴 것부터 검사해야 " | ShakiLabs"만 먼저 벗겨지고 앱 이름이 남는 일이 없다.
 const LEGACY_TITLE_SUFFIXES = [
+  ` | ${APP_NAME}${TITLE_SUFFIX}`,
+  `${SITE_APP_SUFFIX}${TITLE_SUFFIX}`,
   " | 오픈마켓 수수료 비교 계산기",
-  " | 오픈마켓 수수료 계산기",
-  " | ShakiLabs",
+  ` | ${APP_NAME}`,
+  SITE_APP_SUFFIX,
   TITLE_SUFFIX,
 ] as const;
 
@@ -47,12 +62,15 @@ type SEOOptions = {
   description: MaybeRefOrGetter<string>;
   ogImage?: MaybeRefOrGetter<string | undefined>;
   noindex?: MaybeRefOrGetter<boolean | undefined>;
+  /** 기본 "tool". 소개·약관·개인정보·404만 "site"로 넘긴다(위 레시피 주석 참고). */
+  titleKind?: MaybeRefOrGetter<TitleKind | undefined>;
   jsonLd?: MaybeRefOrGetter<
     Record<string, unknown> | Record<string, unknown>[] | undefined
   >;
 };
 
-function normalizeTitle(rawTitle: string): string {
+/** 문서 제목·og:title·twitter:title이 모두 이 함수 하나를 거친다 — 레시피를 두 곳에 적지 않는다. */
+export function buildPageTitle(rawTitle: string, kind: TitleKind = "tool"): string {
   const trimmed = rawTitle.trim();
   let baseTitle = trimmed;
 
@@ -63,11 +81,13 @@ function normalizeTitle(rawTitle: string): string {
     }
   }
 
-  if (!baseTitle) {
-    return `오픈마켓 수수료 비교${TITLE_SUFFIX}`;
+  if (!baseTitle || baseTitle === APP_NAME) {
+    return `${APP_NAME}${TITLE_SUFFIX}`;
   }
 
-  return `${baseTitle}${TITLE_SUFFIX}`;
+  return kind === "site"
+    ? `${baseTitle}${SITE_APP_SUFFIX}${TITLE_SUFFIX}`
+    : `${baseTitle}${TITLE_SUFFIX}`;
 }
 
 export function useSEO({
@@ -75,12 +95,13 @@ export function useSEO({
   description,
   ogImage,
   noindex = false,
+  titleKind,
   jsonLd,
 }: SEOOptions): void {
   const route = useRoute();
 
   useHead(() => {
-    const resolvedTitle = normalizeTitle(toValue(title));
+    const resolvedTitle = buildPageTitle(toValue(title), toValue(titleKind) ?? "tool");
     const resolvedDescription = toValue(description);
     const resolvedNoindex = Boolean(toValue(noindex));
     const resolvedOgImage = toValue(ogImage);

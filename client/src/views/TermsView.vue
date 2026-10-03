@@ -11,6 +11,7 @@ const constantsStore = useConstantsStore();
 <template>
   <SEOHead
     title="이용약관"
+    title-kind="site"
     description="오픈마켓 수수료·결제 수수료·택배비 비교 계산기의 이용 조건과 계산 결과의 한계를 밝히는 이용약관입니다."
   />
 

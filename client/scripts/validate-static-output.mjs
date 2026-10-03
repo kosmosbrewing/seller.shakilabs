@@ -220,6 +220,53 @@ function visibleTextLength(html) {
 
 const MIN_PUBLIC_ROUTE_CHARS = 1500;
 
+// 함대 제목 레시피(2026-10-03 개정) 게이트 — useSEO.buildPageTitle의 두 모양을 산출물에서 확인한다.
+// - 계산기·도구: `<페이지 제목> | ShakiLabs` — 네이버는 제목을 ~35자에서 자르므로 가운데 앱 이름이
+//   되살아나거나 제목이 길어지면 핵심 구절이 다시 잘린다.
+// - 소개·약관·개인정보·404: `<페이지 제목> · <앱 이름> | ShakiLabs` — 앱 이름이 빠지면
+//   shakilabs.com 아래 12개 앱의 "이용약관 | ShakiLabs"가 서로 같은 제목이 된다.
+// - 홈: `<앱 이름> | ShakiLabs`.
+// 소스가 아니라 산출물을 본다: 셸 <title>과 뷰 제목이 합쳐지거나 차트 SVG <title>이 다시
+// 들어와도(0.3.42에서 제거) 여기서 걸린다. 새 라우트는 기본이 도구 모양이다.
+const TITLE_BRAND_SUFFIX = " | ShakiLabs";
+const APP_NAME = "오픈마켓 수수료 계산기";
+const SITE_TITLE_ROUTES = new Set(["/about", "/terms", "/privacy", "/404"]);
+const MAX_PAGE_TITLE_CHARS = 40;
+
+function validateTitleRecipe(html, route) {
+  const titleTagCount = html.match(/<title\b/gi)?.length ?? 0;
+  assert(titleTagCount === 1,
+    `Expected exactly one <title> tag for ${route}, found ${titleTagCount}`);
+
+  const title = html.match(/<title>([^<]+)<\/title>/)?.[1]?.trim() ?? "";
+  assert(title.endsWith(TITLE_BRAND_SUFFIX),
+    `Title must end with "${TITLE_BRAND_SUFFIX}" for ${route}: ${title}`);
+  const head = title.slice(0, -TITLE_BRAND_SUFFIX.length);
+  assert(!head.includes(" | "),
+    `Title must not carry a middle " | " segment for ${route}: ${title}`);
+
+  let pageTitle;
+  if (route === "/") {
+    assert(head === APP_NAME,
+      `Home title must be "${APP_NAME}${TITLE_BRAND_SUFFIX}": ${title}`);
+    pageTitle = head;
+  } else if (SITE_TITLE_ROUTES.has(route)) {
+    const appSuffix = ` · ${APP_NAME}`;
+    assert(head.endsWith(appSuffix),
+      `Site page title must be "<page title>${appSuffix}${TITLE_BRAND_SUFFIX}" for ${route}: ${title}`);
+    pageTitle = head.slice(0, -appSuffix.length);
+  } else {
+    assert(!head.includes(APP_NAME),
+      `Tool page title must not carry the app name for ${route}: ${title}`);
+    pageTitle = head;
+  }
+  assert(pageTitle.length > 0 && pageTitle.length <= MAX_PAGE_TITLE_CHARS,
+    `Page title must be 1-${MAX_PAGE_TITLE_CHARS} chars for ${route}: ${pageTitle.length}`);
+
+  const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1]?.trim();
+  assert(description, `Missing meta description for ${route}`);
+}
+
 function validatePublicRoutes() {
   const titles = new Set();
   const rawDocuments = new Set();
@@ -257,6 +304,7 @@ function validatePublicRoutes() {
     assert(chars >= MIN_PUBLIC_ROUTE_CHARS,
       `Thin content for ${route}: ${chars} chars (minimum ${MIN_PUBLIC_ROUTE_CHARS})`);
     validateJsonLd(html, route);
+    validateTitleRecipe(html, route);
 
     titles.add(actualTitle);
     rawDocuments.add(html);
@@ -268,6 +316,7 @@ function validateNotFound() {
   assert(existsSync(notFoundPath), "Missing custom 404.html output");
 
   const html = readFileSync(notFoundPath, "utf8");
+  validateTitleRecipe(html, "/404");
   assert(/name="robots" content="noindex,nofollow"/.test(html),
     "404.html must be noindex,nofollow");
   assert(html.includes(">404<"), "404.html must render the recovery page");

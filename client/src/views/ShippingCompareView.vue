@@ -53,9 +53,12 @@ const SHIPPING_COMPARE_COL_WIDTHS: Record<ShippingCompareColumnKey, string> = {
 };
 
 
-const seoTitle = "일반 택배 6사 · 편의점 택배 2사 택배비 비교";
+// 네이버가 제목을 ~35자에서 자르므로 검색 구절("택배비 비교")을 맨 앞에, 사람들이 이름으로 찾는
+// 택배사를 그 뒤에 둔다. 2026은 SHIPPING_DATA_VERIFIED(2026.07) 기준, 택배사는 SHIPPING_CARRIERS
+// 8곳(일반 6 · 편의점 2)과 대조했다. CJ는 공개 운임표가 없어 추정이므로 "예상 운임"이라고만 쓴다.
+const seoTitle = "택배비 비교 2026 · CJ·한진·로젠·우체국·편의점 택배 요금";
 const seoDescription =
-  "CJ대한통운, 한진, 로젠, 우체국, 경동, 롯데, CU, GS25의 예상 택배비를 무게와 크기 기준으로 비교합니다.";
+  "무게(kg)·크기(3변 합)별 CJ대한통운·한진·로젠·우체국·경동·롯데 6사와 CU·GS25 편의점 택배의 예상 운임·접수 제한을 비교합니다. 동일권 기준·2026.07 확인, 제주·도서산간 우편번호표 포함.";
 const pageUrl = `${DEFAULT_SITE_URL}/shipping-compare`;
 
 const share = usePageShare({

@@ -19,6 +19,7 @@ const jsonLd = buildFaqPageJsonLd(SELLER_HOME_GUIDE.faqs);
 <template>
   <SEOHead
     title="서비스 안내"
+    title-kind="site"
     description="shakilabs.com/seller는 스마트스토어, 쿠팡, 11번가, G마켓의 수수료를 무료로 비교하는 셀러 전용 도구입니다."
     :json-ld="jsonLd"
   />

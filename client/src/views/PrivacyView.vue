@@ -32,6 +32,7 @@ const CALCULATOR_INPUTS = [
 <template>
   <SEOHead
     title="개인정보 처리방침"
+    title-kind="site"
     description="오픈마켓 수수료 비교 계산기가 어떤 입력값을 받고 어디서 처리하는지, 공유 링크에 무엇이 담기는지 밝히는 개인정보 처리방침입니다."
   />
 
