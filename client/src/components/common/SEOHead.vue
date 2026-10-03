@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { useSEO } from "@/composables/useSEO";
+import { useSEO, type TitleKind } from "@/composables/useSEO";
 
 const props = defineProps<{
   title: string;
   description: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
+  titleKind?: TitleKind;
 }>();
 
 useSEO({
@@ -13,6 +14,7 @@ useSEO({
   description: () => props.description,
   jsonLd: () => props.jsonLd,
   noindex: () => props.noindex,
+  titleKind: () => props.titleKind,
 });
 </script>
 
