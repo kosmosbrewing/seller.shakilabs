@@ -8,7 +8,10 @@ import { SETTLEMENT_CYCLES, SETTLEMENT_ORDER } from "./settlementCycles";
 const guideText = [SELLER_HOME_GUIDE, SELLER_MARKET_COMPARE_GUIDE, SELLER_SHIPPING_GUIDE]
   .flatMap((guide) => [
     guide.intro,
-    ...(guide.sections ?? []).map((section) => section.body),
+    // section.body는 string | string[](문단 분할, BRIEF-V8) — 둘 다 평평하게 편다.
+    ...(guide.sections ?? []).flatMap((section) =>
+      Array.isArray(section.body) ? section.body : [section.body]
+    ),
     ...(guide.faqs ?? []).flatMap((faq) => [faq.q, faq.a]),
   ])
   .join("\n");

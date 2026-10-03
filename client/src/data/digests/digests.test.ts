@@ -93,7 +93,12 @@ describe("파생 다이제스트 — 복제 방지", () => {
   it(`기존 가이드 본문·FAQ와 유사도 ${MAX_LEGACY_SIMILARITY} 미만`, () => {
     const digestBodies = new Set(ALL.map((f) => f.body));
     const legacy = [SELLER_HOME_GUIDE, SELLER_MARKET_COMPARE_GUIDE, SELLER_PAYMENT_GUIDE, SELLER_SHIPPING_GUIDE]
-      .flatMap((g) => [g.intro, ...(g.sections ?? []).map((s) => s.body), ...(g.faqs ?? []).map((q) => q.a)])
+      .flatMap((g) => [
+        g.intro,
+        // section.body는 string | string[](문단 분할, BRIEF-V8) — 평평하게 펴서 문자열만 남긴다.
+        ...(g.sections ?? []).flatMap((s) => (Array.isArray(s.body) ? s.body : [s.body])),
+        ...(g.faqs ?? []).map((q) => q.a),
+      ])
       .filter((body) => !digestBodies.has(body));
     for (const f of ALL) {
       for (const body of legacy) {

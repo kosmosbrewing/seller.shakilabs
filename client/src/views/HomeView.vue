@@ -105,8 +105,6 @@ onUnmounted(() => {
   <div class="text-resize-layout sh-container sh-container--page space-y-5 py-5">
     <CalculatorPageHeader title="오픈마켓 수수료 계산기" />
 
-    <CompareIntro />
-
     <ShCalculatorSplit>
       <template #input>
         <section id="input">
@@ -138,6 +136,10 @@ onUnmounted(() => {
         <SellerRelatedActions />
       </template>
     </ShCalculatorSplit>
+
+    <!-- v8 감사: 이 안내 카드 3장이 계산기 위에 있어 첫 입력이 y=598까지 밀렸다
+         (기준 y<=420). 문구·카드는 그대로 두고 계산기 아래로 옮긴 것뿐이다. -->
+    <CompareIntro />
 
     <BestMarketPriceBreakdown :result="calc.bestMarket.value" />
 

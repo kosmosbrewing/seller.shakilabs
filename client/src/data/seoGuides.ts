@@ -53,8 +53,27 @@ const MARKET_FEE_PROSE =
   `따로 붙는 이중 구조입니다. 쿠팡 ${COUPANG_RANGE}, 11번가 ${ELEVENST_RANGE}, G마켓·옥션 ${GMARKET_RANGE}는 ` +
   `카테고리별 단일 수수료입니다(이 계산기가 다루는 5개 대표 카테고리 기준).`;
 
-const SETTLEMENT_PROSE = SETTLEMENT_ORDER.map(settlementProse).join(" ");
-export interface GuideSection { h2: string; body: string; }
+// 가독성 게이트(BRIEF-V8 seller #3) — 문단은 사람이 한눈에 읽을 수 있는 길이(<=200자)여야
+// 하지만 문장을 지우거나 숫자를 바꾸면 안 된다. "어떤 문장이 들어가는지"는 그대로 두고
+// "문장을 어디서 문단으로 끊을지"만 자동으로 계산해, 데이터가 나중에 또 길어져도
+// 같은 규칙으로 쪼개지게 한다(수동으로 잘라두면 다음 수정 때 다시 길어진다).
+function chunkSentences(sentences: string[], maxChars = 200): string[] {
+  const paragraphs: string[] = [];
+  let current = "";
+  for (const sentence of sentences) {
+    const candidate = current ? `${current} ${sentence}` : sentence;
+    if (candidate.length > maxChars && current) {
+      paragraphs.push(current);
+      current = sentence;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) paragraphs.push(current);
+  return paragraphs;
+}
+
+export interface GuideSection { h2: string; body: string | string[]; }
 export interface GuideFaq { q: string; a: string; }
 export interface GuideChecklist { title: string; items: string[]; }
 // 공공기관 공식 출처 링크 — 콘텐츠 신뢰도(E-E-A-T) 근거로 가이드 하단에 노출한다
@@ -140,7 +159,15 @@ export const SELLER_MARKET_COMPARE_GUIDE: GuideData = {
     },
     {
       h2: "정산 주기 및 유보율",
-      body: `정산 주기는 마켓별로 다를 뿐 아니라, 같은 마켓 안에서도 어떤 정산 방식을 선택했는지에 따라 달라집니다. 아래는 위 비교표와 같은 데이터이며, 각 마켓 공식 안내·약관 원문을 ${SETTLEMENT_VERIFIED}에 확인한 값입니다. ${SETTLEMENT_PROSE} 특히 쿠팡 주정산은 마감 후 15영업일에 70%만 먼저 들어오고 나머지 30%가 다음 달로 넘어가므로, 매출이 늘어날수록 운전자금이 먼저 마릅니다. 판매 시점이 아니라 구매확정 시점이 기산점이라는 점도 함께 감안해야 합니다.`,
+      // v8 감사: 이 섹션이 727자 단일 문단이었다(문장 8개가 한 줄에 다 붙어 가독성 결함).
+      // chunkSentences가 같은 문장들을 그대로 200자 이내 문단으로만 재배열한다 — 문장·숫자 변경 없음.
+      body: chunkSentences([
+        "정산 주기는 마켓별로 다를 뿐 아니라, 같은 마켓 안에서도 어떤 정산 방식을 선택했는지에 따라 달라집니다.",
+        `아래는 위 비교표와 같은 데이터이며, 각 마켓 공식 안내·약관 원문을 ${SETTLEMENT_VERIFIED}에 확인한 값입니다.`,
+        ...SETTLEMENT_ORDER.map(settlementProse),
+        "특히 쿠팡 주정산은 마감 후 15영업일에 70%만 먼저 들어오고 나머지 30%가 다음 달로 넘어가므로, 매출이 늘어날수록 운전자금이 먼저 마릅니다.",
+        "판매 시점이 아니라 구매확정 시점이 기산점이라는 점도 함께 감안해야 합니다.",
+      ]),
     },
     {
       h2: "멀티 채널 전략",
