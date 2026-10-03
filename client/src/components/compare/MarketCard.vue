@@ -62,7 +62,7 @@ watch(() => props.result.totalFee, () => {
           </div>
           <div class="min-w-0">
             <p class="truncate text-body font-bold text-foreground">{{ meta.name }}</p>
-            <div class="mt-1 flex items-center gap-1.5 text-[11px] font-semibold">
+            <div class="mt-1 flex items-center gap-1.5 text-caption font-semibold">
               <span
                 class="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
                 :class="isBest ? 'bg-status-success/10 text-status-success' : 'bg-muted text-muted-foreground'"
@@ -81,7 +81,7 @@ watch(() => props.result.totalFee, () => {
         class="rounded-[1.35rem] px-3.5 py-3.5"
         :class="isBest ? 'bg-status-success/10' : 'bg-white'"
       >
-        <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+        <p class="text-caption font-bold uppercase tracking-[0.14em] text-muted-foreground">
           건당 순이익
         </p>
         <p class="mt-2 text-[30px] font-bold leading-none tabular-nums whitespace-nowrap" :class="isBest ? 'text-status-success' : 'text-foreground'">
@@ -95,7 +95,7 @@ watch(() => props.result.totalFee, () => {
 
       <div class="mt-2.5 grid grid-cols-2 gap-2">
         <div class="rounded-2xl border border-border/70 bg-background px-3 py-3">
-          <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          <p class="text-caption font-bold uppercase tracking-[0.14em] text-muted-foreground">
             총 수수료
           </p>
           <p class="mt-1.5 text-body font-bold tabular-nums text-status-danger">
@@ -103,7 +103,7 @@ watch(() => props.result.totalFee, () => {
           </p>
         </div>
         <div class="rounded-2xl border border-border/70 bg-background px-3 py-3">
-          <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          <p class="text-caption font-bold uppercase tracking-[0.14em] text-muted-foreground">
             수수료율(VAT 포함)
           </p>
           <p class="mt-1.5 text-body font-bold tabular-nums text-foreground">

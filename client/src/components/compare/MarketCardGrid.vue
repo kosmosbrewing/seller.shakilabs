@@ -51,7 +51,7 @@ const totalFeeSpread = computed(() => {
 
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div class="rounded-2xl bg-background px-3 py-2.5">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            <p class="text-caption font-bold uppercase tracking-[0.14em] text-muted-foreground">
               1위 vs 2위
             </p>
             <p class="mt-1 text-caption font-semibold text-foreground">
@@ -65,7 +65,7 @@ const totalFeeSpread = computed(() => {
           </div>
 
           <div class="rounded-2xl bg-background px-3 py-2.5">
-            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+            <p class="text-caption font-bold uppercase tracking-[0.14em] text-muted-foreground">
               마켓간 수수료 편차
             </p>
             <p class="mt-1 text-caption text-muted-foreground">
