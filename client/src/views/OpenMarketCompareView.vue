@@ -36,9 +36,12 @@ interface CompareColumn {
   nowrap?: boolean;
 }
 
-const seoTitle = "스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 오픈마켓 비교";
+// 검색 구절("오픈마켓 수수료 비교")을 맨 앞에 둔다. 마켓 4곳은 OPEN_MARKETS와 대조했고,
+// 2026은 MARKET_COMPARE_VERIFIED(2026.07 재확인)·가이드 제목 "(2026년)"과 맞춘 것이다
+// (요율 개정 시점 자체는 2025.10). 옛 설명의 "입점비"는 이 표에 열이 없어 뺐다.
+const seoTitle = "오픈마켓 수수료 비교 2026 · 스마트스토어·쿠팡·11번가·G마켓";
 const seoDescription =
-  "스마트스토어, 쿠팡, 11번가, G마켓의 입점비·판매 수수료·배송비 수수료·정산주기를 한눈에 비교합니다.";
+  "스마트스토어·쿠팡·11번가·G마켓/옥션 4개 오픈마켓의 판매 수수료(등급·카테고리별), 배송비 수수료, 정산주기를 한 표로 비교합니다. 요율은 2025.10 개정분, 2026.07 재확인 기준.";
 const pageUrl = `${DEFAULT_SITE_URL}/market-compare`;
 
 const compareColumns: CompareColumn[] = [

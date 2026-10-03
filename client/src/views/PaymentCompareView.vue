@@ -37,9 +37,12 @@ interface CompareColumn {
   nowrap?: boolean;
 }
 
-const seoTitle = "토스페이먼츠·네이버페이·카카오페이·PAYCO 결제 서비스 비교";
+// "PG 결제"만 쓰면 네이버페이·카카오페이·페이코까지 PG라고 부르게 된다 — 이 화면 자체가
+// 토스페이먼츠만 "PG 인프라"로, 나머지는 간편결제로 구분하므로 제목도 "PG·간편결제"로 쓴다.
+// 서비스 5개(네이버페이 주문형·결제형 포함)는 PAYMENT_GATEWAYS와 대조했다.
+const seoTitle = "PG·간편결제 수수료 비교 · 토스페이먼츠·네이버페이·카카오페이·페이코";
 const seoDescription =
-  "토스페이먼츠, 네이버페이 주문형·결제형, 카카오페이, PAYCO의 고정비·카드 수수료·정산 조건을 한눈에 비교합니다.";
+  "토스페이먼츠(PG)·네이버페이 주문형·결제형·카카오페이·PAYCO 5개 결제 서비스의 고정비(설정비·연회비), 등급별 카드 수수료, 정산 기준을 비교합니다. VAT 포함 실부담 환산, 2026.07 확인.";
 const pageUrl = `${DEFAULT_SITE_URL}/payment-compare`;
 
 const compareColumns: CompareColumn[] = [

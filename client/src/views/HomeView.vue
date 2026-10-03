@@ -2,6 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { ShCalculatorSplit } from "@shakilabs/ui";
 import SEOHead from "@/components/common/SEOHead.vue";
+import { APP_NAME } from "@/composables/useSEO";
 import SeoRichGuide from "@/components/common/SeoRichGuide.vue";
 import { SELLER_HOME_GUIDE } from "@/data/seoGuides";
 import AdSlot from "@/components/common/AdSlot.vue";
@@ -95,8 +96,9 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- 함대 제목 레시피: 홈은 `<앱 이름> | ShakiLabs` (useSEO.buildPageTitle) -->
   <SEOHead
-    title="스마트스토어 vs 쿠팡 vs 11번가 vs G마켓 수수료 비교"
+    :title="APP_NAME"
     description="같은 상품인데 마켓마다 수수료가 이렇게 다릅니다. 스마트스토어, 쿠팡, 11번가, G마켓 수수료를 한눈에 비교하세요."
   />
 

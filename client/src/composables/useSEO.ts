@@ -3,11 +3,18 @@ import { toValue, type MaybeRefOrGetter } from "vue";
 import { useRoute } from "vue-router";
 import { getSiteUrl } from "@/lib/site";
 
-const TITLE_SUFFIX = " | 오픈마켓 수수료 계산기 | ShakiLabs";
+// 함대 제목 레시피(2026-10-02): `<페이지 제목> | ShakiLabs`.
+// 유입의 거의 전부인 네이버 검색 결과는 제목을 약 35자에서 자르는데, 예전 접미사
+// " | 오픈마켓 수수료 계산기 | ShakiLabs"(27자)가 그 자리를 먹어 핵심 구절과 브랜드가 잘려 보였다.
+// 앱 이름은 홈 제목으로만 쓴다(빈 제목 → `<앱 이름> | ShakiLabs`).
+export const APP_NAME = "오픈마켓 수수료 계산기";
+const TITLE_SUFFIX = " | ShakiLabs";
+// 호출부가 옛 접미사를 붙여 넘겨도 두 번 붙지 않게 벗겨 낸다.
+// 긴 것부터 검사해야 " | ShakiLabs"만 먼저 벗겨지고 가운데 앱 이름이 남는 일이 없다.
 const LEGACY_TITLE_SUFFIXES = [
+  ` | ${APP_NAME}${TITLE_SUFFIX}`,
   " | 오픈마켓 수수료 비교 계산기",
-  " | 오픈마켓 수수료 계산기",
-  " | ShakiLabs",
+  ` | ${APP_NAME}`,
   TITLE_SUFFIX,
 ] as const;
 
@@ -52,7 +59,8 @@ type SEOOptions = {
   >;
 };
 
-function normalizeTitle(rawTitle: string): string {
+/** 문서 제목·og:title·twitter:title이 모두 이 함수 하나를 거친다 — 레시피를 두 곳에 적지 않는다. */
+export function buildPageTitle(rawTitle: string): string {
   const trimmed = rawTitle.trim();
   let baseTitle = trimmed;
 
@@ -63,11 +71,7 @@ function normalizeTitle(rawTitle: string): string {
     }
   }
 
-  if (!baseTitle) {
-    return `오픈마켓 수수료 비교${TITLE_SUFFIX}`;
-  }
-
-  return `${baseTitle}${TITLE_SUFFIX}`;
+  return `${baseTitle || APP_NAME}${TITLE_SUFFIX}`;
 }
 
 export function useSEO({
@@ -80,7 +84,7 @@ export function useSEO({
   const route = useRoute();
 
   useHead(() => {
-    const resolvedTitle = normalizeTitle(toValue(title));
+    const resolvedTitle = buildPageTitle(toValue(title));
     const resolvedDescription = toValue(description);
     const resolvedNoindex = Boolean(toValue(noindex));
     const resolvedOgImage = toValue(ogImage);
