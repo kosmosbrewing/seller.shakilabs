@@ -12,7 +12,7 @@
   [class*="text-[10px]"],
   [class*="text-[11px]"],
   [class~="!text-xs"] {
-    font-size: 12px !important;
+    font-size: 13px !important; /* v8b: 12px가 360px 갤럭시에서 토큰 수정을 무효화했다 */
     line-height: 1.4 !important;
   }
 
@@ -98,7 +98,7 @@
   .text-resize-layout .seller-step-index {
     width: 20px;
     height: 20px;
-    font-size: 11px;
+    font-size: 13px; /* v8b: 11px → 13px */
   }
 
   .text-resize-layout .seller-stepper {

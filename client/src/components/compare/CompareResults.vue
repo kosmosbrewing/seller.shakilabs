@@ -213,7 +213,7 @@ onBeforeUnmount(() => cancelAnimationFrame(rafId));
                   </span>
                   <div class="flex items-center gap-1.5">
                     <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
-                    <span v-if="result.marketKey.startsWith('own_')" class="text-[10px] text-muted-foreground">(등급 연동)</span>
+                    <span v-if="result.marketKey.startsWith('own_')" class="text-caption text-muted-foreground">(등급 연동)</span>
                     <ShBadge v-if="idx === 0" tone="success">
                       <BadgeCheck class="h-3.5 w-3.5" />
                       추천

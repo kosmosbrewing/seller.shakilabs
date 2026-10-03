@@ -232,7 +232,7 @@ const ownStoreHintGroups = computed(() =>
         <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-caption font-bold text-primary-foreground">1</span>
               <label for="price-input">판매가</label>
             </p>
           </div>
@@ -282,7 +282,7 @@ const ownStoreHintGroups = computed(() =>
         <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-caption font-bold text-primary-foreground">2</span>
               <span>카테고리</span>
             </p>
           </div>
@@ -299,7 +299,7 @@ const ownStoreHintGroups = computed(() =>
         <div class="seller-input-card rounded-xl border border-border/60 p-3">
           <div class="space-y-1.5">
             <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">3</span>
+              <span class="seller-step-index inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-caption font-bold text-primary-foreground">3</span>
               <label for="shipping-input">배송비</label>
             </p>
           </div>
@@ -367,8 +367,8 @@ const ownStoreHintGroups = computed(() =>
                   <!-- 스마트스토어 주문관리 수수료 -->
                   <div>
                     <p class="font-semibold text-foreground mb-1">주문관리 수수료</p>
-                    <p class="text-[9px] text-muted-foreground mb-1">VAT 포함 · 상품가+배송비</p>
-                    <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                    <p class="text-caption text-muted-foreground mb-1">VAT 포함 · 상품가+배송비</p>
+                    <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                       <span
                         v-for="(_, tier) in SMARTSTORE_TIER_LABELS"
                         :key="tier"
@@ -387,14 +387,14 @@ const ownStoreHintGroups = computed(() =>
                   <div>
                     <p class="font-semibold text-foreground mb-1">PG사별 카드 수수료</p>
                     <div v-for="group in ownStoreHintGroups" :key="`tier-${group.name}`" class="mt-1.5">
-                      <p class="text-[10px] font-semibold text-foreground mb-1">{{ group.name }}</p>
-                      <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                      <p class="text-caption font-semibold text-foreground mb-1">{{ group.name }}</p>
+                      <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                         <span v-for="row in group.rows" :key="row.tier" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                           <span class="text-muted-foreground">{{ row.tier }}</span>
                           <span class="font-semibold">{{ row.rate }}</span>
                         </span>
                       </div>
-                      <p v-if="group.note" class="mt-1 text-[9px] text-muted-foreground">{{ group.note }}</p>
+                      <p v-if="group.note" class="mt-1 text-caption text-muted-foreground">{{ group.note }}</p>
                     </div>
                   </div>
                 </div>
@@ -434,8 +434,8 @@ const ownStoreHintGroups = computed(() =>
                 <div class="space-y-2">
                   <p class="font-semibold text-foreground">카테고리별 판매 수수료</p>
                   <div v-for="market in MARKET_CAT_FEES" :key="market.label" class="space-y-0.5">
-                    <p class="text-[10px] font-medium text-muted-foreground">{{ market.label }}</p>
-                    <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                    <p class="text-caption font-medium text-muted-foreground">{{ market.label }}</p>
+                    <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                       <span
                         v-for="(label, key) in CAT_SHORT"
                         :key="`${market.label}-${key}`"
@@ -447,7 +447,7 @@ const ownStoreHintGroups = computed(() =>
                       </span>
                     </div>
                   </div>
-                  <p class="text-[9px] text-muted-foreground">
+                  <p class="text-caption text-muted-foreground">
                     배송비 수수료: 공통 <strong class="text-foreground">3.3%</strong> (유료배송 시)
                   </p>
                 </div>
@@ -506,16 +506,16 @@ const ownStoreHintGroups = computed(() =>
               <div class="space-y-2">
                 <p class="font-semibold text-foreground">PG사별 등급 수수료</p>
                 <div v-for="group in ownStoreHintGroups" :key="group.name" class="mt-1.5">
-                  <p class="text-[10px] font-semibold text-foreground mb-1">{{ group.name }}</p>
-                  <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                  <p class="text-caption font-semibold text-foreground mb-1">{{ group.name }}</p>
+                  <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                     <span v-for="row in group.rows" :key="row.tier" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                       <span class="text-muted-foreground">{{ row.tier }}</span>
                       <span class="font-semibold">{{ row.rate }}</span>
                     </span>
                   </div>
-                  <p v-if="group.note" class="mt-1 text-[9px] text-muted-foreground">{{ group.note }}</p>
+                  <p v-if="group.note" class="mt-1 text-caption text-muted-foreground">{{ group.note }}</p>
                 </div>
-                <p class="text-[9px] text-muted-foreground">
+                <p class="text-caption text-muted-foreground">
                   비교 결과는 <strong class="text-foreground">선택한 매출등급 기준</strong>으로 계산됩니다
                 </p>
               </div>
@@ -528,7 +528,7 @@ const ownStoreHintGroups = computed(() =>
             <span
               v-for="key in OWN_STORE_ORDER"
               :key="key"
-              class="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-bold text-foreground"
+              class="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-caption font-bold text-foreground"
             >
               {{ OWN_STORE_META[key].shortName }}
             </span>

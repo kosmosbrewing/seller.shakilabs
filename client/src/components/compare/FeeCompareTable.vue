@@ -46,7 +46,7 @@ const copyRows = computed(() =>
       <div class="flex items-center justify-between gap-2">
         <div class="space-y-1">
           <p class="text-caption text-muted-foreground">수수료 낮은순 · 현재 입력값 기준 건당 수수료와 순이익 비교</p>
-          <p class="text-[10px] text-muted-foreground sm:text-caption">수수료율은 VAT 포함 총 수수료 기준입니다.</p>
+          <p class="text-caption text-muted-foreground sm:text-caption">수수료율은 VAT 포함 총 수수료 기준입니다.</p>
         </div>
         <span class="md:hidden"><CopyTableButton :headers="copyHeaders" :rows="copyRows" /></span>
       </div>
@@ -71,21 +71,21 @@ const copyRows = computed(() =>
             </span>
             <div class="min-w-0 flex-1">
               <span class="block truncate text-body font-bold text-foreground">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
-              <span v-if="isOwnStore(result.marketKey)" class="text-[10px] text-muted-foreground">등급 연동</span>
+              <span v-if="isOwnStore(result.marketKey)" class="text-caption text-muted-foreground">등급 연동</span>
             </div>
           </div>
           <div class="space-y-0 border-t border-border/60">
             <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
-              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
-              <span class="text-right text-[11px] font-semibold tabular-nums text-status-danger sm:text-caption">{{ formatWon(result.totalFee) }}</span>
+              <span class="text-caption font-semibold text-muted-foreground sm:text-caption">총 수수료</span>
+              <span class="text-right text-caption font-semibold tabular-nums text-status-danger sm:text-caption">{{ formatWon(result.totalFee) }}</span>
             </div>
             <div class="grid grid-cols-[4.5rem_1fr] items-center border-b border-border/40 px-3.5 py-2.5">
-              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
+              <span class="text-caption font-semibold text-muted-foreground sm:text-caption">수수료율(VAT 포함)</span>
               <span class="text-right text-body font-bold tabular-nums" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">{{ formatPercent(result.totalFeeRate, 2) }}</span>
             </div>
             <div class="grid grid-cols-[4.5rem_1fr] items-center px-3.5 py-2.5">
-              <span class="text-[11px] font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
-              <span class="text-right text-[11px] font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
+              <span class="text-caption font-semibold text-muted-foreground sm:text-caption">건당 순이익</span>
+              <span class="text-right text-caption font-bold tabular-nums sm:text-caption" :class="idx === 0 ? 'text-status-success' : 'text-foreground'">{{ formatWon(result.netProfit) }}</span>
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ const copyRows = computed(() =>
                   </span>
                   <div class="flex items-center gap-1.5">
                     <span class="whitespace-nowrap text-body font-semibold">{{ ALL_CHANNEL_META[result.marketKey].name }}</span>
-                    <span v-if="isOwnStore(result.marketKey)" class="text-[10px] text-muted-foreground">(등급 연동)</span>
+                    <span v-if="isOwnStore(result.marketKey)" class="text-caption text-muted-foreground">(등급 연동)</span>
                     <ShBadge v-if="idx === 0" tone="success">
                       <BadgeCheck class="h-3.5 w-3.5" />
                       추천

@@ -157,13 +157,13 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
 
       <div class="retro-panel-content space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <p class="text-[11px] text-muted-foreground sm:text-body">
+          <p class="text-caption text-muted-foreground sm:text-body">
             오픈마켓의 판매 수수료·배송비 수수료·정산주기를 비교합니다.
           </p>
           <div class="ml-auto flex flex-wrap items-center gap-2">
             <span
               v-if="lowestFeeLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-caption font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
             >
               <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
               표기 최저 수수료 {{ lowestFeeLabel }}
@@ -196,8 +196,8 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                 :key="`m-${market.key}-${col.key}`"
                 class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
               >
-                <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
-                <span class="min-w-0 text-right text-[11px] font-semibold text-foreground sm:text-caption">
+                <span class="shrink-0 text-caption font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                <span class="min-w-0 text-right text-caption font-semibold text-foreground sm:text-caption">
                   <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
                     {{ market[col.key].core }}
                     <!-- 판매 수수료: 등급/카테고리별 테이블 힌트 -->
@@ -206,15 +206,15 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <div v-for="(section, sIdx) in market.salesFeeBreakdown.sections" :key="sIdx">
                           <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                           <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
-                          <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                          <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                          <p v-if="section.note" class="text-caption text-muted-foreground mb-1.5">{{ section.note }}</p>
+                          <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                             <span v-for="row in section.rows" :key="row.label" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                               <span class="text-muted-foreground">{{ row.label }}</span>
                               <span class="font-semibold">{{ row.rate }}</span>
                             </span>
                           </div>
                         </div>
-                        <p v-if="market.salesFeeBreakdown.footnote" class="text-[9px] text-muted-foreground">
+                        <p v-if="market.salesFeeBreakdown.footnote" class="text-caption text-muted-foreground">
                           {{ market.salesFeeBreakdown.footnote }}
                         </p>
                       </div>
@@ -227,8 +227,8 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                           <div v-for="(section, sIdx) in market.noteBreakdown.sections" :key="sIdx">
                             <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                             <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
-                            <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px] tabular-nums">
+                            <p v-if="section.note" class="text-caption text-muted-foreground mb-1.5">{{ section.note }}</p>
+                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-caption tabular-nums">
                               <tbody>
                                 <tr v-for="row in section.rows" :key="row.label" class="border-b border-border/20 last:border-0">
                                   <td class="py-1 pr-2">{{ row.label }}</td>
@@ -242,7 +242,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <!-- 마켓 특징 -->
                         <template v-if="market.noteFeatures">
                           <p class="font-semibold text-foreground">{{ market.name }} 특징</p>
-                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-caption">
                             <tbody>
                               <tr v-for="feat in market.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -338,15 +338,15 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <div v-for="(section, sIdx) in market.salesFeeBreakdown.sections" :key="sIdx">
                           <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                           <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
-                          <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                          <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                          <p v-if="section.note" class="text-caption text-muted-foreground mb-1.5">{{ section.note }}</p>
+                          <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                             <span v-for="row in section.rows" :key="row.label" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                               <span class="text-muted-foreground">{{ row.label }}</span>
                               <span class="font-semibold">{{ row.rate }}</span>
                             </span>
                           </div>
                         </div>
-                        <p v-if="market.salesFeeBreakdown.footnote" class="text-[9px] text-muted-foreground">
+                        <p v-if="market.salesFeeBreakdown.footnote" class="text-caption text-muted-foreground">
                           {{ market.salesFeeBreakdown.footnote }}
                         </p>
                       </div>
@@ -359,8 +359,8 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                           <div v-for="(section, sIdx) in market.noteBreakdown.sections" :key="sIdx">
                             <hr v-if="sIdx > 0" class="border-border/30 mb-2" />
                             <p class="font-semibold text-foreground mb-1">{{ section.subtitle }}</p>
-                            <p v-if="section.note" class="text-[9px] text-muted-foreground mb-1.5">{{ section.note }}</p>
-                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px] tabular-nums">
+                            <p v-if="section.note" class="text-caption text-muted-foreground mb-1.5">{{ section.note }}</p>
+                            <table aria-label="오픈마켓 수수료 비교" class="w-full text-caption tabular-nums">
                               <tbody>
                                 <tr v-for="row in section.rows" :key="row.label" class="border-b border-border/20 last:border-0">
                                   <td class="py-1 pr-2">{{ row.label }}</td>
@@ -374,7 +374,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
                         <!-- 마켓 특징 -->
                         <template v-if="market.noteFeatures">
                           <p class="font-semibold text-foreground">{{ market.name }} 특징</p>
-                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="오픈마켓 수수료 비교" class="w-full text-caption">
                             <tbody>
                               <tr v-for="feat in market.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -399,7 +399,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, marketKey: Op
         </div>
         </div>
 
-        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-[10px] leading-4 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
+        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-caption leading-4 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
           <BadgeAlert class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
           <div class="space-y-1">
             <p>수수료율은 카테고리, 매출 등급, 계약 조건에 따라 달라질 수 있습니다.</p>

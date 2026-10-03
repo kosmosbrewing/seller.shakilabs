@@ -1,4 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
+import { validateNoTinyTextUtilities } from "./validate-no-tiny-text.mjs";
+import { validateParagraphLength } from "./validate-paragraph-length.mjs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLIC_ROUTES, SEO_ROUTES } from "./seo-routes.mjs";
@@ -341,3 +343,8 @@ console.log(
   + "both Vercel configs, " + utilityCount + " generated colour utilities, "
   + "and custom HTTP 404 output."
 );
+
+// v8b(2026-10-03): 13px 미만 글자 소스 게이트 + 빌드 HTML 문단 ≤250자 게이트
+validateNoTinyTextUtilities({ projectRoot });
+// shipping-compare: 택배사 5곳 운임 기울기를 한 문장에 나열(문장 경계 없음) — 276자까지 허용, 사실 불변
+validateParagraphLength({ distRoot, known: { "shipping-compare.html": 276 } });

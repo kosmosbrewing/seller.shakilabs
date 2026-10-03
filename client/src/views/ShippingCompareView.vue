@@ -354,7 +354,7 @@ function formatPostalRanges(ranges: string[]): string {
               <div class="rounded-xl border border-border/60 p-3">
                 <div class="space-y-1.5">
                   <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">1</span>
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-caption font-bold text-primary-foreground">1</span>
                     <label for="shipping-weight-input">무게</label>
                   </p>
                 </div>
@@ -402,7 +402,7 @@ function formatPostalRanges(ranges: string[]): string {
               <div class="rounded-xl border border-border/60 p-3">
                 <div class="space-y-1.5">
                   <p class="inline-flex items-center gap-1.5 text-body font-bold text-foreground">
-                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">2</span>
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-caption font-bold text-primary-foreground">2</span>
                     <span>크기</span>
                   </p>
                 </div>
@@ -468,7 +468,7 @@ function formatPostalRanges(ranges: string[]): string {
       </div>
 
       <div class="retro-panel-content space-y-1.5">
-        <p class="text-[11px] text-muted-foreground sm:text-body">
+        <p class="text-caption text-muted-foreground sm:text-body">
           상품 무게와 크기에 따라 택배사별 예상 운임을 비교합니다.
         </p>
         <p class="text-caption text-muted-foreground">
@@ -489,7 +489,7 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <p class="text-[11px] text-muted-foreground sm:text-body">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
+            <p class="text-caption text-muted-foreground sm:text-body">부피와 중량 조건에 따라 가장 유리한 택배사를 비교합니다.</p>
             <!-- 최저 예상 운임 배지는 결과 칸 요약(ShippingCheapestSummary)으로 옮겼다 -->
             <div class="ml-auto flex flex-wrap items-center gap-2">
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="generalCopyRows" /></span>
@@ -525,9 +525,9 @@ function formatPostalRanges(ranges: string[]): string {
                   :key="`m-general-${result.carrier.key}-${col.key}`"
                   class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
                 >
-                  <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                  <span class="shrink-0 text-caption font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
                   <span
-                    class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
+                    class="min-w-0 text-right text-caption font-semibold sm:text-caption"
                     :class="[
                       result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
                       col.key === 'totalFare' && cheapestGeneral?.carrier.key === result.carrier.key ? '!text-status-success' : '',
@@ -602,14 +602,14 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestGeneral?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
+                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-caption font-semibold text-status-success"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
                           </span>
                           <span
                             v-else-if="!result.isAvailable"
-                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-[11px] font-semibold text-status-warning"
+                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-caption font-semibold text-status-warning"
                           >
                             접수 불가
                           </span>
@@ -663,7 +663,7 @@ function formatPostalRanges(ranges: string[]): string {
         </div>
         <div class="retro-panel-content space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <p class="text-[11px] text-muted-foreground sm:text-body">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
+            <p class="text-caption text-muted-foreground sm:text-body">소형 발송에 유리하지만 중량·부피 제한을 먼저 확인하세요.</p>
             <!-- 최저 예상 운임 배지는 결과 칸 요약(ShippingCheapestSummary)으로 옮겼다 -->
             <div class="ml-auto flex flex-wrap items-center gap-2">
               <span class="md:hidden"><CopyTableButton :headers="shippingCopyHeaders" :rows="convenienceCopyRows" /></span>
@@ -699,9 +699,9 @@ function formatPostalRanges(ranges: string[]): string {
                   :key="`m-conv-${result.carrier.key}-${col.key}`"
                   class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
                 >
-                  <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                  <span class="shrink-0 text-caption font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
                   <span
-                    class="min-w-0 text-right text-[11px] font-semibold sm:text-caption"
+                    class="min-w-0 text-right text-caption font-semibold sm:text-caption"
                     :class="[
                       result.isAvailable ? 'text-foreground' : 'text-muted-foreground',
                       col.key === 'totalFare' && cheapestConvenience?.carrier.key === result.carrier.key ? '!text-status-success' : '',
@@ -776,14 +776,14 @@ function formatPostalRanges(ranges: string[]): string {
                           </p>
                           <span
                             v-if="cheapestConvenience?.carrier.key === result.carrier.key"
-                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
+                            class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-caption font-semibold text-status-success"
                           >
                             <BadgeCheck class="h-3.5 w-3.5" />
                             최저
                           </span>
                           <span
                             v-else-if="!result.isAvailable"
-                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-[11px] font-semibold text-status-warning"
+                            class="inline-flex items-center rounded-full border border-status-warning/40 bg-status-warning/10 px-2 py-0.5 text-caption font-semibold text-status-warning"
                           >
                             접수 불가
                           </span>
@@ -853,7 +853,7 @@ function formatPostalRanges(ranges: string[]): string {
             >
               <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3">
                 <p class="text-body font-bold text-foreground">{{ group.group }}</p>
-                <span class="rounded-full border border-border/70 bg-muted/15 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                <span class="rounded-full border border-border/70 bg-muted/15 px-2 py-0.5 text-caption font-semibold text-muted-foreground">
                   {{ group.clusters.length }}개 지역
                 </span>
               </summary>
@@ -866,7 +866,7 @@ function formatPostalRanges(ranges: string[]): string {
                   <div class="flex items-start justify-between gap-3">
                     <div>
                       <p class="text-caption font-bold text-foreground">{{ cluster.zone }}</p>
-                      <p v-if="cluster.areas" class="mt-0.5 text-[11px] text-muted-foreground">{{ cluster.areas }}</p>
+                      <p v-if="cluster.areas" class="mt-0.5 text-caption text-muted-foreground">{{ cluster.areas }}</p>
                     </div>
                     <CompareHint v-if="cluster.note" :tooltip="cluster.note" />
                   </div>

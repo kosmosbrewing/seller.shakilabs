@@ -191,17 +191,17 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
       <div class="retro-panel-content space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="space-y-1">
-            <p class="text-[11px] text-muted-foreground sm:text-body">
+            <p class="text-caption text-muted-foreground sm:text-body">
               결제 서비스의 가입비·연회비·카드 수수료·정산 조건을 비교합니다.
             </p>
-            <p class="text-[10px] text-muted-foreground/90 sm:text-caption">
+            <p class="text-caption text-muted-foreground/90 sm:text-caption">
               카드 수수료 표기는 공식 원문 기준이며, VAT 별도 항목은 상단 최저 실부담 계산에서 10%를 가산합니다.
             </p>
           </div>
           <div class="ml-auto flex flex-wrap items-center gap-2">
             <span
               v-if="lowestCardFeeLabel"
-              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-[11px] font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
+              class="inline-flex max-w-full flex-wrap items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2.5 py-1 text-caption font-semibold leading-tight text-foreground dark:border-status-success/35 dark:bg-status-success/15 dark:text-status-success sm:text-caption"
             >
               <BadgeCheck class="h-3.5 w-3.5 text-status-success" />
               영세 기준 최저 실부담 {{ lowestCardFeeLabel }}
@@ -240,21 +240,21 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                 :key="`m-${gateway.key}-${col.key}`"
                 class="flex items-center justify-between gap-3 border-b border-border/40 px-3.5 py-2.5 last:border-b-0"
               >
-                <span class="shrink-0 text-[11px] font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
-                <span class="min-w-0 text-right text-[11px] font-semibold text-foreground sm:text-caption">
+                <span class="shrink-0 text-caption font-semibold text-muted-foreground sm:text-caption">{{ col.label }}</span>
+                <span class="min-w-0 text-right text-caption font-semibold text-foreground sm:text-caption">
                   <span class="inline-flex max-w-full items-center justify-end gap-0.5 whitespace-normal break-words">
                     {{ getCell(gateway, col.key).core }}
                     <!-- 카드 수수료: 등급별 칩 힌트 -->
                     <CompareHint v-if="col.key === 'cardFee' && gateway.cardFeeTiers">
                       <div class="space-y-1.5">
                         <p class="font-semibold text-foreground">등급별 카드 수수료</p>
-                        <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                        <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                           <span v-for="t in gateway.cardFeeTiers.tiers" :key="t.tier" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                             <span class="text-muted-foreground">{{ t.tier }}</span>
                             <span class="font-semibold">{{ t.rate }}</span>
                           </span>
                         </div>
-                        <p class="text-[9px] text-muted-foreground">{{ gateway.cardFeeTiers.vatNote }}</p>
+                        <p class="text-caption text-muted-foreground">{{ gateway.cardFeeTiers.vatNote }}</p>
                       </div>
                     </CompareHint>
                     <!-- 비고: noteFeatures 또는 네이버 비교 테이블 -->
@@ -263,7 +263,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 네이버: 결제형 vs 주문형 비교 -->
                         <template v-if="gateway.key === 'naverOrder' || gateway.key === 'naverPayment'">
                           <p class="font-semibold text-foreground">결제형 vs 주문형 차이점</p>
-                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-caption">
                             <thead>
                               <tr class="border-b border-border/50">
                                 <th scope="col" class="pb-1.5 pr-1.5 text-left font-medium text-muted-foreground">구분</th>
@@ -284,7 +284,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 서비스 특징 -->
                         <template v-if="gateway.noteFeatures">
                           <p class="font-semibold text-foreground">{{ gateway.name }} 특징</p>
-                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-caption">
                             <tbody>
                               <tr v-for="feat in gateway.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -353,7 +353,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <span class="text-body font-semibold">{{ gateway.name }}</span>
                         <span
                           v-if="isLowestCardFeeGateway(gateway.key)"
-                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-[11px] font-semibold text-status-success"
+                          class="inline-flex items-center gap-1 rounded-full border border-status-success/40 bg-status-success/10 px-2 py-0.5 text-caption font-semibold text-status-success"
                         >
                           <BadgeCheck class="h-3.5 w-3.5" />
                           최저
@@ -374,13 +374,13 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                     <CompareHint v-if="col.key === 'cardFee' && gateway.cardFeeTiers">
                       <div class="space-y-1.5">
                         <p class="font-semibold text-foreground">등급별 카드 수수료</p>
-                        <div class="flex flex-wrap gap-1 text-[10px] tabular-nums">
+                        <div class="flex flex-wrap gap-1 text-caption tabular-nums">
                           <span v-for="t in gateway.cardFeeTiers.tiers" :key="t.tier" class="inline-flex items-center gap-1 rounded-md bg-muted/60 px-1.5 py-0.5">
                             <span class="text-muted-foreground">{{ t.tier }}</span>
                             <span class="font-semibold">{{ t.rate }}</span>
                           </span>
                         </div>
-                        <p class="text-[9px] text-muted-foreground">{{ gateway.cardFeeTiers.vatNote }}</p>
+                        <p class="text-caption text-muted-foreground">{{ gateway.cardFeeTiers.vatNote }}</p>
                       </div>
                     </CompareHint>
                     <!-- 비고: noteFeatures 또는 네이버 비교 테이블 -->
@@ -389,7 +389,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 네이버: 결제형 vs 주문형 비교 -->
                         <template v-if="gateway.key === 'naverOrder' || gateway.key === 'naverPayment'">
                           <p class="font-semibold text-foreground">결제형 vs 주문형 차이점</p>
-                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-caption">
                             <thead>
                               <tr class="border-b border-border/50">
                                 <th scope="col" class="pb-1.5 pr-1.5 text-left font-medium text-muted-foreground">구분</th>
@@ -410,7 +410,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
                         <!-- 서비스 특징 -->
                         <template v-if="gateway.noteFeatures">
                           <p class="font-semibold text-foreground">{{ gateway.name }} 특징</p>
-                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-[10px]">
+                          <table aria-label="온라인 결제 수수료 비교" class="w-full text-caption">
                             <tbody>
                               <tr v-for="feat in gateway.noteFeatures" :key="feat.label" class="border-b border-border/20 last:border-0">
                                 <td class="py-1 pr-2 font-medium text-muted-foreground whitespace-nowrap">{{ feat.label }}</td>
@@ -435,7 +435,7 @@ function getCellBg(columnKey: CompareColumnKey, cell: CompareCell, gatewayKey: P
         </div>
         </div>
 
-        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-[10px] leading-4 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
+        <div class="mt-2 flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3.5 py-3 text-caption leading-4 text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/20 dark:text-amber-100 sm:text-caption">
           <BadgeAlert class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
           <div class="space-y-1">
             <p>정산주기는 계약 조건, 매출 규모, PG 연동 구조에 따라 달라질 수 있습니다.</p>
