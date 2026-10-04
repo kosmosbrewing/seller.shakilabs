@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
+import { validateBuiltFontSizes } from "./validate-built-font-sizes.mjs";
 import { validateNoTinyTextUtilities } from "./validate-no-tiny-text.mjs";
 import { validateParagraphLength } from "./validate-paragraph-length.mjs";
 import { dirname, resolve } from "node:path";
@@ -348,3 +349,7 @@ console.log(
 validateNoTinyTextUtilities({ projectRoot });
 // shipping-compare: 택배사 5곳 운임 기울기를 한 문장에 나열(문장 경계 없음) — 276자까지 허용, 사실 불변
 validateParagraphLength({ distRoot, known: { "shipping-compare.html": 276 } });
+
+// v8c(2026-10-04): 배포되는 CSS·HTML의 글자 크기를 직접 잰다 — 13px 미만은 차트 축 눈금(__scale)·차트 전용 text-[12px]만.
+const builtFontDeclarations = validateBuiltFontSizes({ distRoot: distRoot });
+console.log(`Validated built font sizes — ${builtFontDeclarations} declarations, 0 under 13px outside the chart-axis allowance.`);
